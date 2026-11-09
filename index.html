@@ -679,6 +679,81 @@
     padding:4px 6px;border-radius:8px;
   }
   .debt-empty{padding:14px 4px;color:var(--muted);font-size:13px;text-align:center}
+
+  /* ---------- Extra ---------- */
+  .extra-hero{
+    background:linear-gradient(135deg,#0f4a43,#1e6a5e);
+    border-color:transparent;color:#fff;
+    box-shadow:0 16px 34px rgba(15,74,67,.24);
+  }
+  .extra-hero .hero-top span{color:#c7ece3}
+  .extra-hero .hero-year{background:rgba(255,255,255,.16);color:#fff}
+  .extra-hero .hero-amount{color:#fff;font-size:clamp(30px,9vw,44px)}
+  .extra-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:14px}
+  .extra-stat{
+    background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.14);
+    border-radius:12px;padding:8px 9px;min-width:0;
+  }
+  .extra-stat span{
+    display:block;font-size:9px;font-weight:800;letter-spacing:.08em;
+    text-transform:uppercase;color:#c7ece3;white-space:nowrap;
+    overflow:hidden;text-overflow:ellipsis;
+  }
+  .extra-stat b{display:block;font-size:13px;font-weight:950;margin-top:3px;color:#fff;white-space:nowrap}
+  .mini-btn{
+    border:1px solid var(--line);background:#fff;color:var(--brand);
+    border-radius:999px;padding:6px 10px;font-size:9.5px;font-weight:850;
+    white-space:nowrap;max-width:48%;
+  }
+  .mini-btn:active{transform:scale(.97)}
+  .extra-form{display:grid;gap:10px}
+  .extra-form .btn{width:100%}
+  .extra-form .money-field{width:100%}
+  .check-field{
+    display:flex;align-items:center;gap:9px;min-height:46px;
+    font-size:12px;font-weight:800;color:var(--ink-2);
+  }
+  .check-field input{width:20px;height:20px;accent-color:var(--brand)}
+  @media (min-width:560px){
+    .extra-form{grid-template-columns:1fr 1fr}
+    .extra-form .field.full,.extra-form .check-field,.extra-form .btn{grid-column:1 / -1}
+  }
+  .extra-row{
+    display:grid;grid-template-columns:auto 1fr auto auto;gap:10px;align-items:center;
+    padding:10px 2px;border-bottom:1px solid var(--line-2);
+  }
+  .extra-row:last-child{border-bottom:0}
+  .extra-date{
+    width:42px;text-align:center;border-radius:10px;
+    background:var(--brand-soft);color:var(--brand);padding:5px 0;
+  }
+  .extra-date b{display:block;font-size:15px;line-height:1}
+  .extra-date span{display:block;font-size:8px;font-weight:900;letter-spacing:.08em;margin-top:2px}
+  .extra-main{min-width:0}
+  .extra-main b{display:block;font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .extra-main span{display:block;font-size:10px;color:var(--muted);font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-top:2px}
+  .extra-money{text-align:right;font-size:12px;font-weight:900;white-space:nowrap}
+  .extra-money small{display:block;font-size:9px;color:var(--muted);font-weight:800;margin-top:2px}
+  .extra-money small.collected{color:var(--brand)}
+  .extra-actions{display:flex;gap:4px;align-items:center}
+  .extra-state{
+    border:1px solid var(--line);background:#fff;border-radius:999px;
+    padding:5px 7px;font-size:9px;font-weight:850;color:var(--muted);white-space:nowrap;
+  }
+  .extra-state.collected{background:var(--brand-soft);border-color:#99f6e4;color:var(--brand)}
+  .extra-del{
+    width:26px;height:26px;border:0;border-radius:50%;
+    background:transparent;color:var(--muted);font-size:18px;line-height:1;
+  }
+  .extra-del:active{background:var(--line-2)}
+  .extra-empty{padding:14px 4px;color:var(--muted);font-size:13px;text-align:center}
+  @media (max-width:520px){
+    .extra-row{grid-template-columns:auto 1fr auto;grid-template-areas:"date main money" "actions actions actions";row-gap:6px}
+    .extra-date{grid-area:date}
+    .extra-main{grid-area:main}
+    .extra-money{grid-area:money}
+    .extra-actions{grid-area:actions;justify-content:flex-end}
+  }
   @media (max-width:520px){
     .debt-row{grid-template-columns:1fr auto;grid-template-areas:"main amount" "actions actions";row-gap:6px}
     .debt-main{grid-area:main}
@@ -692,7 +767,7 @@
     bottom:calc(10px + env(safe-area-inset-bottom));
     width:min(calc(100% - 22px),560px);
     z-index:50;
-    display:grid;grid-template-columns:repeat(5,1fr);gap:3px;
+    display:grid;grid-template-columns:repeat(6,1fr);gap:2px;
     padding:6px;
     background:rgba(255,253,248,.94);
     border:1px solid rgba(227,220,205,.95);
@@ -1013,6 +1088,81 @@
     <p class="footnote" data-i18n-html="footnote">Total general = suma de los 12 meses + premio del 1er semestre + premio del 2do semestre.<br>El ahorro del 15% se calcula solo con ENE, MAR, MAY, JUL, SEP y NOV.</p>
   </section>
 
+  <!-- ================= EXTRA ================= -->
+  <section class="view" id="view-extra">
+    <div class="section-head">
+      <div>
+        <p class="eyebrow" data-i18n="extraEyebrow">Ingresos aparte</p>
+        <h2 data-i18n="extraTitle">Extra</h2>
+      </div>
+      <span class="tag" data-i18n="extraSeparate">Aparte</span>
+    </div>
+
+    <div class="total-hero extra-hero">
+      <div class="hero-top">
+        <span data-i18n="extraMonthTotal">Total del mes</span>
+        <span class="hero-year" id="extraCountHero">0</span>
+      </div>
+      <div class="hero-amount" id="extraMonthTotal">₽ 0</div>
+      <div class="extra-stats">
+        <div class="extra-stat"><span data-i18n="extraYearTotal">Total del año</span><b id="extraYearTotal">₽ 0</b></div>
+        <div class="extra-stat"><span data-i18n="extraCollected">Cobrado</span><b id="extraCollectedTotal">₽ 0</b></div>
+        <div class="extra-stat"><span data-i18n="extraPending">Pendiente</span><b id="extraPendingTotal">₽ 0</b></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <h3 data-i18n="extraMonth">Mes</h3>
+        <span class="hint" id="extraMonthHint"></span>
+      </div>
+      <div class="month-strip" id="extraMonths"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <h3 data-i18n="extraAddTitle">Anotar trabajo extra</h3>
+        <button type="button" class="mini-btn" id="extraAutofill" data-i18n="extraAutofill">Usar últimos datos</button>
+      </div>
+      <div class="extra-form">
+        <label class="field">
+          <span data-i18n="extraDate">Fecha</span>
+          <input id="extraDate" type="date">
+        </label>
+        <label class="field">
+          <span data-i18n="extraClient">Cliente o agente</span>
+          <input id="extraClient" type="text" maxlength="60" data-i18n-ph="extraClientPlaceholder" placeholder="Ej.: Agencia Norte">
+        </label>
+        <label class="field full">
+          <span data-i18n="extraConcept">Concepto</span>
+          <input id="extraConcept" type="text" maxlength="80" data-i18n-ph="extraConceptPlaceholder" placeholder="Ej.: mudanza, reparación">
+        </label>
+        <label class="field">
+          <span data-i18n="extraAmount">Importe</span>
+          <span class="money-field">
+            <span>₽</span>
+            <input id="extraAmount" type="number" min="0" step="100" inputmode="numeric" placeholder="0">
+          </span>
+        </label>
+        <label class="check-field">
+          <input id="extraCollected" type="checkbox" checked>
+          <span data-i18n="extraCollected">Cobrado</span>
+        </label>
+        <button class="btn primary" id="extraAdd" type="button" data-i18n="extraAddButton">Agregar extra</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <h3 data-i18n="extraListTitle">Trabajos del mes</h3>
+        <span class="hint" id="extraListCount"></span>
+      </div>
+      <div id="extraList"></div>
+    </div>
+
+    <p class="hint" data-i18n="extraNote">Este dinero es aparte: no se suma al salario ni a las deudas.</p>
+  </section>
+
   <!-- ================= DEUDAS ================= -->
   <section class="view" id="view-deudas">
     <div class="section-head">
@@ -1157,6 +1307,10 @@
     <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>
     <span data-i18n="tabYear">Año</span>
   </button>
+  <button type="button" class="tab" data-view="extra">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="7" width="18" height="13" rx="2.5"/><path d="M8 7V5.5A2.5 2.5 0 0 1 10.5 3h3A2.5 2.5 0 0 1 16 5.5V7M3 12h18M12 12v3"/></svg>
+    <span data-i18n="extraTab">Extra</span>
+  </button>
   <button type="button" class="tab" data-view="deudas">
     <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h12v18l-3-2-3 2-3-2-3 2Z"/><path d="M9 8h6M9 12h6"/></svg>
     <span data-i18n="debtTab">Deudas</span>
@@ -1215,6 +1369,38 @@ const I18N = {
       tabMonth: "Month",
       tabYear: "Year",
       tabPrices: "Prices",
+      extraTab: "Extra",
+      extraEyebrow: "Side income",
+      extraTitle: "Extra",
+      extraSeparate: "Separate",
+      extraMonthTotal: "Month total",
+      extraYearTotal: "Year total",
+      extraCollected: "Collected",
+      extraPending: "Pending",
+      extraMonth: "Month",
+      extraAddTitle: "Add extra job",
+      extraDate: "Date",
+      extraClient: "Client or agent",
+      extraClientPlaceholder: "E.g.: North Agency",
+      extraConcept: "Description",
+      extraConceptPlaceholder: "E.g.: moving, repair",
+      extraAmount: "Amount",
+      extraAddButton: "Add extra",
+      extraAutofill: "Use last details",
+      extraAutofillEmpty: "No previous details to autofill.",
+      extraAutofilled: "Last job details loaded.",
+      extraListTitle: "Jobs this month",
+      extraEmpty: "No extra jobs this month yet.",
+      extraNote: "This money is separate: it doesn't add to salary or debts.",
+      extraDateInvalid: "The date must be in {year}.",
+      extraConceptRequired: "Enter a description or a client.",
+      extraAmountRequired: "Enter an amount greater than zero.",
+      extraAdded: "Extra job added.",
+      extraCollectedToast: "Marked as collected.",
+      extraPendingToast: "Marked as pending.",
+      extraDeleteTitle: "Delete extra job",
+      extraDeleteBody: "Delete “{concept}” from {date} for {amount}?",
+      extraDeleted: "Extra job deleted.",
       mainNav: "Main navigation",
       today: "Today",
       chooseDay: "Choose the day",
@@ -1402,6 +1588,38 @@ const I18N = {
       tabMonth: "Mes",
       tabYear: "Año",
       tabPrices: "Precios",
+      extraTab: "Extra",
+      extraEyebrow: "Ingresos aparte",
+      extraTitle: "Extra",
+      extraSeparate: "Aparte",
+      extraMonthTotal: "Total del mes",
+      extraYearTotal: "Total del año",
+      extraCollected: "Cobrado",
+      extraPending: "Pendiente",
+      extraMonth: "Mes",
+      extraAddTitle: "Anotar trabajo extra",
+      extraDate: "Fecha",
+      extraClient: "Cliente o agente",
+      extraClientPlaceholder: "Ej.: Agencia Norte",
+      extraConcept: "Concepto",
+      extraConceptPlaceholder: "Ej.: mudanza, reparación",
+      extraAmount: "Importe",
+      extraAddButton: "Agregar extra",
+      extraAutofill: "Usar últimos datos",
+      extraAutofillEmpty: "Todavía no hay datos para autorrellenar.",
+      extraAutofilled: "Datos del último trabajo cargados.",
+      extraListTitle: "Trabajos del mes",
+      extraEmpty: "Todavía no hay trabajos extra este mes.",
+      extraNote: "Este dinero es aparte: no se suma al salario ni a las deudas.",
+      extraDateInvalid: "La fecha debe ser del año {year}.",
+      extraConceptRequired: "Escribe un concepto o un cliente.",
+      extraAmountRequired: "Escribe un importe mayor que cero.",
+      extraAdded: "Trabajo extra agregado.",
+      extraCollectedToast: "Marcado como cobrado.",
+      extraPendingToast: "Marcado como pendiente.",
+      extraDeleteTitle: "Borrar trabajo extra",
+      extraDeleteBody: "¿Borrar «{concept}» del {date} por {amount}?",
+      extraDeleted: "Trabajo extra borrado.",
       mainNav: "Navegación principal",
       today: "Hoy",
       chooseDay: "Elige el día",
@@ -1588,6 +1806,38 @@ const I18N = {
       tabMonth: "Oy",
       tabYear: "Yil",
       tabPrices: "Narxlar",
+      extraTab: "Extra",
+      extraEyebrow: "Alohida daromad",
+      extraTitle: "Extra",
+      extraSeparate: "Alohida",
+      extraMonthTotal: "Oy jami",
+      extraYearTotal: "Yil jami",
+      extraCollected: "Olingan",
+      extraPending: "Kutilmoqda",
+      extraMonth: "Oy",
+      extraAddTitle: "Qo‘shimcha ish yozish",
+      extraDate: "Sana",
+      extraClient: "Mijoz yoki agent",
+      extraClientPlaceholder: "Masalan: Shimol agentligi",
+      extraConcept: "Tavsif",
+      extraConceptPlaceholder: "Masalan: ko‘chirish, ta’mirlash",
+      extraAmount: "Summa",
+      extraAddButton: "Qo‘shimcha qo‘shish",
+      extraAutofill: "Oxirgi ma’lumotlar",
+      extraAutofillEmpty: "Avtomatik to‘ldirish uchun ma’lumot yo‘q.",
+      extraAutofilled: "Oxirgi ish ma’lumotlari yuklandi.",
+      extraListTitle: "Oydagi ishlar",
+      extraEmpty: "Bu oyda hali qo‘shimcha ish yo‘q.",
+      extraNote: "Bu pul alohida: maoshga ham, qarzga ham qo‘shilmaydi.",
+      extraDateInvalid: "Sana {year}-yil ichida bo‘lishi kerak.",
+      extraConceptRequired: "Tavsif yoki mijoz kiriting.",
+      extraAmountRequired: "Noldan katta summa kiriting.",
+      extraAdded: "Qo‘shimcha ish qo‘shildi.",
+      extraCollectedToast: "Olingan deb belgilandi.",
+      extraPendingToast: "Kutilmoqda deb belgilandi.",
+      extraDeleteTitle: "Qo‘shimcha ishni o‘chirish",
+      extraDeleteBody: "«{concept}» ({date}, {amount}) o‘chirilsinmi?",
+      extraDeleted: "Qo‘shimcha ish o‘chirildi.",
       mainNav: "Asosiy navigatsiya",
       today: "Bugun",
       chooseDay: "Kunni tanlang",
@@ -1775,6 +2025,38 @@ const I18N = {
       tabMonth: "Месяц",
       tabYear: "Год",
       tabPrices: "Цены",
+      extraTab: "Халтура",
+      extraEyebrow: "Отдельный доход",
+      extraTitle: "Халтура",
+      extraSeparate: "Отдельно",
+      extraMonthTotal: "Итого за месяц",
+      extraYearTotal: "Итого за год",
+      extraCollected: "Получено",
+      extraPending: "Ожидает",
+      extraMonth: "Месяц",
+      extraAddTitle: "Записать халтуру",
+      extraDate: "Дата",
+      extraClient: "Клиент или агент",
+      extraClientPlaceholder: "Напр.: Агентство Север",
+      extraConcept: "Описание",
+      extraConceptPlaceholder: "Напр.: переезд, ремонт",
+      extraAmount: "Сумма",
+      extraAddButton: "Добавить халтуру",
+      extraAutofill: "Последние данные",
+      extraAutofillEmpty: "Нет данных для автозаполнения.",
+      extraAutofilled: "Данные последней работы загружены.",
+      extraListTitle: "Работы за месяц",
+      extraEmpty: "За этот месяц халтуры пока нет.",
+      extraNote: "Эти деньги отдельно: не прибавляются к зарплате и долгам.",
+      extraDateInvalid: "Дата должна быть в {year} году.",
+      extraConceptRequired: "Введите описание или клиента.",
+      extraAmountRequired: "Введите сумму больше нуля.",
+      extraAdded: "Халтура добавлена.",
+      extraCollectedToast: "Отмечено как получено.",
+      extraPendingToast: "Отмечено как ожидает.",
+      extraDeleteTitle: "Удалить халтуру",
+      extraDeleteBody: "Удалить «{concept}» от {date} на {amount}?",
+      extraDeleted: "Халтура удалена.",
       mainNav: "Основная навигация",
       today: "Сегодня",
       chooseDay: "Выберите день",
@@ -2041,7 +2323,7 @@ const $ = (sel, root = document) => root.querySelector(sel);
 const $$ = (sel, root = document) => Array.from(root.querySelectorAll(sel));
 
 let state;
-let ui = {view: "hoy", month: CURRENT_MONTH, day: CURRENT_DAY};
+let ui = {view: "hoy", month: CURRENT_MONTH, day: CURRENT_DAY, extraMonth: CURRENT_MONTH};
 let debtFormMonth = CURRENT_MONTH + 1;
 let saveTimer = null;
 let saveStateTimer = null;
@@ -2142,7 +2424,7 @@ function seedYear(){
 }
 
 function seedState(){
-  return {version: 1, activeYear: 2026, years: {"2026": seedYear()}, debts: [], officialSalary: DEFAULT_OFFICIAL_SALARY};
+  return {version: 1, activeYear: 2026, years: {"2026": seedYear()}, debts: [], extra: [], officialSalary: DEFAULT_OFFICIAL_SALARY};
 }
 
 function normalizeYear(raw){
@@ -2201,6 +2483,34 @@ function normalizeDebts(raw){
   return out;
 }
 
+function normalizeExtra(raw){
+  if (!Array.isArray(raw)) return [];
+  const out = [];
+  for (let i = 0; i < raw.length; i++){
+    const job = raw[i];
+    if (!job || typeof job !== "object") continue;
+    const year = parseInt(job.year, 10);
+    const month = parseInt(job.month, 10);
+    const day = parseInt(job.day, 10);
+    const amount = Math.round(nonNeg(job.amount));
+    if (!(year >= 2019 && year <= 2100) || !(month >= 1 && month <= 12)) continue;
+    if (!(day >= 1 && day <= daysInMonth(year, month - 1))) continue;
+    if (amount <= 0) continue;
+    out.push({
+      id: String(job.id || ("extra-" + year + "-" + month + "-" + i + "-" + Date.now())),
+      year,
+      month,
+      day,
+      client: String(job.client ?? "").trim().slice(0, 60),
+      concept: String(job.concept ?? "").trim().slice(0, 80),
+      amount,
+      collected: job.collected !== false,
+      createdAt: Number.isFinite(Number(job.createdAt)) ? Number(job.createdAt) : Date.now()
+    });
+  }
+  return out;
+}
+
 function normalizeOfficialSalary(value){
   const n = Math.round(Number(value));
   return Number.isFinite(n) && n >= 0 ? n : DEFAULT_OFFICIAL_SALARY;
@@ -2253,6 +2563,7 @@ function loadState(){
       activeYear,
       years,
       debts: normalizeDebts(raw.debts),
+      extra: normalizeExtra(raw.extra),
       officialSalary: normalizeOfficialSalary(raw.officialSalary)
     },
     fresh: false,
@@ -2597,6 +2908,7 @@ function setView(view){
   }
   if (view === "mes") renderMonth();
   if (view === "anio") renderAnnual();
+  if (view === "extra") renderExtra();
   if (view === "deudas"){
     debtFormMonth = ui.month + 1;
     renderDebts();
@@ -3215,6 +3527,189 @@ async function deleteDebt(id){
 /* ============================================================
    Render general
    ============================================================ */
+function allExtra(){
+  return Array.isArray(state.extra) ? state.extra : [];
+}
+
+function extraMonthStats(year, month){
+  let total = 0, collected = 0, pending = 0, count = 0;
+  for (const job of allExtra()){
+    if (job.year !== year || job.month !== month) continue;
+    total += job.amount;
+    count++;
+    if (job.collected) collected += job.amount;
+    else pending += job.amount;
+  }
+  return {total, collected, pending, count};
+}
+
+function extraYearTotal(year){
+  return allExtra().reduce((sum, job) => sum + (job.year === year ? job.amount : 0), 0);
+}
+
+function extraDefaultDate(year, month){
+  if (year === CURRENT_YEAR && month === CURRENT_MONTH){
+    return `${CURRENT_YEAR}-${String(CURRENT_MONTH + 1).padStart(2, "0")}-${String(CURRENT_DAY).padStart(2, "0")}`;
+  }
+  return `${year}-${String(month + 1).padStart(2, "0")}-01`;
+}
+
+function renderExtraMonths(){
+  const container = $("#extraMonths");
+  if (!container) return;
+  const year = state.activeYear;
+  container.innerHTML = MONTHS_SHORT.map((name, index) => {
+    const count = allExtra().filter(job => job.year === year && job.month === index + 1).length;
+    const classes = ["month-chip"];
+    if (index === ui.extraMonth) classes.push("active");
+    if (count > 0) classes.push("has-data");
+    return `<button type="button" class="${classes.join(" ")}" data-month="${index}"
+      aria-pressed="${index === ui.extraMonth}" aria-label="${MONTHS_LONG[index]}">${name}</button>`;
+  }).join("");
+}
+
+function renderExtraList(){
+  const list = $("#extraList");
+  if (!list) return;
+  const jobs = allExtra()
+    .filter(job => job.year === state.activeYear && job.month === ui.extraMonth + 1)
+    .sort((a, b) => (b.day - a.day) || (b.createdAt - a.createdAt));
+  $("#extraListCount").textContent = jobs.length ? String(jobs.length) : "";
+  if (!jobs.length){
+    list.innerHTML = `<p class="extra-empty">${esc(t("extraEmpty"))}</p>`;
+    return;
+  }
+  list.innerHTML = jobs.map(job => {
+    const title = job.client || job.concept || "—";
+    const subtitle = job.client ? job.concept : "";
+    return `
+    <div class="extra-row" data-id="${esc(job.id)}">
+      <div class="extra-date"><b>${job.day}</b><span>${MONTHS_SHORT[job.month - 1]}</span></div>
+      <div class="extra-main">
+        <b>${esc(title)}</b>
+        ${subtitle ? `<span>${esc(subtitle)}</span>` : ""}
+      </div>
+      <div class="extra-money">${money(job.amount)}<small class="${job.collected ? "collected" : ""}">${esc(job.collected ? t("extraCollected") : t("extraPending"))}</small></div>
+      <div class="extra-actions">
+        <button type="button" class="extra-state${job.collected ? " collected" : ""}" data-act="toggle">${esc(job.collected ? t("extraCollected") : t("extraPending"))}</button>
+        <button type="button" class="extra-del" data-act="del" aria-label="${esc(t("delete"))}">×</button>
+      </div>
+    </div>`;
+  }).join("");
+}
+
+function renderExtra(){
+  const stats = extraMonthStats(state.activeYear, ui.extraMonth + 1);
+  $("#extraMonthTotal").textContent = money(stats.total);
+  $("#extraCountHero").textContent = stats.count;
+  $("#extraYearTotal").textContent = money(extraYearTotal(state.activeYear));
+  $("#extraCollectedTotal").textContent = money(stats.collected);
+  $("#extraPendingTotal").textContent = money(stats.pending);
+  $("#extraMonthHint").textContent = `${MONTHS_LONG[ui.extraMonth]} ${state.activeYear}`;
+
+  const dateInput = $("#extraDate");
+  if (dateInput){
+    dateInput.min = `${state.activeYear}-01-01`;
+    dateInput.max = `${state.activeYear}-12-31`;
+    const current = dateInput.value ? dateInput.value.split("-").map(Number) : null;
+    if (!current || current[0] !== state.activeYear || current[1] !== ui.extraMonth + 1){
+      dateInput.value = extraDefaultDate(state.activeYear, ui.extraMonth);
+    }
+  }
+
+  renderExtraMonths();
+  renderExtraList();
+}
+
+function addExtra(){
+  const dateInput = $("#extraDate");
+  const parts = String(dateInput.value || "").split("-").map(Number);
+  const [year, month, day] = parts;
+  if (!(year === state.activeYear && month >= 1 && month <= 12 && day >= 1 && day <= daysInMonth(year, month - 1))){
+    toast(t("extraDateInvalid", {year: state.activeYear}));
+    dateInput.focus();
+    return;
+  }
+  const concept = $("#extraConcept").value.trim().slice(0, 80);
+  const client = $("#extraClient").value.trim().slice(0, 60);
+  if (!concept && !client){
+    toast(t("extraConceptRequired"));
+    $("#extraConcept").focus();
+    return;
+  }
+  const amount = Math.round(nonNeg($("#extraAmount").value));
+  if (amount <= 0){
+    toast(t("extraAmountRequired"));
+    $("#extraAmount").focus();
+    return;
+  }
+
+  state.extra = allExtra().concat([{
+    id: "extra-" + Date.now() + "-" + Math.random().toString(36).slice(2, 7),
+    year,
+    month,
+    day,
+    client,
+    concept,
+    amount,
+    collected: $("#extraCollected").checked,
+    createdAt: Date.now()
+  }]);
+  saveNow();
+  ui.extraMonth = month - 1;
+  $("#extraClient").value = "";
+  $("#extraConcept").value = "";
+  $("#extraAmount").value = "";
+  $("#extraCollected").checked = true;
+  renderExtra();
+  $("#extraDate").value = extraDefaultDate(year, month - 1);
+  toast(t("extraAdded"));
+}
+
+function autofillExtra(){
+  const jobs = allExtra().slice().sort((a, b) => b.createdAt - a.createdAt);
+  const last = jobs[0];
+  if (!last || (!last.client && !last.concept)){
+    toast(t("extraAutofillEmpty"));
+    return;
+  }
+  $("#extraClient").value = last.client || "";
+  $("#extraConcept").value = last.concept || "";
+  $("#extraCollected").checked = last.collected !== false;
+  $("#extraAmount").value = "";
+  $("#extraAmount").focus();
+  toast(t("extraAutofilled"));
+}
+
+function toggleExtra(id){
+  const job = allExtra().find(item => item.id === id);
+  if (!job) return;
+  job.collected = !job.collected;
+  saveNow();
+  renderExtra();
+  toast(job.collected ? t("extraCollectedToast") : t("extraPendingToast"));
+}
+
+async function deleteExtra(id){
+  const job = allExtra().find(item => item.id === id);
+  if (!job) return;
+  const ok = await confirmDialog(
+    t("extraDeleteTitle"),
+    t("extraDeleteBody", {
+      concept: esc(job.concept || job.client || "—"),
+      amount: money(job.amount),
+      date: `${job.day} ${MONTHS_SHORT[job.month - 1]} ${job.year}`
+    }),
+    t("delete"),
+    true
+  );
+  if (!ok) return;
+  state.extra = allExtra().filter(item => item.id !== id);
+  saveNow();
+  renderExtra();
+  toast(t("extraDeleted"));
+}
+
 function renderAll(){
   renderYearSelect();
   renderQuickLetters();
@@ -3224,6 +3719,7 @@ function renderAll(){
   renderMonth();
   renderAnnual();
   renderDebts();
+  renderExtra();
   renderPrices();
   updateNav();
 }
@@ -3366,6 +3862,15 @@ function buildCSV(){
     salaryPrices.X, salaryPrices.S, salaryPrices.M, salaryPrices.Y, salaryPrices.P, 0,
     "salario", "", officialSalary(), "", "", "", ""
   ]);
+  for (const job of allExtra()){
+    const prices = (state.years[String(job.year)] || {prices: DEFAULT_PRICES}).prices;
+    const note = [job.client, job.concept].filter(Boolean).join(" · ").slice(0, 80);
+    rows.push([
+      job.year, job.month, job.day, "", 0,
+      prices.X, prices.S, prices.M, prices.Y, prices.P, 0,
+      "extra", note, job.amount, job.collected ? 1 : 0, "", "", ""
+    ]);
+  }
   return "\uFEFF" + rows.map(row => row.map(csvCell).join(";")).join("\r\n") + "\r\n";
 }
 
@@ -3488,6 +3993,7 @@ function parseImport(text){
 
   const imported = new Map();
   const debts = (iTipo >= 0 && iImporte >= 0) ? [] : null;
+  let extraJobs = null;
   let officialSalaryValue = null;
   let invalid = 0;
   let dayCount = 0;
@@ -3506,6 +4012,22 @@ function parseImport(text){
     if (tipo === "salario" && iImporte >= 0){
       const amount = Math.round(parseAmount(row[iImporte]));
       if (Number.isFinite(amount) && amount >= 0) officialSalaryValue = amount;
+      continue;
+    }
+
+    if (tipo === "extra" && iImporte >= 0){
+      const amount = Math.round(parseAmount(row[iImporte]));
+      if (Number.isFinite(amount) && amount > 0 && day >= 1 && day <= daysInMonth(year, month - 1)){
+        if (extraJobs === null) extraJobs = [];
+        const note = String(row[iNota] ?? "").trim().slice(0, 80);
+        const pieces = note.split(" · ");
+        const client = pieces.length > 1 ? pieces[0].slice(0, 60) : "";
+        const concept = (pieces.length > 1 ? pieces.slice(1).join(" · ") : note).slice(0, 80) || "Extra";
+        const collected = /^(1|true|si|sí|cobrado|collected|to‘langan|получено)$/i.test(String(row[iPagada] ?? "").trim());
+        extraJobs.push({year, month, day, client, concept, amount, collected});
+      } else {
+        invalid++;
+      }
       continue;
     }
 
@@ -3586,7 +4108,7 @@ function parseImport(text){
   }
 
   if (!imported.size) throw new Error(t("errNoRows"));
-  return {imported, invalid, dayCount, debts, officialSalary: officialSalaryValue};
+  return {imported, invalid, dayCount, debts, extraJobs, officialSalary: officialSalaryValue};
 }
 
 function applyImport(parsed){
@@ -3607,6 +4129,9 @@ function applyImport(parsed){
 
   if (parsed.debts){
     state.debts = normalizeDebts(parsed.debts);
+  }
+  if (parsed.extraJobs !== null && parsed.extraJobs !== undefined){
+    state.extra = normalizeExtra(parsed.extraJobs);
   }
   if (parsed.officialSalary != null){
     state.officialSalary = normalizeOfficialSalary(parsed.officialSalary);
@@ -3727,6 +4252,7 @@ async function clearAllData(){
     activeYear: CURRENT_YEAR,
     years: {[String(CURRENT_YEAR)]: makeYear(DEFAULT_PRICES)},
     debts: [],
+    extra: [],
     officialSalary: DEFAULT_OFFICIAL_SALARY
   };
   ui.month = CURRENT_MONTH;
@@ -3816,6 +4342,29 @@ function bindEvents(){
     if (!button || !row) return;
     if (button.dataset.act === "pay") payDebt(row.dataset.id);
     else if (button.dataset.act === "del") deleteDebt(row.dataset.id);
+  });
+
+  $("#extraAdd").addEventListener("click", addExtra);
+  $("#extraAutofill").addEventListener("click", autofillExtra);
+  $("#extraMonths").addEventListener("click", event => {
+    const chip = event.target.closest(".month-chip");
+    if (!chip) return;
+    ui.extraMonth = Number(chip.dataset.month);
+    renderExtra();
+  });
+  $("#extraDate").addEventListener("change", () => {
+    const parts = String($("#extraDate").value || "").split("-").map(Number);
+    if (parts[0] === state.activeYear && parts[1] >= 1 && parts[1] <= 12){
+      ui.extraMonth = parts[1] - 1;
+      renderExtra();
+    }
+  });
+  $("#extraList").addEventListener("click", event => {
+    const button = event.target.closest("[data-act]");
+    const row = event.target.closest("[data-id]");
+    if (!button || !row) return;
+    if (button.dataset.act === "toggle") toggleExtra(row.dataset.id);
+    else if (button.dataset.act === "del") deleteExtra(row.dataset.id);
   });
 
   $("#yearSelect").addEventListener("change", async event => {
