@@ -626,13 +626,61 @@
     font-size:10px;color:#9a9488;line-height:1.6;
   }
 
+  /* ---------- Deudas ---------- */
+  .official-field{width:140px;flex:0 0 140px}
+  .debt-hero{
+    background:linear-gradient(140deg,#7c2d12,#9a3412 65%,#7c2d12);
+    box-shadow:0 14px 28px rgba(124,45,18,.26);
+  }
+  .debt-hero .hero-amount{color:#fff7ed}
+  .debt-hero .hero-sub{color:#fed7aa}
+  .debt-compare{
+    display:grid;gap:6px;margin-top:10px;padding:10px 12px;
+    background:var(--bg);border:1px solid var(--line);border-radius:12px;font-size:12px;
+  }
+  .debt-compare-row{display:flex;justify-content:space-between;gap:12px;align-items:baseline}
+  .debt-compare-row span{color:var(--muted);font-weight:700}
+  .debt-compare-row b{font-variant-numeric:tabular-nums;font-weight:850}
+  .debt-compare .bad{color:var(--danger)}
+  .debt-compare .good{color:var(--ok)}
+  .debt-form{display:grid;gap:10px;margin:4px 0 10px}
+  .debt-form .field{margin:0}
+  .debt-form .money-field{width:100%}
+  .debt-form .btn{width:100%}
+  @media (min-width:560px){
+    .debt-form{grid-template-columns:1fr 1fr}
+    .debt-form .field.full{grid-column:1 / -1}
+    .debt-form .btn{grid-column:1 / -1}
+  }
+  .debt-row{
+    display:grid;grid-template-columns:1fr auto auto;gap:9px;align-items:center;
+    padding:10px 2px;border-bottom:1px solid var(--line-2);
+  }
+  .debt-row:last-child{border-bottom:0}
+  .debt-main{min-width:0}
+  .debt-main b{display:block;font-size:11.5px;letter-spacing:.05em;color:var(--brand)}
+  .debt-main span{display:block;font-size:11px;color:var(--muted);margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .debt-amount{font-weight:900;font-size:13px;font-variant-numeric:tabular-nums;color:var(--danger);white-space:nowrap}
+  .debt-row.paid .debt-amount{color:var(--muted);text-decoration:line-through}
+  .debt-actions{display:flex;align-items:center;gap:3px}
+  .debt-state{
+    border:1px solid var(--line);background:var(--bg);color:var(--muted);
+    border-radius:999px;padding:6px 8px;font-size:9.5px;font-weight:850;white-space:nowrap;
+  }
+  .debt-row.paid .debt-state{background:#e7f5ed;border-color:#bfe3cd;color:var(--ok)}
+  .debt-del{
+    border:0;background:none;color:var(--danger);font-size:18px;line-height:1;
+    padding:4px 6px;border-radius:8px;
+  }
+  .debt-empty{padding:14px 4px;color:var(--muted);font-size:13px;text-align:center}
+
   /* ---------- Barra inferior ---------- */
   .tabbar{
     position:fixed;left:50%;transform:translateX(-50%);
     bottom:calc(10px + env(safe-area-inset-bottom));
     width:min(calc(100% - 22px),560px);
     z-index:50;
-    display:grid;grid-template-columns:repeat(4,1fr);gap:3px;
+    display:grid;grid-template-columns:repeat(5,1fr);gap:3px;
     padding:6px;
     background:rgba(255,253,248,.94);
     border:1px solid rgba(227,220,205,.95);
@@ -766,12 +814,13 @@
       <div class="lang-wrap">
         <button type="button" class="lang-btn" id="btnLang" aria-haspopup="menu" aria-expanded="false" aria-label="Cambiar idioma">
           <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a15 15 0 0 1 0 18M12 3a15 15 0 0 0 0 18"/></svg>
-          <span id="langCode">ES</span>
+          <span id="langCode">EN</span>
         </button>
         <div class="lang-menu" id="langMenu" role="menu" aria-label="Idioma" data-i18n-aria="language" hidden>
-          <button type="button" role="menuitemradio" data-lang="es" aria-checked="true"><span>Español</span><b>ES</b></button>
-          <button type="button" role="menuitemradio" data-lang="en" aria-checked="false"><span>English</span><b>EN</b></button>
+          <button type="button" role="menuitemradio" data-lang="en" aria-checked="true"><span>English</span><b>EN</b></button>
+          <button type="button" role="menuitemradio" data-lang="es" aria-checked="false"><span>Español</span><b>ES</b></button>
           <button type="button" role="menuitemradio" data-lang="ru" aria-checked="false"><span>Русский</span><b>RU</b></button>
+          <button type="button" role="menuitemradio" data-lang="uz" aria-checked="false"><span>Oʻzbekcha</span><b>UZ</b></button>
         </div>
       </div>
       <div class="year-box">
@@ -904,7 +953,7 @@
       <div class="card table-card">
         <div class="card-head">
           <h3 data-i18n="monthlyTotals">Totales por mes</h3>
-          <span class="hint" data-i18n="figuresIn">Cifras en $</span>
+          <span class="hint" data-i18n="figuresIn">Cifras en ₽</span>
         </div>
         <div class="table-wrap">
           <table class="year-table">
@@ -950,6 +999,69 @@
     </div>
 
     <p class="footnote" data-i18n-html="footnote">Total general = suma de los 12 meses + premio del 1er semestre + premio del 2do semestre.<br>El ahorro del 15% se calcula solo con ENE, MAR, MAY, JUL, SEP y NOV.</p>
+  </section>
+
+  <!-- ================= DEUDAS ================= -->
+  <section class="view" id="view-deudas">
+    <div class="section-head">
+      <div>
+        <p class="eyebrow" data-i18n="debtEyebrow">Salario oficial</p>
+        <h2 data-i18n="debtTitle">Deudas con la compañía</h2>
+      </div>
+    </div>
+
+    <div class="total-hero debt-hero">
+      <div class="hero-top">
+        <span data-i18n="debtPending">Deuda pendiente</span>
+        <span class="hero-year" id="debtCount">0</span>
+      </div>
+      <div class="hero-amount" id="debtPendingTotal">₽ 0</div>
+      <div class="hero-sub" id="debtTotals"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <h3 data-i18n="debtFixedTitle">Salario oficial</h3>
+        <label class="money-field official-field" data-i18n-aria="debtFixedTitle">
+          <span>₽</span>
+          <input id="officialSalary" type="number" min="0" step="500" inputmode="numeric" value="60000" aria-label="Salario oficial">
+        </label>
+      </div>
+      <div class="debt-compare" id="debtCompare"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <h3 data-i18n="debtAddTitle">Anotar deuda</h3>
+      </div>
+      <div class="debt-form">
+        <label class="field">
+          <span data-i18n="month">Mes</span>
+          <select id="debtMonth"></select>
+        </label>
+        <label class="field">
+          <span data-i18n="debtAmount">Monto</span>
+          <span class="money-field">
+            <span>₽</span>
+            <input id="debtAmount" type="number" min="0" step="500" inputmode="numeric" placeholder="0">
+          </span>
+        </label>
+        <label class="field full">
+          <span data-i18n="debtNote">Nota (opcional)</span>
+          <input id="debtNote" type="text" maxlength="80" data-i18n-ph="debtNotePlaceholder" placeholder="Ej.: mes con pocos días">
+        </label>
+        <button class="btn primary" id="debtAdd" type="button" data-i18n="debtAddButton">Agregar deuda</button>
+      </div>
+      <p class="hint" data-i18n="debtFormHint">Se sugiere la diferencia del mes elegido; podés cambiarla.</p>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <h3 data-i18n="debtListTitle">Deudas anotadas</h3>
+        <span class="hint" id="debtListCount"></span>
+      </div>
+      <div id="debtList"></div>
+    </div>
   </section>
 
   <!-- ================= PRECIOS Y RESPALDO ================= -->
@@ -1030,6 +1142,10 @@
     <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>
     <span data-i18n="tabYear">Año</span>
   </button>
+  <button type="button" class="tab" data-view="deudas">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h12v18l-3-2-3 2-3-2-3 2Z"/><path d="M9 8h6M9 12h6"/></svg>
+    <span data-i18n="debtTab">Deudas</span>
+  </button>
   <button type="button" class="tab" data-view="precios">
     <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.5 13.2 13.2 20.5a2 2 0 0 1-2.8 0L3.5 13.6V4.5h9.1l7.9 7.9a.6.6 0 0 1 0 .8Z"/><circle cx="8" cy="9" r="1.35"/></svg>
     <span data-i18n="tabPrices">Precios</span>
@@ -1055,7 +1171,7 @@
 "use strict";
 
 /* ============================================================
-   Datos iniciales: jornadas de 2026 importadas del Excel
+   Datos iniciales: año 2026 vacío
    ============================================================ */
 const SEED_2026 = {"prices":{"X":7000,"S":5000,"M":3000,"Y":14000,"P":1500},"months":[{"name":"ENE","days":["","","","","","","X","X","","","","","","","","","","","","","","","","","","","X","X","XP","",""],"plus":7500},{"name":"FEB","days":["","","","","","","","","","","","","","","","","","X","","","X","","","","","","","","","",""],"plus":0},{"name":"MAR","days":["","X","X","","X","X","","","","","","","","X","","X","","X","X","X","","","","","","S","X","S","","X",""],"plus":19500},{"name":"ABR","days":["","","X","","","","X","","","","","","X","","","","","","","","","","","","","","","","","",""],"plus":0},{"name":"MAY","days":["","","","","","","X","","X","","","","","","","X","X","X","X","X","X","XP","X","XMP","","X","X","X","XMP","X","XM"],"plus":25500},{"name":"JUN","days":["XP","","X","S","X","S","XMP","XMP","XMP","X","XP","X","X","","XP","X","","X","X","X","","X","XP","XP","","XP","XP","XMP","XMP","XP",""],"plus":0},{"name":"JUL","days":["X","XP","XP","X","","XP","XP","X","","X","X","X","","","","","","","","XP","","XP","XP","XP","XP","","","","","",""],"plus":22500},{"name":"AGO","days":["XP","X","X","","X","X","X","","X","","X","XP","XP","X","","X","XP","X","","X","","","X","","","","","","","","X"],"plus":0},{"name":"SEP","days":["","","","X","","X","","","","X","X","X","","","","X","","","","","","","","XMPPPP","XPP","XPP","XPP","X","X","XPP",""],"plus":19500},{"name":"OCT","days":["","","XM","","","X","","","","","X","","","X","X","","X","","","","X","","","X","X","","X","X","X","XP","X"],"plus":0},{"name":"NOV","days":["X","XMP","X","","","","","","","","","","","","","","","","","","","","","","","","","","","",""],"plus":4500},{"name":"DIC","days":["","","","","","","","","","","","","","","","","","","","","","","","","","","","","","",""],"plus":0}]};
 
@@ -1064,161 +1180,9 @@ const SEED_2026 = {"prices":{"X":7000,"S":5000,"M":3000,"Y":14000,"P":1500},"mon
    ============================================================ */
 /* ---------- Idiomas ---------- */
 const LANG_KEY = "mi-salario-lang-v1";
-const LOCALES = {es: "es-AR", en: "en-US", ru: "ru-RU"};
+const LOCALES = {en: "en-US", es: "es-AR", ru: "ru-RU", uz: "uz-UZ"};
 
 const I18N = {
-  es: {
-    locale: "es-AR",
-    monthsShort: ["ENE", "FEB", "MAR", "ABR", "MAY", "JUN", "JUL", "AGO", "SEP", "OCT", "NOV", "DIC"],
-    monthsLong: ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"],
-    monthsGenitive: null,
-    weekdays: ["D", "L", "M", "X", "J", "V", "S"],
-    ui: {
-      appName: "Mi Salario",
-      tagline: "Registro de jornadas",
-      year: "Año",
-      yearSelect: "Elegir año",
-      language: "Cambiar idioma",
-      quickEntry: "Registro rápido",
-      tabToday: "Hoy",
-      tabMonth: "Mes",
-      tabYear: "Año",
-      tabPrices: "Precios",
-      mainNav: "Navegación principal",
-      today: "Hoy",
-      chooseDay: "Elige el día",
-      daysOfMonth: "Días del mes",
-      shift: "Jornada",
-      delete: "Borrar",
-      jndDayLabel: "Código JND del día",
-      dayBase: "Base del día",
-      autosave: "Se guarda solo",
-      save: "Guardar",
-      saving: "Guardando…",
-      saved: "Guardado",
-      savedCheck: "Guardado ✓",
-      unsaved: "Sin guardar",
-      saveError: "No se pudo guardar. Revisa el espacio o la privacidad del navegador.",
-      saveBadgeTitle: "Tus datos se guardan en este dispositivo",
-      monthlyView: "Vista mensual",
-      daysWorked: "Días trabajados",
-      base: "Base",
-      monthSalary: "Salario del mes",
-      daysRange: "Días 1–31",
-      tapToEdit: "Toca un JND para editarlo",
-      day: "Día",
-      prevMonth: "Mes anterior",
-      nextMonth: "Mes siguiente",
-      jndAria: "JND del día {day}",
-      dayAria: "Día {day}",
-      withShift: ", con jornada",
-      annualSummary: "Resumen anual",
-      annualTitle: "Año {year}",
-      grandTotal: "Total general",
-      baseShifts: "Base jornadas",
-      pluses: "Pluses (+)",
-      savings15: "Ahorro 15%",
-      monthlyTotals: "Totales por mes",
-      figuresIn: "Cifras en $",
-      month: "Mes",
-      days: "Días",
-      total: "Total",
-      bonus1: "Premio 1er semestre",
-      bonus2: "Premio 2do semestre",
-      prizeDetail: "{days} ({months}) × {money}",
-      oddOnly: "Solo impares",
-      savingsNote: "Es informativo: no se descuenta del total.",
-      seeDetail: "Ver detalle",
-      settings: "Configuración",
-      pricesBackup: "Precios y respaldo",
-      pricesFor: "Precios de",
-      restore: "Restaurar",
-      pricesNote: "Se guardan solo para este año. Al cambiarlos, todas las bases del año se recalculan.",
-      jndLetterByLetter: "El JND se lee letra por letra.",
-      jndNote: "Cada X, S, M, Y o P suma su precio; las repeticiones cuentan. El signo + y otros símbolos no suman.",
-      changesSaved: "Los cambios se guardan solos en este dispositivo.",
-      backup: "Respaldo",
-      backupNote: "Exporta un CSV para guardar una copia. Si cambias de móvil o borras los datos del navegador, podrás recuperarlo todo con “Importar CSV”.",
-      exportCsv: "Exportar CSV",
-      importCsv: "Importar CSV",
-      backupMobile: "En el móvil, “Exportar” abre el menú para guardar o compartir el archivo. El CSV incluye todos los años.",
-      deleteData: "Borrar datos",
-      deleteNote: "Estas acciones no se pueden deshacer. Exporta un respaldo antes si quieres conservar una copia.",
-      deleteDataFor: "Borrar datos de",
-      deleteAll: "Borrar todos los datos",
-      howItWorks: "¿Cómo funciona?",
-      howItWorksText: "Elige el mes y el día, escribe el JND y la base se calcula al instante. El campo (+) solo aparece en meses impares y se suma una vez al mes.",
-      seeHelp: "Ver ayuda rápida",
-      cancel: "Cancelar",
-      accept: "Aceptar",
-      close: "Cerrar",
-      footnote: "Total general = suma de los 12 meses + premio del 1er semestre + premio del 2do semestre.<br>El ahorro del 15% se calcula solo con ENE, MAR, MAY, JUL, SEP y NOV.",
-      version: "Mi Salario · JND · Versión 1.0<br>Funciona sin internet · Tus datos quedan guardados en este dispositivo.",
-      plusTitle: "Plus del mes",
-      plusCopy: "Se suma una sola vez al salario del mes. No es por día.",
-      plusAria: "Plus manual del mes",
-      noPlusTitle: "Este mes no tiene (+).",
-      noPlusText: "El salario es solo la suma de las bases de los días.",
-      breakdownEmpty: "Escribe un JND para ver el cálculo.",
-      breakdownNote: "· el + y otros símbolos no suman",
-      addLetter: "Agregar letra",
-      addLetterAria: "Agregar {letter}, precio {price}",
-      priceAria: "Precio de {letter}",
-      otherYear: "+ Otro año…",
-      yearCreated: "Año {year} creado con los precios del año más cercano.",
-      dayDot: "Día {day} · {month}",
-      loadWarning: "No se pudieron leer los datos guardados. Se cargó el respaldo de 2026.",
-      loadSeed: "Datos de 2026 cargados desde tu Excel.",
-      continue: "Continuar",
-      deleteEverything: "Borrar todo",
-      gotIt: "Entendido",
-      finalError: "Escribe {word} para confirmar.",
-      emptyDay: "Ese día ya está vacío.",
-      shiftSaved: "Jornada guardada.",
-      clearTitle: "Borrar jornada",
-      clearBody: "<p>Se quitará el JND {jnd} del día <b>{date}</b>.</p><p>La base de ese día volverá a {zero}.</p>",
-      dayDeleted: "Día borrado.",
-      wentToday: "Fuiste a hoy: {date}.",
-      errEmptyFile: "El archivo está vacío o no tiene datos.",
-      errColumns: "Faltan columnas. El CSV debe tener: anio, mes, dia y jnd.",
-      errNoRows: "No se encontró ninguna fila válida.",
-      importInvalid: "<p class=\"warn\">Se ignorarán {n} fila(s) con datos inválidos.</p>",
-      importTitle: "Importar respaldo",
-      importBody: "<p>Se reemplazarán por completo los datos de: {years}.</p><p>Jornadas a importar: {days}.</p>{invalid}<p class=\"hint\">Los demás años no se tocan. Esta acción no se puede deshacer.</p>",
-      importBtn: "Importar",
-      imported: "Respaldo importado: {n} jornadas.",
-      importFailTitle: "No se pudo importar",
-      importFailHint: "Elige un CSV exportado por esta app.",
-      shareTitle: "Respaldo de Mi Salario",
-      shared: "Respaldo compartido.",
-      csvDownloaded: "CSV descargado.",
-      eraseYearTitle: "Borrar datos de {year}",
-      eraseYearBody: "<p>Se borrarán todas las jornadas, los (+) y los totales de <b>{year}</b>.</p><p>Los precios de ese año se conservan. Los demás años no se tocan.</p><p class=\"warn\">Esta acción no se puede deshacer.</p>",
-      yearDeleted: "Datos de {year} borrados.",
-      eraseAllTitle: "Borrar todos los datos",
-      eraseAllBody: "<p>Se borrarán <b>todos los años</b>, todas las jornadas y todos los (+).</p><p class=\"warn\">Esta acción no se puede deshacer.</p>",
-      finalTitle: "Confirmación final",
-      finalBody: "<p>Escribe <b>{word}</b> para confirmar que quieres borrar todo.</p>",
-      confirmWord: "BORRAR",
-      allDeleted: "Todos los datos fueron borrados.",
-      restoreTitle: "Restaurar precios de {year}",
-      restoreBody: "<p>Se usarán los precios originales: X {x}, S {s}, M {m}, Y {y}, P {p}.</p><p>Las jornadas no se borran; solo se recalculan las bases.</p>",
-      restored: "Precios restaurados.",
-      helpTitle: "Ayuda rápida",
-      help1: "1. Elige el mes y toca un día.",
-      help2: "2. Escribe el JND (X, XP, XMP…) o usa los botones X, S, M, Y, P.",
-      help3: "3. La base se calcula al instante. Se guarda sola.",
-      help4: "El (+) solo aparece en ENE, MAR, MAY, JUL, SEP y NOV. Se suma una vez al mes.",
-      help5: "El ahorro 15% es informativo: se calcula solo con esos meses impares y no se resta del total.",
-      help6: "Respaldo: exporta un CSV de vez en cuando. Si borras los datos del navegador, el CSV es tu copia de seguridad.",
-      openYearTitle: "Abrir otro año",
-      openYearBody: "<p>Escribe un año entre 2019 y 2100. Si no existe, se crea vacío con los precios del año más cercano.</p>",
-      invalidYear: "Escribe un año válido (2019–2100).",
-      open: "Abrir",
-      salaries: "Salarios",
-      bonuses: "Premios"
-    }
-  },
   en: {
     locale: "en-US",
     monthsShort: ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"],
@@ -1271,7 +1235,7 @@ const I18N = {
       pluses: "Pluses (+)",
       savings15: "Savings 15%",
       monthlyTotals: "Monthly totals",
-      figuresIn: "Amounts in $",
+      figuresIn: "Amounts in ₽",
       month: "Month",
       days: "Days",
       total: "Total",
@@ -1320,7 +1284,6 @@ const I18N = {
       yearCreated: "Year {year} created with the nearest year's prices.",
       dayDot: "Day {day} · {month}",
       loadWarning: "Saved data couldn't be read. The 2026 backup was loaded.",
-      loadSeed: "2026 data loaded from your Excel file.",
       continue: "Continue",
       deleteEverything: "Delete everything",
       gotIt: "Got it",
@@ -1368,9 +1331,406 @@ const I18N = {
       invalidYear: "Type a valid year (2019–2100).",
       open: "Open",
       salaries: "Salaries",
-      bonuses: "Bonuses"
+      bonuses: "Bonuses",
+      debtTab: "Debts",
+      debtEyebrow: "Official salary",
+      debtTitle: "Debts with the company",
+      debtPending: "Outstanding debt",
+      debtPaidLabel: "Paid",
+      debtTotalLabel: "Total",
+      debtFixedTitle: "Official salary",
+      debtThisMonth: "This month",
+      debtEarned: "Calculated salary",
+      debtFixedShort: "Official salary",
+      debtDiff: "Difference",
+      debtNoDays: "No shifts entered this month.",
+      debtNoDebt: "This month generates no debt.",
+      debtSurplus: "You earned {amount} above the official salary.",
+      debtAddTitle: "Record debt",
+      debtAmount: "Amount",
+      debtNote: "Note (optional)",
+      debtNotePlaceholder: "E.g.: month with few days",
+      debtAddButton: "Add debt",
+      debtFormHint: "The difference for the selected month is suggested; you can change it.",
+      debtListTitle: "Recorded debts",
+      debtEmpty: "No debts recorded yet.",
+      debtPaidPill: "Paid",
+      debtPendingPill: "Pending",
+      debtAdded: "Debt recorded.",
+      debtDeleted: "Debt deleted.",
+      debtPaidToast: "Debt marked as paid.",
+      debtPendingToast: "Debt marked as unpaid.",
+      debtDeleteTitle: "Delete debt",
+      debtDeleteBody: "The debt for <b>{month}</b> of <b>{amount}</b> will be deleted.",
+      debtAmountRequired: "Enter an amount greater than 0."
     }
   },
+
+  es: {
+    locale: "es-AR",
+    monthsShort: ["ENE", "FEB", "MAR", "ABR", "MAY", "JUN", "JUL", "AGO", "SEP", "OCT", "NOV", "DIC"],
+    monthsLong: ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"],
+    monthsGenitive: null,
+    weekdays: ["D", "L", "M", "X", "J", "V", "S"],
+    ui: {
+      appName: "Mi Salario",
+      tagline: "Registro de jornadas",
+      year: "Año",
+      yearSelect: "Elegir año",
+      language: "Cambiar idioma",
+      quickEntry: "Registro rápido",
+      tabToday: "Hoy",
+      tabMonth: "Mes",
+      tabYear: "Año",
+      tabPrices: "Precios",
+      mainNav: "Navegación principal",
+      today: "Hoy",
+      chooseDay: "Elige el día",
+      daysOfMonth: "Días del mes",
+      shift: "Jornada",
+      delete: "Borrar",
+      jndDayLabel: "Código JND del día",
+      dayBase: "Base del día",
+      autosave: "Se guarda solo",
+      save: "Guardar",
+      saving: "Guardando…",
+      saved: "Guardado",
+      savedCheck: "Guardado ✓",
+      unsaved: "Sin guardar",
+      saveError: "No se pudo guardar. Revisa el espacio o la privacidad del navegador.",
+      saveBadgeTitle: "Tus datos se guardan en este dispositivo",
+      monthlyView: "Vista mensual",
+      daysWorked: "Días trabajados",
+      base: "Base",
+      monthSalary: "Salario del mes",
+      daysRange: "Días 1–31",
+      tapToEdit: "Toca un JND para editarlo",
+      day: "Día",
+      prevMonth: "Mes anterior",
+      nextMonth: "Mes siguiente",
+      jndAria: "JND del día {day}",
+      dayAria: "Día {day}",
+      withShift: ", con jornada",
+      annualSummary: "Resumen anual",
+      annualTitle: "Año {year}",
+      grandTotal: "Total general",
+      baseShifts: "Base jornadas",
+      pluses: "Pluses (+)",
+      savings15: "Ahorro 15%",
+      monthlyTotals: "Totales por mes",
+      figuresIn: "Cifras en ₽",
+      month: "Mes",
+      days: "Días",
+      total: "Total",
+      bonus1: "Premio 1er semestre",
+      bonus2: "Premio 2do semestre",
+      prizeDetail: "{days} ({months}) × {money}",
+      oddOnly: "Solo impares",
+      savingsNote: "Es informativo: no se descuenta del total.",
+      seeDetail: "Ver detalle",
+      settings: "Configuración",
+      pricesBackup: "Precios y respaldo",
+      pricesFor: "Precios de",
+      restore: "Restaurar",
+      pricesNote: "Se guardan solo para este año. Al cambiarlos, todas las bases del año se recalculan.",
+      jndLetterByLetter: "El JND se lee letra por letra.",
+      jndNote: "Cada X, S, M, Y o P suma su precio; las repeticiones cuentan. El signo + y otros símbolos no suman.",
+      changesSaved: "Los cambios se guardan solos en este dispositivo.",
+      backup: "Respaldo",
+      backupNote: "Exporta un CSV para guardar una copia. Si cambias de móvil o borras los datos del navegador, podrás recuperarlo todo con “Importar CSV”.",
+      exportCsv: "Exportar CSV",
+      importCsv: "Importar CSV",
+      backupMobile: "En el móvil, “Exportar” abre el menú para guardar o compartir el archivo. El CSV incluye todos los años.",
+      deleteData: "Borrar datos",
+      deleteNote: "Estas acciones no se pueden deshacer. Exporta un respaldo antes si quieres conservar una copia.",
+      deleteDataFor: "Borrar datos de",
+      deleteAll: "Borrar todos los datos",
+      howItWorks: "¿Cómo funciona?",
+      howItWorksText: "Elige el mes y el día, escribe el JND y la base se calcula al instante. El campo (+) solo aparece en meses impares y se suma una vez al mes.",
+      seeHelp: "Ver ayuda rápida",
+      cancel: "Cancelar",
+      accept: "Aceptar",
+      close: "Cerrar",
+      footnote: "Total general = suma de los 12 meses + premio del 1er semestre + premio del 2do semestre.<br>El ahorro del 15% se calcula solo con ENE, MAR, MAY, JUL, SEP y NOV.",
+      version: "Mi Salario · JND · Versión 1.0<br>Funciona sin internet · Tus datos quedan guardados en este dispositivo.",
+      plusTitle: "Plus del mes",
+      plusCopy: "Se suma una sola vez al salario del mes. No es por día.",
+      plusAria: "Plus manual del mes",
+      noPlusTitle: "Este mes no tiene (+).",
+      noPlusText: "El salario es solo la suma de las bases de los días.",
+      breakdownEmpty: "Escribe un JND para ver el cálculo.",
+      breakdownNote: "· el + y otros símbolos no suman",
+      addLetter: "Agregar letra",
+      addLetterAria: "Agregar {letter}, precio {price}",
+      priceAria: "Precio de {letter}",
+      otherYear: "+ Otro año…",
+      yearCreated: "Año {year} creado con los precios del año más cercano.",
+      dayDot: "Día {day} · {month}",
+      loadWarning: "No se pudieron leer los datos guardados. Se cargó el respaldo de 2026.",
+      continue: "Continuar",
+      deleteEverything: "Borrar todo",
+      gotIt: "Entendido",
+      finalError: "Escribe {word} para confirmar.",
+      emptyDay: "Ese día ya está vacío.",
+      shiftSaved: "Jornada guardada.",
+      clearTitle: "Borrar jornada",
+      clearBody: "<p>Se quitará el JND {jnd} del día <b>{date}</b>.</p><p>La base de ese día volverá a {zero}.</p>",
+      dayDeleted: "Día borrado.",
+      wentToday: "Fuiste a hoy: {date}.",
+      errEmptyFile: "El archivo está vacío o no tiene datos.",
+      errColumns: "Faltan columnas. El CSV debe tener: anio, mes, dia y jnd.",
+      errNoRows: "No se encontró ninguna fila válida.",
+      importInvalid: "<p class=\"warn\">Se ignorarán {n} fila(s) con datos inválidos.</p>",
+      importTitle: "Importar respaldo",
+      importBody: "<p>Se reemplazarán por completo los datos de: {years}.</p><p>Jornadas a importar: {days}.</p>{invalid}<p class=\"hint\">Los demás años no se tocan. Esta acción no se puede deshacer.</p>",
+      importBtn: "Importar",
+      imported: "Respaldo importado: {n} jornadas.",
+      importFailTitle: "No se pudo importar",
+      importFailHint: "Elige un CSV exportado por esta app.",
+      shareTitle: "Respaldo de Mi Salario",
+      shared: "Respaldo compartido.",
+      csvDownloaded: "CSV descargado.",
+      eraseYearTitle: "Borrar datos de {year}",
+      eraseYearBody: "<p>Se borrarán todas las jornadas, los (+) y los totales de <b>{year}</b>.</p><p>Los precios de ese año se conservan. Los demás años no se tocan.</p><p class=\"warn\">Esta acción no se puede deshacer.</p>",
+      yearDeleted: "Datos de {year} borrados.",
+      eraseAllTitle: "Borrar todos los datos",
+      eraseAllBody: "<p>Se borrarán <b>todos los años</b>, todas las jornadas y todos los (+).</p><p class=\"warn\">Esta acción no se puede deshacer.</p>",
+      finalTitle: "Confirmación final",
+      finalBody: "<p>Escribe <b>{word}</b> para confirmar que quieres borrar todo.</p>",
+      confirmWord: "BORRAR",
+      allDeleted: "Todos los datos fueron borrados.",
+      restoreTitle: "Restaurar precios de {year}",
+      restoreBody: "<p>Se usarán los precios originales: X {x}, S {s}, M {m}, Y {y}, P {p}.</p><p>Las jornadas no se borran; solo se recalculan las bases.</p>",
+      restored: "Precios restaurados.",
+      helpTitle: "Ayuda rápida",
+      help1: "1. Elige el mes y toca un día.",
+      help2: "2. Escribe el JND (X, XP, XMP…) o usa los botones X, S, M, Y, P.",
+      help3: "3. La base se calcula al instante. Se guarda sola.",
+      help4: "El (+) solo aparece en ENE, MAR, MAY, JUL, SEP y NOV. Se suma una vez al mes.",
+      help5: "El ahorro 15% es informativo: se calcula solo con esos meses impares y no se resta del total.",
+      help6: "Respaldo: exporta un CSV de vez en cuando. Si borras los datos del navegador, el CSV es tu copia de seguridad.",
+      openYearTitle: "Abrir otro año",
+      openYearBody: "<p>Escribe un año entre 2019 y 2100. Si no existe, se crea vacío con los precios del año más cercano.</p>",
+      invalidYear: "Escribe un año válido (2019–2100).",
+      open: "Abrir",
+      salaries: "Salarios",
+      bonuses: "Premios",
+      debtTab: "Deudas",
+      debtEyebrow: "Salario oficial",
+      debtTitle: "Deudas con la compañía",
+      debtPending: "Deuda pendiente",
+      debtPaidLabel: "Pagado",
+      debtTotalLabel: "Total",
+      debtFixedTitle: "Salario oficial",
+      debtThisMonth: "Este mes",
+      debtEarned: "Salario calculado",
+      debtFixedShort: "Salario oficial",
+      debtDiff: "Diferencia",
+      debtNoDays: "No hay jornadas cargadas este mes.",
+      debtNoDebt: "Este mes no genera deuda.",
+      debtSurplus: "Superaste el fijo por {amount}.",
+      debtAddTitle: "Anotar deuda",
+      debtAmount: "Monto",
+      debtNote: "Nota (opcional)",
+      debtNotePlaceholder: "Ej.: mes con pocos días",
+      debtAddButton: "Agregar deuda",
+      debtFormHint: "Se sugiere la diferencia del mes elegido; podés cambiarla.",
+      debtListTitle: "Deudas anotadas",
+      debtEmpty: "Todavía no hay deudas anotadas.",
+      debtPaidPill: "Pagada",
+      debtPendingPill: "Pendiente",
+      debtAdded: "Deuda anotada.",
+      debtDeleted: "Deuda borrada.",
+      debtPaidToast: "Deuda marcada como pagada.",
+      debtPendingToast: "Deuda marcada como pendiente.",
+      debtDeleteTitle: "Borrar deuda",
+      debtDeleteBody: "Se borrará la deuda de <b>{month}</b> por <b>{amount}</b>.",
+      debtAmountRequired: "Escribe un monto mayor a 0."
+    }
+  },
+  uz: {
+    locale: "uz-UZ",
+    monthsShort: ["YAN","FEV","MAR","APR","MAY","IYN","IYL","AVG","SEN","OKT","NOY","DEK"],
+    monthsLong: ["Yanvar","Fevral","Mart","Aprel","May","Iyun","Iyul","Avgust","Sentabr","Oktabr","Noyabr","Dekabr"],
+    monthsGenitive: null,
+    weekdays: ["Yak","Dush","Sesh","Chor","Pay","Jum","Shan"],
+    ui: {
+      appName: "Maoshim",
+      tagline: "Smenalar daftari",
+      year: "Yil",
+      yearSelect: "Yilni tanlash",
+      language: "Tilni o‘zgartirish",
+      quickEntry: "Tezkor kiritish",
+      tabToday: "Bugun",
+      tabMonth: "Oy",
+      tabYear: "Yil",
+      tabPrices: "Narxlar",
+      mainNav: "Asosiy navigatsiya",
+      today: "Bugun",
+      chooseDay: "Kunni tanlang",
+      daysOfMonth: "Oydagi kunlar",
+      shift: "Smena",
+      delete: "O‘chirish",
+      jndDayLabel: "Kun uchun JND kodi",
+      dayBase: "Kunlik baza",
+      autosave: "Avtomatik saqlanadi",
+      save: "Saqlash",
+      saving: "Saqlanmoqda…",
+      saved: "Saqlandi",
+      savedCheck: "Saqlandi ✓",
+      unsaved: "Saqlanmagan",
+      saveError: "Saqlab bo‘lmadi. Brauzer xotirasi yoki maxfiylik sozlamalarini tekshiring.",
+      saveBadgeTitle: "Ma’lumotlar shu qurilmada saqlanadi",
+      monthlyView: "Oylik ko‘rinish",
+      daysWorked: "Ishlangan kunlar",
+      base: "Baza",
+      monthSalary: "Oylik maosh",
+      daysRange: "1–31-kunlar",
+      tapToEdit: "Tahrirlash uchun JND ga bosing",
+      day: "Kun",
+      prevMonth: "Oldingi oy",
+      nextMonth: "Keyingi oy",
+      jndAria: "{day}-kun JND",
+      dayAria: "{day}-kun",
+      withShift: ", smena bor",
+      annualSummary: "Yillik xulosa",
+      annualTitle: "{year}-yil",
+      grandTotal: "Umumiy jami",
+      baseShifts: "Smenalar bazasi",
+      pluses: "Qo‘shimchalar (+)",
+      savings15: "Jamg‘arma 15%",
+      monthlyTotals: "Oylik jami",
+      figuresIn: "Summalar ₽da",
+      month: "Oy",
+      days: "Kunlar",
+      total: "Jami",
+      bonus1: "1-yarim yillik mukofoti",
+      bonus2: "2-yarim yillik mukofoti",
+      prizeDetail: "{days} ({months}) × {money}",
+      oddOnly: "Faqat toq oylar",
+      savingsNote: "Faqat ma’lumot uchun: jamidan ayirilmaydi.",
+      seeDetail: "Batafsil",
+      settings: "Sozlamalar",
+      pricesBackup: "Narxlar va zaxira nusxa",
+      pricesFor: "Narxlar:",
+      restore: "Tiklash",
+      pricesNote: "Faqat shu yil uchun saqlanadi. O‘zgartirsangiz, yil bo‘yicha barcha bazalar qayta hisoblanadi.",
+      jndLetterByLetter: "JND harflar bo‘yicha o‘qiladi.",
+      jndNote: "Har bir X, S, M, Y yoki P o‘z narxini qo‘shadi; takrorlar hisobga olinadi. + belgisi va boshqa belgilar hech narsa qo‘shmaydi.",
+      changesSaved: "O‘zgarishlar shu qurilmada avtomatik saqlanadi.",
+      backup: "Zaxira nusxa",
+      backupNote: "Nusxa saqlash uchun CSV yuklab oling. Telefonni almashtirsangiz yoki brauzer ma’lumotlarini tozalasangiz, hammasini “CSV import” orqali tiklash mumkin.",
+      exportCsv: "CSV yuklab olish",
+      importCsv: "CSV import qilish",
+      backupMobile: "Telefonda “Yuklab olish” faylni saqlash yoki ulashish menyusini ochadi. CSV barcha yillarni o‘z ichiga oladi.",
+      deleteData: "Ma’lumotlarni o‘chirish",
+      deleteNote: "Bu amallarni bekor qilib bo‘lmaydi. Nusxa kerak bo‘lsa, avval zaxira CSV yuklab oling.",
+      deleteDataFor: "Ma’lumotlarni o‘chirish:",
+      deleteAll: "Barcha ma’lumotlarni o‘chirish",
+      howItWorks: "Qanday ishlaydi?",
+      howItWorksText: "Oy va kunni tanlang, JND kiriting — baza darhol hisoblanadi. (+) maydoni faqat toq oylarda chiqadi va oyiga bir marta qo‘shiladi.",
+      seeHelp: "Tezkor yordam",
+      cancel: "Bekor qilish",
+      accept: "OK",
+      close: "Yopish",
+      footnote: "Umumiy jami = 12 oy + 1-yarim yillik mukofoti + 2-yarim yillik mukofoti.<br>15% jamg‘arma faqat YAN, MAR, MAY, IYUL, SEN va NOY oylaridan hisoblanadi.",
+      version: "Maoshim · JND · 1.0-versiya<br>Internetsiz ishlaydi · Ma’lumotlar shu qurilmada saqlanadi.",
+      plusTitle: "Oylik qo‘shimcha",
+      plusCopy: "Oy maoshiga bir marta qo‘shiladi. Har bir kun uchun emas.",
+      plusAria: "Qo‘lda kiritilgan oylik qo‘shimcha",
+      noPlusTitle: "Bu oyda (+) yo‘q.",
+      noPlusText: "Maosh faqat kunlik bazalar yig‘indisidan iborat.",
+      breakdownEmpty: "Hisobni ko‘rish uchun JND kiriting.",
+      breakdownNote: "· + va boshqa belgilar hech narsa qo‘shmaydi",
+      addLetter: "Harf qo‘shish",
+      addLetterAria: "{letter} qo‘shish, narxi {price}",
+      priceAria: "{letter} narxi",
+      otherYear: "+ Boshqa yil…",
+      yearCreated: "{year}-yil eng yaqin yil narxlari bilan yaratildi.",
+      dayDot: "{day}-kun · {month}",
+      loadWarning: "Saqlangan ma’lumotlarni o‘qib bo‘lmadi. 2026-yil zaxirasi yuklandi.",
+      continue: "Davom etish",
+      deleteEverything: "Hammasini o‘chirish",
+      gotIt: "Tushundim",
+      finalError: "Tasdiqlash uchun {word} deb yozing.",
+      emptyDay: "Bu kun allaqachon bo‘sh.",
+      shiftSaved: "Smena saqlandi.",
+      clearTitle: "Smenani o‘chirish",
+      clearBody: "<p>{jnd} JND <b>{date}</b> kuni o‘chiriladi.</p><p>Bu kunning bazasi yana {zero} bo‘ladi.</p>",
+      dayDeleted: "Kun o‘chirildi.",
+      wentToday: "Bugunga o‘tildi: {date}.",
+      errEmptyFile: "Fayl bo‘sh yoki unda ma’lumot yo‘q.",
+      errColumns: "Ustunlar yetishmaydi. CSVda anio, mes, dia va jnd bo‘lishi kerak.",
+      errNoRows: "Birorta to‘g‘ri qator topilmadi.",
+      importInvalid: "<p class=\"warn\">Noto‘g‘ri ma’lumotli {n} qator o‘tkazib yuboriladi.</p>",
+      importTitle: "Zaxira nusxani import qilish",
+      importBody: "<p>Bu yillar ma’lumotlari to‘liq almashtiriladi: {years}.</p><p>Import qilinadigan smenalar: {days}.</p>{invalid}<p class=\"hint\">Boshqa yillarga tegilmaydi. Bu amalni bekor qilib bo‘lmaydi.</p>",
+      importBtn: "Import qilish",
+      imported: "Zaxira nusxa import qilindi. Smenalar: {n}.",
+      importFailTitle: "Import qilib bo‘lmadi",
+      importFailHint: "Bu ilovadan yuklangan CSV faylni tanlang.",
+      shareTitle: "Maoshim zaxira nusxasi",
+      shared: "Nusxa ulashildi.",
+      csvDownloaded: "CSV yuklab olindi.",
+      eraseYearTitle: "{year}-yil ma’lumotlarini o‘chirish",
+      eraseYearBody: "<p><b>{year}</b> yilidagi barcha smenalar, (+) va jami o‘chiriladi.</p><p>O‘sha yil narxlari saqlanadi. Boshqa yillarga tegilmaydi.</p><p class=\"warn\">Bu amalni bekor qilib bo‘lmaydi.</p>",
+      yearDeleted: "{year}-yil ma’lumotlari o‘chirildi.",
+      eraseAllTitle: "Barcha ma’lumotlarni o‘chirish",
+      eraseAllBody: "<p><b>Barcha yillar</b>, barcha smenalar va barcha (+) o‘chiriladi.</p><p class=\"warn\">Bu amalni bekor qilib bo‘lmaydi.</p>",
+      finalTitle: "Yakuniy tasdiqlash",
+      finalBody: "<p>Hammasini o‘chirish uchun <b>{word}</b> deb yozing.</p>",
+      confirmWord: "OCHIRISH",
+      allDeleted: "Barcha ma’lumotlar o‘chirildi.",
+      restoreTitle: "{year}-yil narxlarini tiklash",
+      restoreBody: "<p>Asl narxlar ishlatiladi: X {x}, S {s}, M {m}, Y {y}, P {p}.</p><p>Smenalar o‘chirilmaydi; faqat bazalar qayta hisoblanadi.</p>",
+      restored: "Narxlar tiklandi.",
+      helpTitle: "Tezkor yordam",
+      help1: "1. Oy va kunni tanlang.",
+      help2: "2. JND kiriting (X, XP, XMP…) yoki X, S, M, Y, P tugmalaridan foydalaning.",
+      help3: "3. Baza darhol hisoblanadi va avtomatik saqlanadi.",
+      help4: "(+) faqat YAN, MAR, MAY, IYUL, SEN va NOY oylarida chiqadi. Oyiga bir marta qo‘shiladi.",
+      help5: "15% jamg‘arma faqat ma’lumot uchun: toq oylar bo‘yicha hisoblanadi va jamidan ayirilmaydi.",
+      help6: "Zaxira: vaqti-vaqti bilan CSV yuklab oling. Brauzer ma’lumotlarini tozalasangiz, CSV sizning sug‘urtangiz.",
+      openYearTitle: "Boshqa yilni ochish",
+      openYearBody: "<p>2019–2100 oralig‘ida yil kiriting. Agar u mavjud bo‘lmasa, eng yaqin yil narxlari bilan bo‘sh yaratiladi.</p>",
+      invalidYear: "To‘g‘ri yil kiriting (2019–2100).",
+      open: "Ochish",
+      salaries: "Maoshlar",
+      bonuses: "Mukofotlar",
+      debtTab: "Qarzlar",
+      debtEyebrow: "Rasmiy maosh",
+      debtTitle: "Kompaniyaga qarzlar",
+      debtPending: "To‘lanmagan qarz",
+      debtPaidLabel: "To‘langan",
+      debtTotalLabel: "Jami",
+      debtFixedTitle: "Rasmiy maosh",
+      debtThisMonth: "Bu oy",
+      debtEarned: "Hisoblangan maosh",
+      debtFixedShort: "Rasmiy maosh",
+      debtDiff: "Farq",
+      debtNoDays: "Bu oyda smenalar kiritilmagan.",
+      debtNoDebt: "Bu oy qarz yaratmaydi.",
+      debtSurplus: "Belgilangandan {amount} ko‘p ishladingiz.",
+      debtAddTitle: "Qarzni yozish",
+      debtAmount: "Summa",
+      debtNote: "Izoh (ixtiyoriy)",
+      debtNotePlaceholder: "Masalan: kam kun ishlangan oy",
+      debtAddButton: "Qarz qo‘shish",
+      debtFormHint: "Tanlangan oy uchun farq taklif qilinadi; uni o‘zgartirishingiz mumkin.",
+      debtListTitle: "Yozilgan qarzlar",
+      debtEmpty: "Hozircha qarzlar yozilmagan.",
+      debtPaidPill: "To‘langan",
+      debtPendingPill: "Kutilmoqda",
+      debtAdded: "Qarz yozildi.",
+      debtDeleted: "Qarz o‘chirildi.",
+      debtPaidToast: "Qarz to‘langan deb belgilandi.",
+      debtPendingToast: "Qarz to‘lanmagan deb belgilandi.",
+      debtDeleteTitle: "Qarzni o‘chirish",
+      debtDeleteBody: "<p><b>{month}</b> oyi uchun <b>{amount}</b> qarz o‘chiriladi.</p>",
+      debtAmountRequired: "0 dan katta summa kiriting.",
+    }
+  },
+
   ru: {
     locale: "ru-RU",
     monthsShort: ["ЯНВ", "ФЕВ", "МАР", "АПР", "МАЙ", "ИЮН", "ИЮЛ", "АВГ", "СЕН", "ОКТ", "НОЯ", "ДЕК"],
@@ -1472,7 +1832,6 @@ const I18N = {
       yearCreated: "Год {year} создан с ценами ближайшего года.",
       dayDot: "День {day} · {month}",
       loadWarning: "Не удалось прочитать сохранённые данные. Загружена копия 2026 года.",
-      loadSeed: "Данные за 2026 год загружены из Excel.",
       continue: "Продолжить",
       deleteEverything: "Удалить всё",
       gotIt: "Понятно",
@@ -1520,7 +1879,38 @@ const I18N = {
       invalidYear: "Введите корректный год (2019–2100).",
       open: "Открыть",
       salaries: "Зарплаты",
-      bonuses: "Премии"
+      bonuses: "Премии",
+      debtTab: "Долги",
+      debtEyebrow: "Оклад",
+      debtTitle: "Долги перед компанией",
+      debtPending: "Невыплаченный долг",
+      debtPaidLabel: "Выплачено",
+      debtTotalLabel: "Всего",
+      debtFixedTitle: "Оклад",
+      debtThisMonth: "Этот месяц",
+      debtEarned: "Расчётная зарплата",
+      debtFixedShort: "Оклад",
+      debtDiff: "Разница",
+      debtNoDays: "В этом месяце смены не внесены.",
+      debtNoDebt: "В этом месяце долга нет.",
+      debtSurplus: "Вы заработали больше фиксированной суммы на {amount}.",
+      debtAddTitle: "Записать долг",
+      debtAmount: "Сумма",
+      debtNote: "Заметка (необязательно)",
+      debtNotePlaceholder: "Например: месяц с малым числом дней",
+      debtAddButton: "Добавить долг",
+      debtFormHint: "Предлагается разница за выбранный месяц; её можно изменить.",
+      debtListTitle: "Записанные долги",
+      debtEmpty: "Долгов пока нет.",
+      debtPaidPill: "Выплачено",
+      debtPendingPill: "Ожидает",
+      debtAdded: "Долг записан.",
+      debtDeleted: "Долг удалён.",
+      debtPaidToast: "Долг отмечен как выплаченный.",
+      debtPendingToast: "Долг отмечен как невыплаченный.",
+      debtDeleteTitle: "Удалить долг",
+      debtDeleteBody: "Долг за <b>{month}</b> на <b>{amount}</b> будет удалён.",
+      debtAmountRequired: "Введите сумму больше 0."
     }
   }
 };
@@ -1553,6 +1943,7 @@ function daysWord(n){
     return "дней";
   }
   if (lang === "en") return n === 1 ? "day" : "days";
+  if (lang === "uz") return "kun";
   return n === 1 ? "día" : "días";
 }
 
@@ -1562,6 +1953,7 @@ function daysText(n){
 
 function dateLabel(day, monthIndex){
   if (lang === "en") return MONTHS_LONG[monthIndex] + " " + day;
+  if (lang === "uz") return day + "-" + MONTHS_LONG[monthIndex].toLowerCase();
   if (lang === "ru") return day + " " + (MONTHS_GEN[monthIndex] || MONTHS_LONG[monthIndex].toLowerCase());
   return day + " de " + MONTHS_LONG[monthIndex].toLowerCase();
 }
@@ -1599,11 +1991,13 @@ function applyStaticTranslations(){
   $$("[data-i18n-html]").forEach(el => { el.innerHTML = t(el.dataset.i18nHtml); });
   $$("[data-i18n-aria]").forEach(el => el.setAttribute("aria-label", t(el.dataset.i18nAria)));
   $$("[data-i18n-title]").forEach(el => { el.title = t(el.dataset.i18nTitle); });
+  $$("[data-i18n-ph]").forEach(el => { el.placeholder = t(el.dataset.i18nPh); });
 }
 
 const LETTERS = ["X","S","M","Y","P"];
 const DEFAULT_PRICES = {X:7000, S:5000, M:3000, Y:14000, P:1500};
 const PREMIUM_PER_DAY = 1500;
+const DEFAULT_OFFICIAL_SALARY = 60000;
 const STORAGE_KEY = "mi-salario-jnd-v1";
 const START_YEAR = 2019;
 const NOW = new Date();
@@ -1617,6 +2011,7 @@ const $$ = (sel, root = document) => Array.from(root.querySelectorAll(sel));
 
 let state;
 let ui = {view: "hoy", month: CURRENT_MONTH, day: CURRENT_DAY};
+let debtFormMonth = CURRENT_MONTH + 1;
 let saveTimer = null;
 let saveStateTimer = null;
 let toastTimer = null;
@@ -1678,11 +2073,12 @@ function num(value){
 }
 
 function currencySymbol(){
-  return lang === "ru" ? "₽" : "$";
+  // En esta versión todos los importes son en rublos.
+  return "₽";
 }
 
 function money(value){
-  return currencySymbol() + " " + num(value);
+  return num(value) + " ₽";
 }
 
 function daysInMonth(year, monthIndex){
@@ -1715,7 +2111,7 @@ function seedYear(){
 }
 
 function seedState(){
-  return {version: 1, activeYear: 2026, years: {"2026": seedYear()}};
+  return {version: 1, activeYear: 2026, years: {"2026": seedYear()}, debts: [], officialSalary: DEFAULT_OFFICIAL_SALARY};
 }
 
 function normalizeYear(raw){
@@ -1733,6 +2129,38 @@ function normalizeYear(raw){
     }
   }
   return year;
+}
+
+function normalizeDebts(raw){
+  if (!Array.isArray(raw)) return [];
+  const out = [];
+  for (let i = 0; i < raw.length; i++){
+    const d = raw[i];
+    if (!d || typeof d !== "object") continue;
+    const year = parseInt(d.year, 10);
+    const month = parseInt(d.month, 10);
+    const amount = Math.round(nonNeg(d.amount));
+    if (!(year >= 2019 && year <= 2100) || !(month >= 1 && month <= 12) || amount <= 0) continue;
+    out.push({
+      id: String(d.id || ("debt-" + year + "-" + month + "-" + i + "-" + Date.now())),
+      year,
+      month,
+      amount,
+      note: String(d.note ?? "").slice(0, 80),
+      paid: Boolean(d.paid),
+      createdAt: Number.isFinite(Number(d.createdAt)) ? Number(d.createdAt) : Date.now()
+    });
+  }
+  return out;
+}
+
+function normalizeOfficialSalary(value){
+  const n = Math.round(Number(value));
+  return Number.isFinite(n) && n >= 0 ? n : DEFAULT_OFFICIAL_SALARY;
+}
+
+function officialSalary(){
+  return normalizeOfficialSalary(state.officialSalary);
 }
 
 function loadState(){
@@ -1772,7 +2200,17 @@ function loadState(){
     activeYear = Number(Object.keys(years).sort((a, b) => Number(a) - Number(b))[0]);
   }
 
-  return {state: {version: 1, activeYear, years}, fresh: false, warning: false};
+  return {
+    state: {
+      version: 1,
+      activeYear,
+      years,
+      debts: normalizeDebts(raw.debts),
+      officialSalary: normalizeOfficialSalary(raw.officialSalary)
+    },
+    fresh: false,
+    warning: false
+  };
 }
 
 function currentYearData(){
@@ -2112,6 +2550,10 @@ function setView(view){
   }
   if (view === "mes") renderMonth();
   if (view === "anio") renderAnnual();
+  if (view === "deudas"){
+    debtFormMonth = ui.month + 1;
+    renderDebts();
+  }
   if (view === "precios") renderPrices();
   window.scrollTo({top: 0, behavior: "smooth"});
 }
@@ -2416,6 +2858,172 @@ function renderPrices(){
 }
 
 /* ============================================================
+   Deudas con la compañía
+   ============================================================ */
+function allDebts(){
+  return Array.isArray(state.debts) ? state.debts : [];
+}
+
+function debtTotals(){
+  let pending = 0, paid = 0, pendingCount = 0;
+  const debts = allDebts();
+  for (const d of debts){
+    if (d.paid) paid += d.amount;
+    else { pending += d.amount; pendingCount++; }
+  }
+  return {pending, paid, total: pending + paid, count: debts.length, pendingCount};
+}
+
+function monthLabel(year, month){
+  return `${MONTHS_SHORT[month - 1]} ${year}`;
+}
+
+function debtSuggestion(year, month){
+  const yd = state.years[String(year)];
+  if (!yd) return {salary: 0, days: 0, has: false, short: 0, surplus: 0, fixed: officialSalary()};
+  const st = monthStats(yd, month - 1);
+  const fixed = officialSalary();
+  const has = st.worked > 0 || st.plus > 0;
+  return {
+    salary: st.salary,
+    days: st.worked,
+    has,
+    fixed,
+    short: has ? Math.max(0, fixed - st.salary) : 0,
+    surplus: has ? Math.max(0, st.salary - fixed) : 0
+  };
+}
+
+function renderDebtForm(){
+  const select = $("#debtMonth");
+  if (!select) return;
+  select.innerHTML = MONTHS_LONG.map((name, index) =>
+    `<option value="${index + 1}"${index + 1 === debtFormMonth ? " selected" : ""}>${name}</option>`
+  ).join("");
+  updateDebtCompare(true);
+}
+
+function updateDebtCompare(fillAmount){
+  const select = $("#debtMonth");
+  const box = $("#debtCompare");
+  if (!select || !box) return;
+  const month = parseInt(select.value, 10) || 1;
+  const year = state.activeYear;
+  const st = debtSuggestion(year, month);
+
+  if (!st.has){
+    box.innerHTML =
+      `<div class="debt-compare-row"><span>${esc(t("debtThisMonth"))} · ${MONTHS_LONG[month - 1]} ${year}</span></div>` +
+      `<div class="debt-compare-row"><span>${esc(t("debtNoDays"))}</span></div>`;
+  } else {
+    let result;
+    if (st.short > 0){
+      result = `<div class="debt-compare-row"><span>${esc(t("debtDiff"))}</span><b class="bad">${money(st.short)}</b></div>`;
+    } else if (st.surplus > 0){
+      result = `<div class="debt-compare-row"><span class="good">${esc(t("debtSurplus", {amount: money(st.surplus)}))}</span></div>`;
+    } else {
+      result = `<div class="debt-compare-row"><span class="good">${esc(t("debtNoDebt"))}</span></div>`;
+    }
+    box.innerHTML =
+      `<div class="debt-compare-row"><span>${esc(t("debtThisMonth"))} · ${MONTHS_LONG[month - 1]} ${year}</span></div>` +
+      `<div class="debt-compare-row"><span>${esc(t("debtEarned"))}</span><b>${money(st.salary)}</b></div>` +
+      `<div class="debt-compare-row"><span>${esc(t("debtFixedShort"))}</span><b>${money(st.fixed)}</b></div>` +
+      result;
+  }
+
+  if (fillAmount){
+    $("#debtAmount").value = st.short > 0 ? st.short : "";
+  }
+}
+
+function renderDebtList(){
+  const list = $("#debtList");
+  if (!list) return;
+  const debts = allDebts().slice().sort((a, b) =>
+    (b.year - a.year) || (b.month - a.month) || (b.createdAt - a.createdAt)
+  );
+  $("#debtListCount").textContent = debts.length ? String(debts.length) : "";
+  if (!debts.length){
+    list.innerHTML = `<p class="debt-empty">${esc(t("debtEmpty"))}</p>`;
+    return;
+  }
+  list.innerHTML = debts.map(d => `
+    <div class="debt-row${d.paid ? " paid" : ""}" data-id="${esc(d.id)}">
+      <div class="debt-main">
+        <b>${monthLabel(d.year, d.month)}</b>
+        <span>${esc(d.note || "—")}</span>
+      </div>
+      <div class="debt-amount">${money(d.amount)}</div>
+      <div class="debt-actions">
+        <button type="button" class="debt-state" data-act="toggle">${esc(d.paid ? t("debtPaidPill") : t("debtPendingPill"))}</button>
+        <button type="button" class="debt-del" data-act="del" aria-label="${esc(t("delete"))}">×</button>
+      </div>
+    </div>`).join("");
+}
+
+function renderDebts(){
+  const totals = debtTotals();
+  $("#debtPendingTotal").textContent = money(totals.pending);
+  $("#debtTotals").textContent = `${t("debtPaidLabel")} ${money(totals.paid)} · ${t("debtTotalLabel")} ${money(totals.total)}`;
+  $("#debtCount").textContent = totals.pendingCount;
+  const salaryInput = $("#officialSalary");
+  if (salaryInput && document.activeElement !== salaryInput){
+    salaryInput.value = officialSalary();
+  }
+  renderDebtForm();
+  renderDebtList();
+}
+
+function addDebt(){
+  const amount = Math.round(nonNeg($("#debtAmount").value));
+  if (amount <= 0){
+    toast(t("debtAmountRequired"));
+    $("#debtAmount").focus();
+    return;
+  }
+  const month = parseInt($("#debtMonth").value, 10) || debtFormMonth;
+  const note = $("#debtNote").value.trim().slice(0, 80);
+  state.debts = allDebts().concat([{
+    id: "debt-" + Date.now() + "-" + Math.random().toString(36).slice(2, 7),
+    year: state.activeYear,
+    month,
+    amount,
+    note,
+    paid: false,
+    createdAt: Date.now()
+  }]);
+  saveNow();
+  $("#debtNote").value = "";
+  renderDebts();
+  toast(t("debtAdded"));
+}
+
+function toggleDebt(id){
+  const debt = allDebts().find(d => d.id === id);
+  if (!debt) return;
+  debt.paid = !debt.paid;
+  saveNow();
+  renderDebts();
+  toast(debt.paid ? t("debtPaidToast") : t("debtPendingToast"));
+}
+
+async function deleteDebt(id){
+  const debt = allDebts().find(d => d.id === id);
+  if (!debt) return;
+  const ok = await confirmDialog(
+    t("debtDeleteTitle"),
+    t("debtDeleteBody", {month: monthLabel(debt.year, debt.month), amount: money(debt.amount)}),
+    t("delete"),
+    true
+  );
+  if (!ok) return;
+  state.debts = allDebts().filter(d => d.id !== id);
+  saveNow();
+  renderDebts();
+  toast(t("debtDeleted"));
+}
+
+/* ============================================================
    Render general
    ============================================================ */
 function renderAll(){
@@ -2426,6 +3034,7 @@ function renderAll(){
   renderQuick();
   renderMonth();
   renderAnnual();
+  renderDebts();
   renderPrices();
   updateNav();
 }
@@ -2536,7 +3145,7 @@ function csvCell(value){
 }
 
 function buildCSV(){
-  const rows = [["anio","mes","dia","jnd","plus_mes","precio_x","precio_s","precio_m","precio_y","precio_p","base"]];
+  const rows = [["anio","mes","dia","jnd","plus_mes","precio_x","precio_s","precio_m","precio_y","precio_p","base","tipo","nota","importe","pagada"]];
   const years = Object.keys(state.years).map(Number).sort((a, b) => a - b);
 
   for (const yearNumber of years){
@@ -2545,14 +3154,28 @@ function buildCSV(){
     for (let month = 0; month < 12; month++){
       const stats = monthStats(yearData, month);
       const plus = month % 2 === 0 ? stats.plus : 0;
-      rows.push([yearNumber, month + 1, 0, "", plus, prices.X, prices.S, prices.M, prices.Y, prices.P, stats.base]);
+      rows.push([yearNumber, month + 1, 0, "", plus, prices.X, prices.S, prices.M, prices.Y, prices.P, stats.base, "", "", "", ""]);
       for (let day = 1; day <= 31; day++){
         const jnd = normalizeJND(yearData.months[month].days[day - 1]);
         if (!jnd) continue;
-        rows.push([yearNumber, month + 1, day, jnd, plus, prices.X, prices.S, prices.M, prices.Y, prices.P, baseOf(jnd, prices)]);
+        rows.push([yearNumber, month + 1, day, jnd, plus, prices.X, prices.S, prices.M, prices.Y, prices.P, baseOf(jnd, prices), "", "", "", ""]);
       }
     }
   }
+  for (const debt of allDebts()){
+    const prices = (state.years[String(debt.year)] || {prices: DEFAULT_PRICES}).prices;
+    rows.push([
+      debt.year, debt.month, 0, "", 0,
+      prices.X, prices.S, prices.M, prices.Y, prices.P, 0,
+      "deuda", debt.note || "", debt.amount, debt.paid ? 1 : 0
+    ]);
+  }
+  const salaryPrices = currentYearData().prices;
+  rows.push([
+    state.activeYear, 1, 0, "", 0,
+    salaryPrices.X, salaryPrices.S, salaryPrices.M, salaryPrices.Y, salaryPrices.P, 0,
+    "salario", "", officialSalary(), ""
+  ]);
   return "\uFEFF" + rows.map(row => row.map(csvCell).join(";")).join("\r\n") + "\r\n";
 }
 
@@ -2665,8 +3288,14 @@ function parseImport(text){
     P: find("precio_p","pp")
   };
   const iPlus = find("plus_mes","plus","mas");
+  const iTipo = find("tipo");
+  const iNota = find("nota");
+  const iImporte = find("importe");
+  const iPagada = find("pagada");
 
   const imported = new Map();
+  const debts = (iTipo >= 0 && iImporte >= 0) ? [] : null;
+  let officialSalaryValue = null;
   let invalid = 0;
   let dayCount = 0;
 
@@ -2677,6 +3306,29 @@ function parseImport(text){
     const day = parseInt(row[iDay], 10);
     if (!(year >= 2019 && year <= 2100) || !month || !(day >= 0 && day <= 31)){
       invalid++;
+      continue;
+    }
+
+    const tipo = String(row[iTipo] ?? "").trim().toLowerCase();
+    if (tipo === "salario" && iImporte >= 0){
+      const amount = Math.round(parseAmount(row[iImporte]));
+      if (Number.isFinite(amount) && amount >= 0) officialSalaryValue = amount;
+      continue;
+    }
+
+    if (debts && tipo === "deuda"){
+      const amount = Math.round(parseAmount(row[iImporte]));
+      if (Number.isFinite(amount) && amount > 0){
+        debts.push({
+          year,
+          month,
+          amount,
+          note: String(row[iNota] ?? "").slice(0, 80),
+          paid: /^(1|true|si|sí|pagada|to‘langan)$/i.test(String(row[iPagada] ?? "").trim())
+        });
+      } else {
+        invalid++;
+      }
       continue;
     }
 
@@ -2721,7 +3373,7 @@ function parseImport(text){
   }
 
   if (!imported.size) throw new Error(t("errNoRows"));
-  return {imported, invalid, dayCount};
+  return {imported, invalid, dayCount, debts, officialSalary: officialSalaryValue};
 }
 
 function applyImport(parsed){
@@ -2738,6 +3390,13 @@ function applyImport(parsed){
       yearData.months[month].plus = month % 2 === 0 ? record.months[month].plus : 0;
     }
     state.years[String(yearNumber)] = yearData;
+  }
+
+  if (parsed.debts){
+    state.debts = normalizeDebts(parsed.debts);
+  }
+  if (parsed.officialSalary != null){
+    state.officialSalary = normalizeOfficialSalary(parsed.officialSalary);
   }
 
   if (!years.includes(state.activeYear)){
@@ -2853,7 +3512,9 @@ async function clearAllData(){
   state = {
     version: 1,
     activeYear: CURRENT_YEAR,
-    years: {[String(CURRENT_YEAR)]: makeYear(DEFAULT_PRICES)}
+    years: {[String(CURRENT_YEAR)]: makeYear(DEFAULT_PRICES)},
+    debts: [],
+    officialSalary: DEFAULT_OFFICIAL_SALARY
   };
   ui.month = CURRENT_MONTH;
   ui.day = CURRENT_DAY;
@@ -2916,6 +3577,31 @@ function bindEvents(){
   });
   document.addEventListener("click", event => {
     if (!event.target.closest(".lang-wrap")) closeLangMenu();
+  });
+
+  $("#officialSalary").addEventListener("input", () => {
+    state.officialSalary = Math.max(0, Math.round(Number($("#officialSalary").value) || 0));
+    scheduleSave();
+    updateDebtCompare(true);
+  });
+  $("#officialSalary").addEventListener("blur", () => {
+    state.officialSalary = Math.max(0, Math.round(Number($("#officialSalary").value) || 0));
+    $("#officialSalary").value = officialSalary();
+    saveNow();
+    flashSaved();
+    updateDebtCompare(true);
+  });
+  $("#debtMonth").addEventListener("change", () => {
+    debtFormMonth = parseInt($("#debtMonth").value, 10) || 1;
+    updateDebtCompare(true);
+  });
+  $("#debtAdd").addEventListener("click", addDebt);
+  $("#debtList").addEventListener("click", event => {
+    const button = event.target.closest("[data-act]");
+    const row = event.target.closest("[data-id]");
+    if (!button || !row) return;
+    if (button.dataset.act === "toggle") toggleDebt(row.dataset.id);
+    else deleteDebt(row.dataset.id);
   });
 
   $("#yearSelect").addEventListener("change", async event => {
@@ -3113,9 +3799,6 @@ function init(){
   renderAll();
   setSaveBadge("ok");
 
-  if (loaded.fresh){
-    setTimeout(() => toast(t("loadSeed")), 700);
-  }
 }
 
 init();

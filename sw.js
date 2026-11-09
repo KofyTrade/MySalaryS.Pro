@@ -1,5 +1,5 @@
 const CACHE_PREFIX = "misalario-personal-";
-const CACHE = CACHE_PREFIX + "v2";
+const CACHE = CACHE_PREFIX + "v3";
 const ASSETS = ["./", "./index.html", "./manifest.webmanifest", "./icon-192.png", "./icon-512.png"];
 
 self.addEventListener("install", event => {
@@ -14,7 +14,7 @@ self.addEventListener("activate", event => {
   event.waitUntil(
     caches.keys()
       .then(keys => Promise.all(keys.filter(key =>
-        key === "misalario-v1" || (key.startsWith(CACHE_PREFIX) && key !== CACHE)
+        (key.startsWith(CACHE_PREFIX) && key !== CACHE)
       ).map(key => caches.delete(key))))
       .then(() => self.clients.claim())
   );
