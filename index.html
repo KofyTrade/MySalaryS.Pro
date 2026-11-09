@@ -7,6 +7,8 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Mi Salario">
+<link rel="manifest" href="./manifest.webmanifest">
+<link rel="apple-touch-icon" href="./icon-192.png">
 <meta name="description" content="Registro de jornadas JND, salario mensual y resumen anual. Funciona sin internet.">
 <title>Mi Salario · JND</title>
 <style>
@@ -2500,6 +2502,14 @@ function init(){
 }
 
 init();
+
+/* Guarda la app en el teléfono para poder abrirla sin internet (solo versión publicada). */
+if (typeof navigator !== "undefined" && "serviceWorker" in navigator &&
+    typeof location !== "undefined" && location.protocol === "https:") {
+  window.addEventListener("load", function () {
+    navigator.serviceWorker.register("./sw.js").catch(function () {});
+  });
+}
 </script>
 </body>
 </html>
