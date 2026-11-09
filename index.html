@@ -648,9 +648,9 @@
   .debt-form .money-field{width:100%}
   .debt-form .btn{width:100%}
   @media (min-width:560px){
-    .debt-form{grid-template-columns:1fr 1fr}
-    .debt-form .field.full{grid-column:1 / -1}
-    .debt-form .btn{grid-column:1 / -1}
+    .debt-form{grid-template-columns:1fr}
+    .debt-form .field.full{grid-column:auto}
+    .debt-form .btn{grid-column:auto}
   }
   .debt-row{
     display:grid;grid-template-columns:1fr auto auto;gap:9px;align-items:center;
@@ -662,7 +662,13 @@
   .debt-main span{display:block;font-size:11px;color:var(--muted);margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
   .debt-amount{font-weight:900;font-size:13px;font-variant-numeric:tabular-nums;color:var(--danger);white-space:nowrap}
   .debt-row.paid .debt-amount{color:var(--muted);text-decoration:line-through}
-  .debt-actions{display:flex;align-items:center;gap:3px}
+  .debt-amount small{display:block;font-size:10px;color:var(--muted);font-weight:700;margin-top:2px;white-space:normal;text-decoration:none}
+  .debt-row.partial .debt-state{background:#fef3c7;border-color:#fde68a;color:#92400e}
+  .debt-actions{display:flex;align-items:center;gap:3px;flex-wrap:wrap;justify-content:flex-end}
+  .debt-abonar{
+    border:1px solid #99f6e4;background:var(--brand-soft);color:var(--brand);
+    border-radius:999px;padding:6px 9px;font-size:9.5px;font-weight:850;white-space:nowrap;
+  }
   .debt-state{
     border:1px solid var(--line);background:var(--bg);color:var(--muted);
     border-radius:999px;padding:6px 8px;font-size:9.5px;font-weight:850;white-space:nowrap;
@@ -673,6 +679,12 @@
     padding:4px 6px;border-radius:8px;
   }
   .debt-empty{padding:14px 4px;color:var(--muted);font-size:13px;text-align:center}
+  @media (max-width:520px){
+    .debt-row{grid-template-columns:1fr auto;grid-template-areas:"main amount" "actions actions";row-gap:6px}
+    .debt-main{grid-area:main}
+    .debt-amount{grid-area:amount}
+    .debt-actions{grid-area:actions;justify-content:flex-end}
+  }
 
   /* ---------- Barra inferior ---------- */
   .tabbar{
@@ -910,7 +922,7 @@
 
     <div class="card table-card" style="margin-top:12px">
       <div class="card-head">
-        <h3 data-i18n="daysRange">Días 1–31</h3>
+        <h3 id="daysRangeTitle" data-i18n="daysRange">Días 1–31</h3>
         <span class="hint" data-i18n="tapToEdit">Toca un JND para editarlo</span>
       </div>
       <div class="table-wrap">
@@ -1032,7 +1044,7 @@
 
     <div class="card">
       <div class="card-head">
-        <h3 data-i18n="debtAddTitle">Anotar deuda</h3>
+        <h3 data-i18n="debtAddTitle">Pagar deuda</h3>
       </div>
       <div class="debt-form">
         <label class="field">
@@ -1043,16 +1055,19 @@
           <span data-i18n="debtAmount">Monto</span>
           <span class="money-field">
             <span>₽</span>
-            <input id="debtAmount" type="number" min="0" step="500" inputmode="numeric" placeholder="0">
+            <input id="debtAmount" type="number" min="0" step="500" inputmode="numeric" placeholder="0" readonly>
           </span>
         </label>
         <label class="field full">
-          <span data-i18n="debtNote">Nota (opcional)</span>
-          <input id="debtNote" type="text" maxlength="80" data-i18n-ph="debtNotePlaceholder" placeholder="Ej.: mes con pocos días">
+          <span data-i18n="debtPayment">Pago</span>
+          <span class="money-field">
+            <span>₽</span>
+            <input id="debtPayment" type="number" min="0" step="500" inputmode="numeric" placeholder="0">
+          </span>
         </label>
-        <button class="btn primary" id="debtAdd" type="button" data-i18n="debtAddButton">Agregar deuda</button>
+        <button class="btn primary" id="debtAdd" type="button" data-i18n="debtAddButton">Pagar</button>
       </div>
-      <p class="hint" data-i18n="debtFormHint">Se sugiere la diferencia del mes elegido; podés cambiarla.</p>
+      <p class="hint" data-i18n="debtFormHint">El monto es el salario oficial. La deuda del mes se descuenta sola de lo que ganaste; el pago de la barra se resta de esa deuda.</p>
     </div>
 
     <div class="card">
@@ -1220,7 +1235,7 @@ const I18N = {
       daysWorked: "Days worked",
       base: "Base",
       monthSalary: "Month salary",
-      daysRange: "Days 1–31",
+      daysRange: "Days 1–{count}",
       tapToEdit: "Tap a JND to edit it",
       day: "Day",
       prevMonth: "Previous month",
@@ -1346,20 +1361,24 @@ const I18N = {
       debtNoDays: "No shifts entered this month.",
       debtNoDebt: "This month generates no debt.",
       debtSurplus: "You earned {amount} above the official salary.",
-      debtAddTitle: "Record debt",
+      debtAddTitle: "Pay debt",
       debtAmount: "Amount",
-      debtNote: "Note (optional)",
-      debtNotePlaceholder: "E.g.: month with few days",
-      debtAddButton: "Add debt",
-      debtFormHint: "The difference for the selected month is suggested; you can change it.",
+      debtPayment: "Payments",
+      debtRemaining: "Pending",
+      debtPartialPill: "Partial",
+      debtPayAction: "Add payment",
+      debtPayTitle: "Pay debt",
+      debtPayBody: "Debt for {month}: {remaining} pending. How much did you pay?",
+      debtPayButton: "Record payment",
+      debtPayInvalid: "Enter an amount between 1 and {remaining}.",
+      debtPaymentAdded: "Payment recorded.",
+      debtAddButton: "Pay",
+      debtFormHint: "The amount is the official salary. Payments shows what you earned that month; you can change it. The subtraction happens only when you tap Pay.",
       debtListTitle: "Recorded debts",
       debtEmpty: "No debts recorded yet.",
       debtPaidPill: "Paid",
       debtPendingPill: "Pending",
-      debtAdded: "Debt recorded.",
       debtDeleted: "Debt deleted.",
-      debtPaidToast: "Debt marked as paid.",
-      debtPendingToast: "Debt marked as unpaid.",
       debtDeleteTitle: "Delete debt",
       debtDeleteBody: "The debt for <b>{month}</b> of <b>{amount}</b> will be deleted.",
       debtAmountRequired: "Enter an amount greater than 0."
@@ -1403,7 +1422,7 @@ const I18N = {
       daysWorked: "Días trabajados",
       base: "Base",
       monthSalary: "Salario del mes",
-      daysRange: "Días 1–31",
+      daysRange: "Días 1–{count}",
       tapToEdit: "Toca un JND para editarlo",
       day: "Día",
       prevMonth: "Mes anterior",
@@ -1529,20 +1548,24 @@ const I18N = {
       debtNoDays: "No hay jornadas cargadas este mes.",
       debtNoDebt: "Este mes no genera deuda.",
       debtSurplus: "Superaste el fijo por {amount}.",
-      debtAddTitle: "Anotar deuda",
+      debtAddTitle: "Pagar deuda",
       debtAmount: "Monto",
-      debtNote: "Nota (opcional)",
-      debtNotePlaceholder: "Ej.: mes con pocos días",
-      debtAddButton: "Agregar deuda",
-      debtFormHint: "Se sugiere la diferencia del mes elegido; podés cambiarla.",
+      debtPayment: "Pagos",
+      debtRemaining: "Pendiente",
+      debtPartialPill: "Parcial",
+      debtPayAction: "Abonar",
+      debtPayTitle: "Pagar deuda",
+      debtPayBody: "Deuda de {month}: pendiente {remaining}. ¿Cuánto pagaste?",
+      debtPayButton: "Registrar pago",
+      debtPayInvalid: "Escribe un monto entre 1 y {remaining}.",
+      debtPaymentAdded: "Pago registrado.",
+      debtAddButton: "Pagar",
+      debtFormHint: "El monto es el salario oficial. En Pagos aparece lo que ganaste ese mes; podés cambiarlo. La resta se hace recién cuando tocás Pagar.",
       debtListTitle: "Deudas anotadas",
       debtEmpty: "Todavía no hay deudas anotadas.",
       debtPaidPill: "Pagada",
       debtPendingPill: "Pendiente",
-      debtAdded: "Deuda anotada.",
       debtDeleted: "Deuda borrada.",
-      debtPaidToast: "Deuda marcada como pagada.",
-      debtPendingToast: "Deuda marcada como pendiente.",
       debtDeleteTitle: "Borrar deuda",
       debtDeleteBody: "Se borrará la deuda de <b>{month}</b> por <b>{amount}</b>.",
       debtAmountRequired: "Escribe un monto mayor a 0."
@@ -1585,7 +1608,7 @@ const I18N = {
       daysWorked: "Ishlangan kunlar",
       base: "Baza",
       monthSalary: "Oylik maosh",
-      daysRange: "1–31-kunlar",
+      daysRange: "1–{count}-kunlar",
       tapToEdit: "Tahrirlash uchun JND ga bosing",
       day: "Kun",
       prevMonth: "Oldingi oy",
@@ -1711,20 +1734,24 @@ const I18N = {
       debtNoDays: "Bu oyda smenalar kiritilmagan.",
       debtNoDebt: "Bu oy qarz yaratmaydi.",
       debtSurplus: "Belgilangandan {amount} ko‘p ishladingiz.",
-      debtAddTitle: "Qarzni yozish",
+      debtAddTitle: "Qarzni to‘lash",
       debtAmount: "Summa",
-      debtNote: "Izoh (ixtiyoriy)",
-      debtNotePlaceholder: "Masalan: kam kun ishlangan oy",
-      debtAddButton: "Qarz qo‘shish",
-      debtFormHint: "Tanlangan oy uchun farq taklif qilinadi; uni o‘zgartirishingiz mumkin.",
+      debtPayment: "To‘lovlar",
+      debtRemaining: "Qoldiq",
+      debtPartialPill: "Qisman",
+      debtPayAction: "To‘lov qo‘shish",
+      debtPayTitle: "Qarzni to‘lash",
+      debtPayBody: "Qarz: {month}, qoldiq {remaining}. Qancha to‘ladingiz?",
+      debtPayButton: "To‘lovni yozish",
+      debtPayInvalid: "1 dan {remaining} gacha summa kiriting.",
+      debtPaymentAdded: "To‘lov yozildi.",
+      debtAddButton: "To‘lash",
+      debtFormHint: "Summa — rasmiy maosh. To‘lovlar maydonida o‘sha oy ishlagan summangiz ko‘rinadi; uni o‘zgartirishingiz mumkin. Ayirish faqat To‘lash bosilganda bajariladi.",
       debtListTitle: "Yozilgan qarzlar",
       debtEmpty: "Hozircha qarzlar yozilmagan.",
       debtPaidPill: "To‘langan",
       debtPendingPill: "Kutilmoqda",
-      debtAdded: "Qarz yozildi.",
       debtDeleted: "Qarz o‘chirildi.",
-      debtPaidToast: "Qarz to‘langan deb belgilandi.",
-      debtPendingToast: "Qarz to‘lanmagan deb belgilandi.",
       debtDeleteTitle: "Qarzni o‘chirish",
       debtDeleteBody: "<p><b>{month}</b> oyi uchun <b>{amount}</b> qarz o‘chiriladi.</p>",
       debtAmountRequired: "0 dan katta summa kiriting.",
@@ -1768,7 +1795,7 @@ const I18N = {
       daysWorked: "Отработанные дни",
       base: "База",
       monthSalary: "Зарплата за месяц",
-      daysRange: "Дни 1–31",
+      daysRange: "Дни 1–{count}",
       tapToEdit: "Нажмите на JND, чтобы изменить",
       day: "День",
       prevMonth: "Предыдущий месяц",
@@ -1894,20 +1921,24 @@ const I18N = {
       debtNoDays: "В этом месяце смены не внесены.",
       debtNoDebt: "В этом месяце долга нет.",
       debtSurplus: "Вы заработали больше фиксированной суммы на {amount}.",
-      debtAddTitle: "Записать долг",
+      debtAddTitle: "Оплатить долг",
       debtAmount: "Сумма",
-      debtNote: "Заметка (необязательно)",
-      debtNotePlaceholder: "Например: месяц с малым числом дней",
-      debtAddButton: "Добавить долг",
-      debtFormHint: "Предлагается разница за выбранный месяц; её можно изменить.",
+      debtPayment: "Платежи",
+      debtRemaining: "Осталось",
+      debtPartialPill: "Частично",
+      debtPayAction: "Внести платёж",
+      debtPayTitle: "Оплатить долг",
+      debtPayBody: "Долг за {month}: осталось {remaining}. Сколько вы заплатили?",
+      debtPayButton: "Записать платёж",
+      debtPayInvalid: "Введите сумму от 1 до {remaining}.",
+      debtPaymentAdded: "Платёж записан.",
+      debtAddButton: "Оплатить",
+      debtFormHint: "Сумма — это официальная зарплата. В «Платежи» показывается заработок за месяц; его можно изменить. Вычитание происходит только при нажатии «Оплатить».",
       debtListTitle: "Записанные долги",
       debtEmpty: "Долгов пока нет.",
       debtPaidPill: "Выплачено",
       debtPendingPill: "Ожидает",
-      debtAdded: "Долг записан.",
       debtDeleted: "Долг удалён.",
-      debtPaidToast: "Долг отмечен как выплаченный.",
-      debtPendingToast: "Долг отмечен как невыплаченный.",
       debtDeleteTitle: "Удалить долг",
       debtDeleteBody: "Долг за <b>{month}</b> на <b>{amount}</b> будет удалён.",
       debtAmountRequired: "Введите сумму больше 0."
@@ -2141,13 +2172,29 @@ function normalizeDebts(raw){
     const month = parseInt(d.month, 10);
     const amount = Math.round(nonNeg(d.amount));
     if (!(year >= 2019 && year <= 2100) || !(month >= 1 && month <= 12) || amount <= 0) continue;
+    const auto = Boolean(d.auto);
+    const autoPaid = 0;
+    let extraPaid;
+    if (auto){
+      extraPaid = d.extraPaid != null
+        ? Math.max(0, Math.round(Number(d.extraPaid) || 0))
+        : 0;
+    } else {
+      const rawPaid = d.paidAmount != null ? Number(d.paidAmount) : (d.paid ? amount : 0);
+      extraPaid = Math.max(0, Math.round(Number.isFinite(rawPaid) ? rawPaid : 0));
+    }
+    const paidAmount = Math.max(0, Math.min(amount, extraPaid));
     out.push({
       id: String(d.id || ("debt-" + year + "-" + month + "-" + i + "-" + Date.now())),
       year,
       month,
       amount,
+      autoPaid,
+      extraPaid,
+      paidAmount,
+      auto,
       note: String(d.note ?? "").slice(0, 80),
-      paid: Boolean(d.paid),
+      paid: paidAmount >= amount,
       createdAt: Number.isFinite(Number(d.createdAt)) ? Number(d.createdAt) : Date.now()
     });
   }
@@ -2627,18 +2674,17 @@ function renderQuick(){
   $("#quickTitle").textContent = `${MONTHS_LONG[ui.month]} ${state.activeYear}`;
   $("#quickMonthStats").textContent = `${daysText(stats.worked)} · ${money(stats.salary)}`;
 
-  $("#dayGrid").innerHTML = Array.from({length: 31}, (_, index) => {
+  const count = daysInMonth(state.activeYear, ui.month);
+  $("#dayGrid").innerHTML = Array.from({length: count}, (_, index) => {
     const day = index + 1;
     const raw = yearData.months[ui.month].days[index];
     const filled = String(raw).trim() !== "";
     const isToday = state.activeYear === CURRENT_YEAR && ui.month === CURRENT_MONTH && day === CURRENT_DAY;
     const isSelected = day === ui.day;
-    const isOut = day > daysInMonth(state.activeYear, ui.month);
     const classes = ["day-btn"];
     if (filled) classes.push("filled");
     if (isSelected) classes.push("selected");
     if (isToday) classes.push("today");
-    if (isOut) classes.push("out");
     return `<button type="button" class="${classes.join(" ")}" data-day="${day}"
       aria-pressed="${isSelected}" aria-label="${esc(t("dayAria", {day}) + (filled ? t("withShift") : ""))}">${day}</button>`;
   }).join("");
@@ -2709,20 +2755,20 @@ function updateMonthTotals(){
 
 function renderMonthTable(){
   const yearData = currentYearData();
-  $("#monthBody").innerHTML = Array.from({length: 31}, (_, index) => {
+  const count = daysInMonth(state.activeYear, ui.month);
+  $("#monthBody").innerHTML = Array.from({length: count}, (_, index) => {
     const day = index + 1;
     const raw = yearData.months[ui.month].days[index] || "";
     const base = baseOf(raw, yearData.prices);
-    const isOut = day > daysInMonth(state.activeYear, ui.month);
     const isToday = state.activeYear === CURRENT_YEAR && ui.month === CURRENT_MONTH && day === CURRENT_DAY;
-    const weekday = isOut ? "" : WEEKDAYS[new Date(state.activeYear, ui.month, day).getDay()];
+    const weekdayIndex = new Date(state.activeYear, ui.month, day).getDay();
+    const weekday = WEEKDAYS[weekdayIndex];
     const classes = [];
-    if (!isOut && (new Date(state.activeYear, ui.month, day).getDay() === 0 || new Date(state.activeYear, ui.month, day).getDay() === 6)) classes.push("weekend");
+    if (weekdayIndex === 0 || weekdayIndex === 6) classes.push("weekend");
     if (isToday) classes.push("today");
-    if (isOut) classes.push("out");
     if (raw.trim() !== "") classes.push("has-data");
     return `<tr class="${classes.join(" ")}" data-row="${day}">
-      <td class="day-cell"><span class="dnum">${day}</span>${weekday ? `<span class="wk">${weekday}</span>` : ""}</td>
+      <td class="day-cell"><span class="dnum">${day}</span><span class="wk">${weekday}</span></td>
       <td><input class="jnd-cell" data-day="${day}" value="${esc(raw)}"
         aria-label="${esc(t("jndAria", {day}))}" inputmode="text" autocapitalize="characters"
         autocomplete="off" autocorrect="off" spellcheck="false" maxlength="40"
@@ -2730,6 +2776,8 @@ function renderMonthTable(){
       <td class="base-cell">${base ? num(base) : '<span class="zero">—</span>'}</td>
     </tr>`;
   }).join("");
+  const range = $("#daysRangeTitle");
+  if (range) range.textContent = t("daysRange", {count});
 }
 
 function renderMonth(){
@@ -2864,14 +2912,92 @@ function allDebts(){
   return Array.isArray(state.debts) ? state.debts : [];
 }
 
+function monthHasData(year, month){
+  const yd = state.years[String(year)];
+  if (!yd) return false;
+  const st = monthStats(yd, month - 1);
+  return st.worked > 0 || st.plus > 0;
+}
+
+function syncAutoDebts(){
+  const official = officialSalary();
+  if (official <= 0) return;
+  let changed = false;
+
+  for (const key of Object.keys(state.years)){
+    const year = Number(key);
+    if (!(year >= 2019 && year <= 2100)) continue;
+    for (let month = 1; month <= 12; month++){
+      const existing = allDebts().find(d => d.year === year && d.month === month);
+      const hasData = monthHasData(year, month);
+
+      if (hasData){
+        if (!existing){
+          state.debts.push({
+            id: "debt-auto-" + year + "-" + month,
+            year,
+            month,
+            amount: official,
+            autoPaid: 0,
+            extraPaid: 0,
+            paidAmount: 0,
+            auto: true,
+            note: "",
+            paid: false,
+            createdAt: Date.now()
+          });
+          changed = true;
+        } else if (existing.auto){
+          const extraPaid = Math.max(0, Math.round(Number(existing.extraPaid) || 0));
+          const paidAmount = Math.min(official, extraPaid);
+          if (existing.amount !== official || existing.autoPaid !== 0 || existing.paidAmount !== paidAmount){
+            existing.amount = official;
+            existing.autoPaid = 0;
+            existing.paidAmount = paidAmount;
+            existing.paid = paidAmount >= official;
+            changed = true;
+          }
+        }
+      } else if (existing && existing.auto){
+        const extraPaid = Math.max(0, Math.round(Number(existing.extraPaid) || 0));
+        if (extraPaid <= 0){
+          state.debts = state.debts.filter(d => d !== existing);
+          changed = true;
+        } else if (existing.amount !== official || existing.autoPaid !== 0){
+          existing.amount = official;
+          existing.autoPaid = 0;
+          existing.paidAmount = Math.min(official, extraPaid);
+          existing.paid = existing.paidAmount >= official;
+          changed = true;
+        }
+      }
+    }
+  }
+
+  if (changed) saveNow();
+}
+
 function debtTotals(){
-  let pending = 0, paid = 0, pendingCount = 0;
+  let pending = 0, paid = 0, total = 0, pendingCount = 0;
   const debts = allDebts();
   for (const d of debts){
-    if (d.paid) paid += d.amount;
-    else { pending += d.amount; pendingCount++; }
+    const amount = Math.max(0, Math.round(Number(d.amount) || 0));
+    const paidAmount = Math.max(0, Math.min(amount, Math.round(Number(d.paidAmount) || 0)));
+    const remaining = amount - paidAmount;
+    total += amount;
+    paid += paidAmount;
+    if (remaining > 0){
+      pending += remaining;
+      pendingCount++;
+    }
   }
-  return {pending, paid, total: pending + paid, count: debts.length, pendingCount};
+  return {pending, paid, total, count: debts.length, pendingCount};
+}
+
+function remainingOf(debt){
+  const amount = Math.max(0, Math.round(Number(debt.amount) || 0));
+  const paidAmount = Math.max(0, Math.min(amount, Math.round(Number(debt.paidAmount) || 0)));
+  return amount - paidAmount;
 }
 
 function monthLabel(year, month){
@@ -2889,6 +3015,7 @@ function debtSuggestion(year, month){
     days: st.worked,
     has,
     fixed,
+    payment: has ? Math.min(st.salary, fixed) : 0,
     short: has ? Math.max(0, fixed - st.salary) : 0,
     surplus: has ? Math.max(0, st.salary - fixed) : 0
   };
@@ -2932,7 +3059,8 @@ function updateDebtCompare(fillAmount){
   }
 
   if (fillAmount){
-    $("#debtAmount").value = st.short > 0 ? st.short : "";
+    $("#debtAmount").value = st.fixed > 0 ? st.fixed : "";
+    $("#debtPayment").value = st.has && st.payment > 0 ? st.payment : "";
   }
 }
 
@@ -2947,21 +3075,29 @@ function renderDebtList(){
     list.innerHTML = `<p class="debt-empty">${esc(t("debtEmpty"))}</p>`;
     return;
   }
-  list.innerHTML = debts.map(d => `
-    <div class="debt-row${d.paid ? " paid" : ""}" data-id="${esc(d.id)}">
+  list.innerHTML = debts.map(d => {
+    const amount = Math.max(0, Math.round(Number(d.amount) || 0));
+    const paidAmount = Math.max(0, Math.min(amount, Math.round(Number(d.paidAmount) || 0)));
+    const remaining = amount - paidAmount;
+    const status = remaining <= 0 ? t("debtPaidPill") : paidAmount > 0 ? t("debtPartialPill") : t("debtPendingPill");
+    const rowClass = remaining <= 0 ? " paid" : paidAmount > 0 ? " partial" : "";
+    return `
+    <div class="debt-row${rowClass}" data-id="${esc(d.id)}">
       <div class="debt-main">
         <b>${monthLabel(d.year, d.month)}</b>
-        <span>${esc(d.note || "—")}</span>
       </div>
-      <div class="debt-amount">${money(d.amount)}</div>
+      <div class="debt-amount">${money(amount)}<small>${esc(t("debtPaidLabel"))} ${money(paidAmount)} · ${esc(t("debtRemaining"))} ${money(remaining)}</small></div>
       <div class="debt-actions">
-        <button type="button" class="debt-state" data-act="toggle">${esc(d.paid ? t("debtPaidPill") : t("debtPendingPill"))}</button>
+        <span class="debt-state">${esc(status)}</span>
+        ${remaining > 0 ? `<button type="button" class="debt-abonar" data-act="pay">${esc(t("debtPayAction"))}</button>` : ""}
         <button type="button" class="debt-del" data-act="del" aria-label="${esc(t("delete"))}">×</button>
       </div>
-    </div>`).join("");
+    </div>`;
+  }).join("");
 }
 
 function renderDebts(){
+  syncAutoDebts();
   const totals = debtTotals();
   $("#debtPendingTotal").textContent = money(totals.pending);
   $("#debtTotals").textContent = `${t("debtPaidLabel")} ${money(totals.paid)} · ${t("debtTotalLabel")} ${money(totals.total)}`;
@@ -2975,36 +3111,89 @@ function renderDebts(){
 }
 
 function addDebt(){
-  const amount = Math.round(nonNeg($("#debtAmount").value));
-  if (amount <= 0){
+  const month = parseInt($("#debtMonth").value, 10) || debtFormMonth;
+  const year = state.activeYear;
+  const payment = Math.round(nonNeg($("#debtPayment").value));
+  if (payment <= 0){
     toast(t("debtAmountRequired"));
-    $("#debtAmount").focus();
+    $("#debtPayment").focus();
     return;
   }
-  const month = parseInt($("#debtMonth").value, 10) || debtFormMonth;
-  const note = $("#debtNote").value.trim().slice(0, 80);
-  state.debts = allDebts().concat([{
-    id: "debt-" + Date.now() + "-" + Math.random().toString(36).slice(2, 7),
-    year: state.activeYear,
-    month,
-    amount,
-    note,
-    paid: false,
-    createdAt: Date.now()
-  }]);
+
+  syncAutoDebts();
+  let debt = allDebts().find(d => d.year === year && d.month === month);
+  if (!debt){
+    debt = {
+      id: "debt-auto-" + year + "-" + month,
+      year,
+      month,
+      amount: officialSalary(),
+      autoPaid: 0,
+      extraPaid: 0,
+      paidAmount: 0,
+      auto: true,
+      note: "",
+      paid: false,
+      createdAt: Date.now()
+    };
+    state.debts.push(debt);
+  }
+
+  const remaining = remainingOf(debt);
+  if (remaining <= 0){
+    toast(t("debtNoDebt"));
+    return;
+  }
+
+  const applied = Math.min(remaining, payment);
+  debt.extraPaid = Math.max(0, Math.round(Number(debt.extraPaid) || 0)) + applied;
+  debt.paidAmount = Math.min(debt.amount, (Number(debt.autoPaid) || 0) + debt.extraPaid);
+  debt.paid = debt.paidAmount >= debt.amount;
   saveNow();
-  $("#debtNote").value = "";
   renderDebts();
-  toast(t("debtAdded"));
+  $("#debtPayment").value = "";
+  toast(t("debtPaymentAdded"));
 }
 
-function toggleDebt(id){
+async function payDebt(id){
   const debt = allDebts().find(d => d.id === id);
   if (!debt) return;
-  debt.paid = !debt.paid;
+  const remaining = remainingOf(debt);
+  if (remaining <= 0) return;
+
+  const result = await showModal({
+    title: t("debtPayTitle"),
+    body: `<p>${esc(t("debtPayBody", {month: monthLabel(debt.year, debt.month), remaining: money(remaining)}))}</p>`,
+    input: {
+      type: "number",
+      value: String(remaining),
+      maxlength: 10,
+      inputmode: "numeric",
+      label: t("debtPayTitle"),
+      validate: value => {
+        const n = Math.round(Number(value));
+        return Number.isFinite(n) && n > 0 && n <= remaining
+          ? ""
+          : t("debtPayInvalid", {remaining: money(remaining)});
+      }
+    },
+    confirmText: t("debtPayButton")
+  });
+  if (result === null || result === undefined) return;
+
+  const payment = Math.min(remaining, Math.max(0, Math.round(Number(result) || 0)));
+  if (payment <= 0) return;
+  if (debt.auto){
+    debt.extraPaid = Math.max(0, Math.round(Number(debt.extraPaid) || 0)) + payment;
+    debt.paidAmount = Math.min(debt.amount, (Number(debt.autoPaid) || 0) + debt.extraPaid);
+  } else {
+    debt.paidAmount = Math.min(debt.amount, (Number(debt.paidAmount) || 0) + payment);
+    debt.extraPaid = Math.max(0, Math.round(Number(debt.extraPaid) || 0)) + payment;
+  }
+  debt.paid = debt.paidAmount >= debt.amount;
   saveNow();
   renderDebts();
-  toast(debt.paid ? t("debtPaidToast") : t("debtPendingToast"));
+  toast(t("debtPaymentAdded"));
 }
 
 async function deleteDebt(id){
@@ -3145,7 +3334,7 @@ function csvCell(value){
 }
 
 function buildCSV(){
-  const rows = [["anio","mes","dia","jnd","plus_mes","precio_x","precio_s","precio_m","precio_y","precio_p","base","tipo","nota","importe","pagada"]];
+  const rows = [["anio","mes","dia","jnd","plus_mes","precio_x","precio_s","precio_m","precio_y","precio_p","base","tipo","nota","importe","pagada","pago","auto","extra"]];
   const years = Object.keys(state.years).map(Number).sort((a, b) => a - b);
 
   for (const yearNumber of years){
@@ -3154,11 +3343,11 @@ function buildCSV(){
     for (let month = 0; month < 12; month++){
       const stats = monthStats(yearData, month);
       const plus = month % 2 === 0 ? stats.plus : 0;
-      rows.push([yearNumber, month + 1, 0, "", plus, prices.X, prices.S, prices.M, prices.Y, prices.P, stats.base, "", "", "", ""]);
+      rows.push([yearNumber, month + 1, 0, "", plus, prices.X, prices.S, prices.M, prices.Y, prices.P, stats.base, "", "", "", "", "", "", ""]);
       for (let day = 1; day <= 31; day++){
         const jnd = normalizeJND(yearData.months[month].days[day - 1]);
         if (!jnd) continue;
-        rows.push([yearNumber, month + 1, day, jnd, plus, prices.X, prices.S, prices.M, prices.Y, prices.P, baseOf(jnd, prices), "", "", "", ""]);
+        rows.push([yearNumber, month + 1, day, jnd, plus, prices.X, prices.S, prices.M, prices.Y, prices.P, baseOf(jnd, prices), "", "", "", "", "", "", ""]);
       }
     }
   }
@@ -3167,14 +3356,15 @@ function buildCSV(){
     rows.push([
       debt.year, debt.month, 0, "", 0,
       prices.X, prices.S, prices.M, prices.Y, prices.P, 0,
-      "deuda", debt.note || "", debt.amount, debt.paid ? 1 : 0
+      "deuda", debt.note || "", debt.amount, debt.paid ? 1 : 0, debt.paidAmount || 0,
+      debt.auto ? 1 : 0, debt.extraPaid || 0
     ]);
   }
   const salaryPrices = currentYearData().prices;
   rows.push([
     state.activeYear, 1, 0, "", 0,
     salaryPrices.X, salaryPrices.S, salaryPrices.M, salaryPrices.Y, salaryPrices.P, 0,
-    "salario", "", officialSalary(), ""
+    "salario", "", officialSalary(), "", "", "", ""
   ]);
   return "\uFEFF" + rows.map(row => row.map(csvCell).join(";")).join("\r\n") + "\r\n";
 }
@@ -3292,6 +3482,9 @@ function parseImport(text){
   const iNota = find("nota");
   const iImporte = find("importe");
   const iPagada = find("pagada");
+  const iPago = find("pago");
+  const iAuto = find("auto");
+  const iExtra = find("extra");
 
   const imported = new Map();
   const debts = (iTipo >= 0 && iImporte >= 0) ? [] : null;
@@ -3319,12 +3512,32 @@ function parseImport(text){
     if (debts && tipo === "deuda"){
       const amount = Math.round(parseAmount(row[iImporte]));
       if (Number.isFinite(amount) && amount > 0){
+        const paidFlag = /^(1|true|si|sí|pagada|to‘langan)$/i.test(String(row[iPagada] ?? "").trim());
+        const auto = iAuto >= 0 && /^(1|true|si|sí|auto)$/i.test(String(row[iAuto] ?? "").trim());
+        let paidAmount = paidFlag ? amount : 0;
+        if (iPago >= 0){
+          const n = Math.round(parseAmount(row[iPago]));
+          if (Number.isFinite(n) && n >= 0) paidAmount = n;
+        }
+        paidAmount = Math.max(0, Math.min(amount, paidAmount));
+
+        let extraPaid = paidAmount;
+        if (auto && iExtra >= 0){
+          const n = Math.round(parseAmount(row[iExtra]));
+          if (Number.isFinite(n) && n >= 0) extraPaid = Math.max(0, Math.min(amount, n));
+        }
+        const effectivePaid = auto ? extraPaid : paidAmount;
+
         debts.push({
           year,
           month,
           amount,
+          auto,
+          autoPaid: 0,
+          extraPaid,
+          paidAmount: effectivePaid,
           note: String(row[iNota] ?? "").slice(0, 80),
-          paid: /^(1|true|si|sí|pagada|to‘langan)$/i.test(String(row[iPagada] ?? "").trim())
+          paid: effectivePaid >= amount
         });
       } else {
         invalid++;
@@ -3589,7 +3802,8 @@ function bindEvents(){
     $("#officialSalary").value = officialSalary();
     saveNow();
     flashSaved();
-    updateDebtCompare(true);
+    syncAutoDebts();
+    renderDebts();
   });
   $("#debtMonth").addEventListener("change", () => {
     debtFormMonth = parseInt($("#debtMonth").value, 10) || 1;
@@ -3600,8 +3814,8 @@ function bindEvents(){
     const button = event.target.closest("[data-act]");
     const row = event.target.closest("[data-id]");
     if (!button || !row) return;
-    if (button.dataset.act === "toggle") toggleDebt(row.dataset.id);
-    else deleteDebt(row.dataset.id);
+    if (button.dataset.act === "pay") payDebt(row.dataset.id);
+    else if (button.dataset.act === "del") deleteDebt(row.dataset.id);
   });
 
   $("#yearSelect").addEventListener("change", async event => {
