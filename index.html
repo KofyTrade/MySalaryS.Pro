@@ -1,0 +1,2505 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0f4a43">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Mi Salario">
+<meta name="description" content="Registro de jornadas JND, salario mensual y resumen anual. Funciona sin internet.">
+<title>Mi Salario · JND</title>
+<style>
+  :root{
+    --bg:#f2eee4;
+    --bg-2:#e9e2d3;
+    --card:#fffdf8;
+    --ink:#132e2a;
+    --ink-2:#40534e;
+    --muted:#65746d;
+    --line:#e3dccd;
+    --line-2:#efe9dc;
+    --brand:#0f4a43;
+    --brand-2:#17685d;
+    --brand-soft:#e4efeb;
+    --accent:#d99a25;
+    --accent-2:#f2c14e;
+    --accent-soft:#fbf1d9;
+    --accent-ink:#5d430c;
+    --danger:#a63b2c;
+    --danger-soft:#f8e7e2;
+    --ok:#2f7a58;
+    --shadow:0 10px 28px rgba(19,46,42,.08);
+    --shadow-soft:0 4px 14px rgba(19,46,42,.05);
+    --radius:20px;
+    --tabbar-h:70px;
+  }
+  *{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%;scroll-behavior:smooth}
+  body{
+    margin:0;
+    min-height:100vh;
+    background:
+      radial-gradient(900px 360px at 100% -10%, rgba(217,154,37,.10), transparent 70%),
+      radial-gradient(800px 300px at 0% 0%, rgba(23,104,93,.06), transparent 70%),
+      var(--bg);
+    color:var(--ink);
+    font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+    font-size:15px;
+    line-height:1.45;
+    overflow-x:hidden;
+    -webkit-tap-highlight-color:transparent;
+  }
+  body.modal-open{overflow:hidden}
+  [hidden]{display:none!important}
+  button{font:inherit;cursor:pointer;color:inherit}
+  input,select,textarea{font:inherit;color:inherit}
+  button:focus-visible,input:focus-visible,select:focus-visible,summary:focus-visible{
+    outline:3px solid var(--accent);
+    outline-offset:2px;
+  }
+  input[type=number]::-webkit-outer-spin-button,
+  input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+  input[type=number]{-moz-appearance:textfield;appearance:textfield}
+  ::selection{background:var(--accent-2);color:#302100}
+  .sr-only{
+    position:absolute!important;width:1px;height:1px;padding:0;margin:-1px;
+    overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;
+  }
+
+  /* ---------- Barra superior ---------- */
+  .appbar{
+    position:sticky;top:0;z-index:40;
+    padding-top:env(safe-area-inset-top);
+    background:
+      radial-gradient(700px 200px at 12% -60%, rgba(65,160,143,.55), transparent 70%),
+      linear-gradient(135deg,#0c3b36 0%,#0f4a43 55%,#14584e 100%);
+    color:#f8f2e4;
+    box-shadow:0 6px 22px rgba(10,38,34,.22);
+  }
+  .appbar::after{
+    content:"";display:block;height:1px;
+    background:linear-gradient(90deg,transparent,rgba(242,193,78,.55),transparent);
+  }
+  .appbar-inner{
+    max-width:1040px;margin:0 auto;
+    padding:11px 16px;
+    display:flex;align-items:center;gap:10px;
+  }
+  .brand{display:flex;align-items:center;gap:10px;min-width:0;flex:1}
+  .logo{
+    width:42px;height:42px;border-radius:13px;flex:0 0 auto;
+    display:grid;place-items:center;
+    background:linear-gradient(145deg,rgba(242,193,78,.22),rgba(255,255,255,.06));
+    border:1px solid rgba(242,193,78,.55);
+    color:var(--accent-2);
+    font-weight:900;font-size:13px;letter-spacing:.06em;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.16);
+  }
+  .brand-copy{min-width:0}
+  .brand-copy h1{
+    margin:0;font-size:18px;line-height:1.1;letter-spacing:-.01em;
+    font-weight:850;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  }
+  .brand-copy p{
+    margin:2px 0 0;font-size:10px;letter-spacing:.12em;text-transform:uppercase;
+    color:#bcd6d0;font-weight:700;white-space:nowrap;
+  }
+  .appbar-right{display:flex;align-items:center;gap:8px;flex:0 0 auto}
+  .save-badge{
+    font-size:10px;font-weight:800;letter-spacing:.02em;
+    color:#b9d5ce;display:inline-flex;align-items:center;gap:4px;
+    white-space:nowrap;transition:color .2s ease;
+  }
+  .save-badge::before{content:"●";font-size:7px;color:#7fbfae}
+  .save-badge.saving{color:#f4d38c}
+  .save-badge.saving::before{color:#f4d38c}
+  .save-badge.err{color:#ffb6a8}
+  .save-badge.err::before{color:#ff8d78}
+  .year-box{display:flex;align-items:center;gap:6px}
+  .year-box label{
+    font-size:9px;text-transform:uppercase;letter-spacing:.12em;
+    color:#b9d5ce;font-weight:800;
+  }
+  .year-select{
+    appearance:none;-webkit-appearance:none;
+    background:rgba(255,255,255,.11);
+    border:1px solid rgba(255,255,255,.28);
+    border-radius:12px;
+    color:#fff;font-weight:850;font-size:15px;
+    padding:8px 30px 8px 11px;
+    min-height:40px;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.5 6 6.5 11 1.5' fill='none' stroke='%23f2c14e' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+    background-repeat:no-repeat;background-position:right 10px center;
+  }
+  .year-select option{color:var(--ink);background:#fffdf8}
+
+  /* ---------- Estructura ---------- */
+  main{
+    max-width:1040px;margin:0 auto;
+    padding:16px 14px calc(var(--tabbar-h) + 44px);
+  }
+  .view{display:none}
+  .view.active{display:block;animation:viewIn .28s ease both}
+  @keyframes viewIn{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
+  .section-head{
+    display:flex;align-items:flex-end;justify-content:space-between;gap:12px;
+    margin:4px 2px 12px;
+  }
+  .section-head h2{
+    margin:0;font-size:clamp(22px,5.4vw,30px);line-height:1.08;
+    letter-spacing:-.025em;font-weight:850;
+  }
+  .eyebrow{
+    margin:0 0 3px;font-size:10px;text-transform:uppercase;letter-spacing:.14em;
+    color:var(--muted);font-weight:850;
+  }
+  .hint{margin:0;color:var(--muted);font-size:12px;line-height:1.45}
+  .footnote{
+    margin:16px 6px 0;color:var(--muted);font-size:11px;line-height:1.55;text-align:center;
+  }
+  .card{
+    background:var(--card);
+    border:1px solid rgba(227,220,205,.9);
+    border-radius:var(--radius);
+    box-shadow:var(--shadow-soft);
+    padding:16px;
+  }
+  .card-head{
+    display:flex;align-items:center;justify-content:space-between;gap:10px;
+    margin-bottom:12px;
+  }
+  .card-head h3{margin:0;font-size:15px;font-weight:850;letter-spacing:-.01em}
+  .pill{
+    display:inline-flex;align-items:center;gap:5px;
+    background:var(--brand-soft);color:var(--brand);
+    border-radius:999px;padding:5px 9px;
+    font-size:11px;font-weight:850;white-space:nowrap;
+  }
+  .tag{
+    display:inline-flex;align-items:center;
+    background:var(--accent-soft);color:var(--accent-ink);
+    border:1px solid #efdcb0;border-radius:999px;
+    padding:4px 8px;font-size:10px;font-weight:850;letter-spacing:.02em;
+    white-space:nowrap;
+  }
+  .btn{
+    display:inline-flex;align-items:center;justify-content:center;gap:7px;
+    min-height:48px;padding:0 18px;
+    border-radius:14px;border:1px solid transparent;
+    font-size:14px;font-weight:800;letter-spacing:.01em;
+    transition:transform .12s ease,background .15s ease,border-color .15s ease,box-shadow .15s ease;
+    text-decoration:none;
+  }
+  .btn:active{transform:scale(.975)}
+  .btn.primary{background:var(--brand);color:#fff;box-shadow:0 5px 14px rgba(15,74,67,.20)}
+  .btn.primary:hover{background:var(--brand-2)}
+  .btn.accent{background:var(--accent);color:#2c1e00;box-shadow:0 5px 14px rgba(217,154,37,.24)}
+  .btn.accent:hover{background:var(--accent-2)}
+  .btn.ghost{background:rgba(255,253,248,.7);border-color:var(--line);color:var(--ink)}
+  .btn.ghost:hover{background:#fff}
+  .btn.danger{background:var(--danger);color:#fff}
+  .btn.soft-danger{background:var(--danger-soft);border-color:#efd2ca;color:var(--danger)}
+  .btn.sm{min-height:40px;padding:0 13px;font-size:12px;border-radius:12px}
+  .btn.block{width:100%}
+  .text-btn{
+    border:0;background:transparent;padding:7px 4px;border-radius:8px;
+    font-size:12px;font-weight:850;color:var(--brand);text-decoration:underline;
+    text-underline-offset:3px;text-decoration-thickness:1px;
+  }
+  .text-btn.danger{color:var(--danger)}
+  .icon-btn{
+    width:40px;height:40px;border-radius:12px;border:1px solid rgba(255,255,255,.25);
+    background:rgba(255,255,255,.08);color:#fff;font-weight:900;
+    display:grid;place-items:center;
+  }
+
+  /* ---------- Tiras de meses ---------- */
+  .month-strip{
+    display:flex;gap:7px;overflow-x:auto;
+    padding:2px 2px 10px;margin:0 -2px;
+    scrollbar-width:none;-ms-overflow-style:none;
+    scroll-snap-type:x proximity;
+  }
+  .month-strip::-webkit-scrollbar{display:none}
+  .month-chip{
+    position:relative;flex:0 0 auto;min-width:56px;
+    min-height:42px;padding:8px 11px 10px;
+    border-radius:999px;border:1px solid var(--line);
+    background:rgba(255,253,248,.75);
+    color:var(--ink-2);font-size:11px;font-weight:900;letter-spacing:.06em;
+    scroll-snap-align:start;
+    transition:background .15s ease,color .15s ease,border-color .15s ease,transform .12s ease;
+  }
+  .month-chip:active{transform:scale(.96)}
+  .month-chip.active{
+    background:var(--brand);border-color:var(--brand);color:#fff;
+    box-shadow:0 4px 12px rgba(15,74,67,.20);
+  }
+  .month-chip.has-data::after{
+    content:"";position:absolute;left:50%;bottom:5px;transform:translateX(-50%);
+    width:4px;height:4px;border-radius:50%;background:var(--accent);
+  }
+  .month-chip.active.has-data::after{background:var(--accent-2)}
+
+  /* ---------- Registro rápido ---------- */
+  .quick-layout{display:grid;grid-template-columns:1fr;gap:12px}
+  .day-card{padding-bottom:14px}
+  .day-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
+  .day-btn{
+    position:relative;aspect-ratio:1/1;min-height:38px;max-height:54px;
+    border-radius:12px;border:1px solid var(--line);
+    background:#faf7ef;color:var(--ink-2);
+    font-weight:800;font-size:13px;
+    transition:background .12s ease,color .12s ease,border-color .12s ease,transform .1s ease;
+    display:grid;place-items:center;
+  }
+  .day-btn:active{transform:scale(.95)}
+  .day-btn.filled{
+    background:var(--brand-soft);border-color:#bcd8d0;color:var(--brand);
+  }
+  .day-btn.filled::after{
+    content:"";position:absolute;left:50%;bottom:4px;transform:translateX(-50%);
+    width:4px;height:4px;border-radius:50%;background:var(--accent);
+  }
+  .day-btn.selected{
+    background:var(--brand);border-color:var(--brand);color:#fff;
+    box-shadow:0 0 0 3px rgba(15,74,67,.13);
+  }
+  .day-btn.selected::after{background:var(--accent-2)}
+  .day-btn.today{outline:2px solid var(--accent);outline-offset:-2px}
+  .day-btn.out{color:#b3ada0}
+  .day-btn.out:not(.filled){background:#f6f2e8;border-style:dashed}
+  .entry-card{padding:16px}
+  .entry-top{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+  .day-badge{
+    width:48px;height:48px;border-radius:14px;flex:0 0 auto;
+    display:grid;place-items:center;
+    background:linear-gradient(145deg,var(--accent-soft),#f7e7c1);
+    border:1px solid #ecd7a7;color:var(--accent-ink);
+    font-size:20px;font-weight:900;line-height:1;
+  }
+  .entry-meta{flex:1;min-width:0}
+  .entry-meta .eyebrow{margin-bottom:0}
+  .entry-meta h3{margin:1px 0 0;font-size:15px;font-weight:850}
+  .jnd-input{
+    width:100%;height:64px;
+    border:2px solid var(--line);border-radius:16px;
+    background:#fff;
+    color:var(--brand);
+    font-size:clamp(24px,7vw,32px);
+    font-weight:900;letter-spacing:.16em;text-align:center;text-transform:uppercase;
+    padding:0 12px;
+    transition:border-color .15s ease,box-shadow .15s ease;
+  }
+  .jnd-input::placeholder{color:#c3bcae;font-weight:700;letter-spacing:.10em;font-size:15px;text-transform:none}
+  .jnd-input:focus{outline:none;border-color:var(--brand);box-shadow:0 0 0 4px var(--brand-soft)}
+  .quick-letters{display:grid;grid-template-columns:repeat(5,1fr);gap:7px;margin-top:9px}
+  .letter-btn{
+    min-height:56px;border-radius:14px;border:1px solid var(--line);
+    background:#fff;color:var(--brand);
+    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;
+    transition:background .12s ease,border-color .12s ease,transform .1s ease;
+  }
+  .letter-btn:active{transform:scale(.95);background:var(--accent-soft);border-color:#e9cf94}
+  .letter-btn span{font-size:20px;font-weight:900;line-height:1}
+  .letter-btn small{font-size:10px;font-weight:800;color:var(--muted);letter-spacing:.01em}
+  .base-preview{
+    display:flex;align-items:flex-end;justify-content:space-between;gap:10px;
+    margin-top:13px;padding:12px 15px;
+    background:linear-gradient(135deg,var(--accent-soft),#fdf7e8);
+    border:1px solid #efdcb0;border-radius:16px;
+  }
+  .base-preview span{
+    font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:.1em;
+    color:#80601b;
+  }
+  .base-preview strong{font-size:clamp(22px,6vw,28px);line-height:1;color:#463106;letter-spacing:-.02em}
+  .breakdown{
+    display:flex;flex-wrap:wrap;align-items:center;gap:5px;
+    min-height:24px;margin-top:9px;
+  }
+  .b-chip{
+    display:inline-flex;align-items:center;gap:4px;
+    background:var(--brand-soft);border:1px solid #cfe2db;
+    border-radius:8px;padding:3px 6px;
+    font-size:10px;color:var(--brand);font-weight:750;
+  }
+  .b-chip b{font-weight:900}
+  .b-chip em{font-style:normal;color:var(--muted);font-weight:850}
+  .b-plus{color:#b7afa1;font-size:11px;font-weight:800}
+  .b-empty,.b-note{font-size:10px;color:var(--muted)}
+  .entry-actions{
+    display:flex;align-items:center;justify-content:space-between;gap:10px;
+    margin-top:12px;
+  }
+  .save-state{font-size:11px;font-weight:750;color:var(--muted)}
+  .save-state.ok{color:var(--ok)}
+  .save-state.err{color:var(--danger)}
+
+  /* ---------- Estadísticas ---------- */
+  .stats-grid{
+    display:grid;grid-template-columns:repeat(2,1fr);gap:9px;
+    margin:12px 0;
+  }
+  .stat{
+    background:var(--card);border:1px solid var(--line);
+    border-radius:16px;padding:11px 13px;
+    box-shadow:var(--shadow-soft);
+  }
+  .stat span{
+    display:block;font-size:9px;text-transform:uppercase;letter-spacing:.1em;
+    color:var(--muted);font-weight:850;
+  }
+  .stat strong{
+    display:block;margin-top:3px;
+    font-size:clamp(17px,4.6vw,22px);line-height:1.1;
+    letter-spacing:-.02em;font-weight:850;font-variant-numeric:tabular-nums;
+  }
+  .stat.total{background:var(--brand);border-color:var(--brand);color:#fff}
+  .stat.total span{color:#c9e0da}
+  .stat.accent{background:var(--accent-soft);border-color:#efdcb0}
+  .stat.accent strong{color:var(--accent-ink)}
+  .stat.muted strong{color:#aaa397}
+
+  /* ---------- Vista mensual ---------- */
+  .nav-arrows{display:flex;gap:6px}
+  .arrow-btn{
+    width:44px;height:44px;border-radius:13px;
+    border:1px solid var(--line);background:var(--card);
+    display:grid;place-items:center;color:var(--brand);
+    font-size:19px;font-weight:900;
+  }
+  .arrow-btn:disabled{opacity:.35;cursor:not-allowed}
+  .plus-card{
+    display:flex;align-items:center;justify-content:space-between;gap:14px;
+    background:linear-gradient(135deg,#fff9ea,#fffdf8);
+    border-color:#efdcb0;
+  }
+  .plus-copy{display:flex;align-items:center;gap:10px;min-width:0}
+  .plus-badge{
+    flex:0 0 auto;width:44px;height:44px;border-radius:13px;
+    display:grid;place-items:center;
+    background:var(--accent);color:#2c1e00;font-weight:900;font-size:15px;
+    box-shadow:0 4px 10px rgba(217,154,37,.22);
+  }
+  .plus-copy h3{margin:0;font-size:14px;font-weight:850}
+  .plus-copy p{margin:2px 0 0;font-size:11px;color:var(--muted);line-height:1.35}
+  .money-field{
+    position:relative;flex:0 0 auto;width:132px;
+  }
+  .money-field > span{
+    position:absolute;left:11px;top:50%;transform:translateY(-50%);
+    color:var(--muted);font-size:14px;font-weight:800;pointer-events:none;
+  }
+  .money-field input{
+    width:100%;height:48px;
+    border:1px solid #dfca99;border-radius:12px;background:#fff;
+    padding:0 8px 0 27px;
+    font-size:17px;font-weight:850;font-variant-numeric:tabular-nums;
+    color:var(--accent-ink);
+  }
+  .money-field input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px #f6e7c5}
+  .note-card{
+    display:flex;gap:9px;align-items:flex-start;
+    background:#f7f4ec;border:1px dashed #ddd5c5;border-radius:15px;
+    padding:11px 13px;color:var(--ink-2);font-size:11px;line-height:1.45;
+  }
+  .note-card b{color:var(--ink)}
+  .note-icon{
+    flex:0 0 auto;width:20px;height:20px;border-radius:50%;
+    background:var(--bg-2);display:grid;place-items:center;
+    font-size:11px;font-weight:900;color:var(--muted);
+  }
+  .table-card{padding:14px 12px 6px}
+  .table-wrap{width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch}
+  table{width:100%;border-collapse:collapse}
+  .month-table th{
+    padding:7px 8px;text-align:left;
+    font-size:9px;letter-spacing:.1em;text-transform:uppercase;
+    color:var(--muted);font-weight:900;
+    border-bottom:1px solid var(--line);
+  }
+  .month-table th.right,.month-table td.base-cell{text-align:right}
+  .month-table td{
+    padding:3px 8px;border-bottom:1px solid var(--line-2);
+    vertical-align:middle;
+  }
+  .month-table tr:last-child td{border-bottom:0}
+  .month-table tr.weekend{background:#fbf7ee}
+  .month-table tr.today{background:#fff7e1}
+  .month-table tr.today .dnum{color:var(--accent-ink);background:var(--accent-soft);border-color:#ebd3a0}
+  .month-table tr.out{opacity:.45}
+  .day-cell{white-space:nowrap;width:62px}
+  .dnum{
+    display:inline-grid;place-items:center;
+    width:28px;height:28px;border-radius:9px;
+    border:1px solid transparent;
+    font-size:13px;font-weight:850;font-variant-numeric:tabular-nums;
+  }
+  .wk{
+    display:inline-block;margin-left:3px;
+    font-size:9px;font-weight:850;color:var(--muted);
+  }
+  .jnd-cell{
+    width:100%;min-width:88px;height:40px;
+    border:1px solid transparent;border-bottom:1px dashed #ded6c6;border-radius:9px;
+    background:transparent;
+    padding:0 8px;
+    font-size:16px;font-weight:850;letter-spacing:.06em;text-transform:uppercase;
+    color:var(--brand);
+  }
+  .jnd-cell::placeholder{color:#c8c1b3;font-weight:500;letter-spacing:0;font-size:13px;text-transform:none}
+  .jnd-cell:placeholder-shown{border-bottom-color:transparent}
+  .jnd-cell:focus{outline:none;background:#fff;border-color:var(--brand);box-shadow:0 0 0 3px var(--brand-soft)}
+  .base-cell{
+    white-space:nowrap;width:94px;
+    font-size:13px;font-weight:850;font-variant-numeric:tabular-nums;
+    color:var(--ink-2);
+  }
+  .zero{color:#c6bfb1;font-weight:600}
+
+  /* ---------- Vista anual ---------- */
+  .total-hero{
+    position:relative;overflow:hidden;
+    background:
+      radial-gradient(500px 240px at 100% 0%, rgba(242,193,78,.24), transparent 65%),
+      linear-gradient(135deg,#0d403a,#145a50 70%,#17685d);
+    color:#fff;border-radius:24px;padding:20px;
+    box-shadow:0 14px 34px rgba(12,59,54,.22);
+  }
+  .total-hero::after{
+    content:"";position:absolute;right:-38px;bottom:-58px;
+    width:180px;height:180px;border-radius:50%;
+    border:1px solid rgba(242,193,78,.20);
+    box-shadow:0 0 0 26px rgba(242,193,78,.055),0 0 0 54px rgba(242,193,78,.035);
+    pointer-events:none;
+  }
+  .hero-top{display:flex;align-items:center;justify-content:space-between;gap:10px;position:relative;z-index:1}
+  .hero-top span:first-child{
+    font-size:10px;text-transform:uppercase;letter-spacing:.14em;font-weight:850;color:#c7dfd9;
+  }
+  .hero-year{
+    display:inline-flex;align-items:center;
+    background:rgba(255,255,255,.11);border:1px solid rgba(255,255,255,.2);
+    border-radius:999px;padding:4px 9px;
+    font-size:11px;font-weight:850;color:var(--accent-2);
+  }
+  .hero-amount{
+    position:relative;z-index:1;
+    margin-top:6px;font-size:clamp(36px,9.6vw,58px);line-height:1.02;
+    font-weight:900;letter-spacing:-.035em;font-variant-numeric:tabular-nums;
+  }
+  .hero-sub{
+    position:relative;z-index:1;
+    display:flex;flex-wrap:wrap;gap:5px 9px;align-items:center;
+    margin-top:8px;font-size:11px;font-weight:700;color:#cfe3de;
+  }
+  .hero-sub b{color:#fff;font-weight:850}
+  .hero-dot{color:rgba(255,255,255,.38)}
+  .annual-layout{display:grid;grid-template-columns:1fr;gap:12px;margin-top:12px}
+  .side-stack{display:grid;gap:10px;align-content:start}
+  .prize-card{display:flex;gap:11px;align-items:flex-start;padding:14px}
+  .prize-badge{
+    flex:0 0 auto;width:42px;height:42px;border-radius:13px;
+    display:grid;place-items:center;
+    background:var(--accent-soft);border:1px solid #efdcb0;
+    color:var(--accent-ink);font-weight:900;font-size:13px;
+  }
+  .prize-card h3{margin:1px 0 1px;font-size:19px;font-weight:900;letter-spacing:-.02em}
+  .prize-card .hint{font-size:11px}
+  .ahorro-card{padding:14px}
+  .ahorro-total{font-size:27px;font-weight:900;letter-spacing:-.025em;margin:2px 0 3px}
+  .ahorro-card details{margin-top:9px;border-top:1px solid var(--line-2);padding-top:8px}
+  .ahorro-card summary{
+    cursor:pointer;font-size:11px;font-weight:850;color:var(--brand);
+    list-style:none;display:flex;align-items:center;justify-content:space-between;
+  }
+  .ahorro-card summary::-webkit-details-marker{display:none}
+  .ahorro-card summary::after{content:"＋";font-size:13px;color:var(--muted)}
+  .ahorro-card details[open] summary::after{content:"−"}
+  .ahorro-row{
+    display:grid;grid-template-columns:38px 1fr auto;gap:6px;
+    padding:5px 0;font-size:11px;border-bottom:1px solid var(--line-2);
+  }
+  .ahorro-row:last-child{border-bottom:0}
+  .ahorro-row span:first-child{font-weight:850;color:var(--ink-2)}
+  .ahorro-row span:nth-child(2){color:var(--muted);text-align:right}
+  .ahorro-row span:last-child{font-weight:850;color:var(--ok);text-align:right;min-width:58px}
+  .year-table th{padding:8px 5px;text-align:right;font-size:9px}
+  .year-table th:first-child{text-align:left}
+  .year-table td{padding:7px 5px;text-align:right;font-size:12px;font-variant-numeric:tabular-nums}
+  .year-table td:first-child{text-align:left;font-weight:850;font-size:11px;letter-spacing:.03em}
+  .year-table td.plus{color:var(--accent-ink);font-weight:800}
+  .year-table td.total{font-weight:900;color:var(--brand)}
+  .year-table tr.odd td:first-child{color:var(--brand)}
+  .year-table tfoot td{
+    padding:10px 5px;border-top:2px solid var(--line);
+    border-bottom:0;font-weight:900;font-size:11px;
+  }
+  .year-table tfoot td:first-child{letter-spacing:.06em}
+  .year-table tfoot td.total{color:var(--brand)}
+  .year-table .days{color:var(--muted);font-weight:750}
+  .year-table .dash{color:#bdb6a8;font-weight:600}
+
+  /* ---------- Precios / respaldo ---------- */
+  .prices-card{padding-bottom:12px}
+  .price-row{
+    display:grid;grid-template-columns:48px 1fr;gap:11px;align-items:center;
+    padding:9px 0;border-bottom:1px solid var(--line-2);
+  }
+  .price-row:last-of-type{border-bottom:0}
+  .letter-badge{
+    width:44px;height:44px;border-radius:13px;
+    display:grid;place-items:center;
+    background:linear-gradient(145deg,var(--brand),var(--brand-2));
+    color:#fff;font-size:19px;font-weight:900;
+    box-shadow:0 4px 10px rgba(15,74,67,.18);
+  }
+  .price-field{display:flex;align-items:center;gap:8px}
+  .price-field .money-field{width:100%;flex:1}
+  .price-field .money-field input{height:46px;border-color:var(--line);color:var(--ink);font-size:17px}
+  .price-field .money-field input:focus{border-color:var(--brand);box-shadow:0 0 0 3px var(--brand-soft)}
+  .price-field .money-field > span{color:var(--muted)}
+  .price-note{
+    display:flex;gap:8px;align-items:flex-start;
+    margin-top:10px;padding:10px 11px;
+    background:var(--brand-soft);border-radius:12px;
+    font-size:11px;line-height:1.45;color:var(--brand);
+  }
+  .price-note b{font-weight:900}
+  .example{
+    margin-top:11px;padding:11px 12px;
+    background:#faf7ef;border:1px dashed var(--line);
+    border-radius:12px;font-size:12px;color:var(--ink-2);
+  }
+  .example b{color:var(--brand);font-weight:900}
+  .example-code{
+    display:inline-block;background:#fff;border:1px solid var(--line);
+    border-radius:6px;padding:1px 5px;font-weight:900;letter-spacing:.06em;
+  }
+  .backup-card{margin-top:12px}
+  .backup-actions{display:grid;grid-template-columns:1fr;gap:8px;margin-top:12px}
+  .backup-actions .btn{width:100%}
+  .backup-note{
+    margin-top:10px;display:flex;gap:8px;
+    font-size:11px;line-height:1.5;color:var(--muted);
+  }
+  .backup-note b{color:var(--ink-2)}
+  .danger-card{margin-top:12px;border-color:#ecd5ce;background:#fffaf8}
+  .danger-card h3{color:var(--danger)}
+  .danger-actions{display:grid;gap:8px;margin-top:10px}
+  .danger-actions .btn{width:100%}
+  .help-card{margin-top:12px;background:linear-gradient(135deg,#f5faf7,#fffdf8);border-color:#d6e7e0}
+  .help-card h3{margin:0 0 5px;font-size:15px}
+  .help-card p{margin:0 0 10px;font-size:12px;line-height:1.55;color:var(--ink-2)}
+  .help-card .btn{width:100%}
+  .version{
+    margin:18px 0 0;text-align:center;
+    font-size:10px;color:#9a9488;line-height:1.6;
+  }
+
+  /* ---------- Barra inferior ---------- */
+  .tabbar{
+    position:fixed;left:50%;transform:translateX(-50%);
+    bottom:calc(10px + env(safe-area-inset-bottom));
+    width:min(calc(100% - 22px),560px);
+    z-index:50;
+    display:grid;grid-template-columns:repeat(4,1fr);gap:3px;
+    padding:6px;
+    background:rgba(255,253,248,.94);
+    border:1px solid rgba(227,220,205,.95);
+    border-radius:22px;
+    box-shadow:0 14px 36px rgba(19,46,42,.18);
+    backdrop-filter:blur(14px);
+    -webkit-backdrop-filter:blur(14px);
+  }
+  .tab{
+    min-height:54px;border:0;border-radius:16px;
+    background:transparent;color:var(--muted);
+    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;
+    font-size:9px;font-weight:850;letter-spacing:.02em;
+    transition:background .15s ease,color .15s ease,transform .1s ease;
+  }
+  .tab svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+  .tab:active{transform:scale(.97)}
+  .tab.active{background:var(--brand);color:#fff;box-shadow:0 4px 12px rgba(15,74,67,.18)}
+
+  /* ---------- Modal ---------- */
+  .modal-backdrop{
+    position:fixed;inset:0;z-index:100;
+    display:grid;place-items:center;padding:18px;
+    background:rgba(8,29,26,.58);
+    backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);
+    opacity:0;transition:opacity .18s ease;
+  }
+  .modal-backdrop.show{opacity:1}
+  .modal{
+    width:min(440px,100%);max-height:88vh;overflow:auto;
+    background:var(--card);border-radius:24px;
+    padding:21px 20px 18px;
+    box-shadow:0 24px 60px rgba(0,0,0,.30);
+    transform:translateY(8px) scale(.985);
+    transition:transform .18s ease;
+  }
+  .modal-backdrop.show .modal{transform:none}
+  .modal h3{margin:0 0 10px;font-size:20px;letter-spacing:-.02em;font-weight:900}
+  .modal-body{font-size:13px;line-height:1.55;color:var(--ink-2)}
+  .modal-body p{margin:0 0 9px}
+  .modal-body p:last-child{margin-bottom:0}
+  .modal-body b{color:var(--ink)}
+  .modal-body .warn{color:var(--danger);font-weight:750}
+  .modal-body .hint{font-size:11px}
+  .modal-input-wrap{margin-top:12px}
+  .modal-input{
+    width:100%;height:52px;border:2px solid var(--line);border-radius:13px;
+    padding:0 12px;font-size:18px;font-weight:800;background:#fff;
+  }
+  .modal-input:focus{outline:none;border-color:var(--brand);box-shadow:0 0 0 3px var(--brand-soft)}
+  .modal-error{min-height:16px;margin-top:6px;font-size:11px;font-weight:750;color:var(--danger)}
+  .modal-actions{display:flex;gap:8px;margin-top:16px}
+  .modal-actions .btn{flex:1;min-height:46px;padding:0 12px;font-size:13px}
+  .modal-actions .btn[hidden]{display:none!important}
+
+  /* ---------- Toast ---------- */
+  .toast{
+    position:fixed;left:50%;z-index:120;
+    top:calc(72px + env(safe-area-inset-top));
+    transform:translateX(-50%) translateY(-10px);
+    max-width:min(420px,calc(100% - 34px));
+    background:#123b35;color:#fff;
+    border:1px solid rgba(242,193,78,.35);
+    border-radius:13px;padding:10px 14px;
+    font-size:12px;font-weight:750;line-height:1.35;text-align:center;
+    box-shadow:0 10px 30px rgba(8,29,26,.35);
+    opacity:0;pointer-events:none;
+    transition:opacity .2s ease,transform .2s ease;
+  }
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+  /* ---------- Escritorio ---------- */
+  @media (min-width:700px){
+    main{padding:22px 22px calc(var(--tabbar-h) + 54px)}
+    .appbar-inner{padding:13px 22px}
+    .brand-copy h1{font-size:20px}
+    .quick-layout{grid-template-columns:1.08fr .92fr;align-items:start}
+    .day-grid{gap:7px}
+    .day-btn{min-height:46px}
+    .entry-card{padding:18px}
+    .stats-grid{grid-template-columns:repeat(4,1fr);gap:10px}
+    .annual-layout{grid-template-columns:1.22fr .78fr;align-items:start}
+    .backup-actions{grid-template-columns:1fr 1fr}
+    .danger-actions{grid-template-columns:1fr 1fr}
+    .help-card .btn{width:auto}
+    .price-field .money-field{max-width:260px}
+  }
+  @media (max-width:600px){
+    .save-badge{display:none}
+  }
+  @media (max-width:390px){
+    .appbar-inner{padding:10px 12px}
+    main{padding:13px 11px calc(var(--tabbar-h) + 42px)}
+    .card{padding:14px}
+    .day-grid{gap:5px}
+    .day-btn{font-size:12px;border-radius:10px;min-height:34px}
+    .quick-letters{gap:5px}
+    .letter-btn{min-height:52px}
+    .letter-btn span{font-size:18px}
+    .month-chip{min-width:50px;padding:7px 9px 9px}
+    .year-box label{display:none}
+    .year-select{font-size:14px;padding-right:27px}
+    .money-field{width:118px}
+    .plus-card{padding:12px}
+    .plus-copy p{font-size:10px}
+  }
+  @media (max-width:360px){
+    .brand-copy p{display:none}
+    .brand-copy h1{font-size:17px}
+    .logo{width:38px;height:38px;font-size:12px}
+    .year-select{min-height:38px;font-size:14px;padding:6px 26px 6px 9px}
+  }
+  @media (prefers-reduced-motion:reduce){
+    *,*::before,*::after{animation-duration:.001ms!important;transition-duration:.001ms!important;scroll-behavior:auto!important}
+  }
+</style>
+</head>
+<body>
+
+<header class="appbar">
+  <div class="appbar-inner">
+    <div class="brand">
+      <div class="logo" aria-hidden="true">JND</div>
+      <div class="brand-copy">
+        <h1>Mi Salario</h1>
+        <p>Registro de jornadas</p>
+      </div>
+    </div>
+    <div class="appbar-right">
+      <span class="save-badge" id="saveBadge" title="Tus datos se guardan en este dispositivo">Guardado</span>
+      <div class="year-box">
+        <label for="yearSelect">Año</label>
+        <select class="year-select" id="yearSelect" aria-label="Elegir año"></select>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main>
+  <!-- ================= REGISTRO RÁPIDO ================= -->
+  <section class="view active" id="view-hoy">
+    <div class="section-head">
+      <div>
+        <p class="eyebrow">Registro rápido</p>
+        <h2 id="quickTitle">Noviembre 2026</h2>
+      </div>
+      <button type="button" class="btn ghost sm" id="btnToday">Hoy</button>
+    </div>
+
+    <div class="month-strip" id="quickMonths" aria-label="Elegir mes"></div>
+
+    <div class="quick-layout">
+      <div class="card day-card">
+        <div class="card-head">
+          <h3>Elige el día</h3>
+          <span class="pill" id="quickMonthStats">0 días · $ 0</span>
+        </div>
+        <div class="day-grid" id="dayGrid" role="group" aria-label="Días del mes"></div>
+      </div>
+
+      <div class="card entry-card" id="entryCard">
+        <div class="entry-top">
+          <div class="day-badge" id="selectedDayBadge">1</div>
+          <div class="entry-meta">
+            <p class="eyebrow">Jornada</p>
+            <h3 id="selectedDayTitle">Día 1 · ENE</h3>
+          </div>
+          <button type="button" class="text-btn danger" id="btnClearDay">Borrar</button>
+        </div>
+
+        <label class="sr-only" for="jndInput">Código JND del día</label>
+        <input class="jnd-input" id="jndInput" type="text" placeholder="X, XP, XMP…"
+               inputmode="text" autocapitalize="characters" autocomplete="off"
+               autocorrect="off" spellcheck="false" maxlength="40" enterkeyhint="done">
+
+        <div class="quick-letters" id="quickLetters" aria-label="Agregar letra"></div>
+
+        <div class="base-preview">
+          <span>Base del día</span>
+          <strong id="basePreview">$ 0</strong>
+        </div>
+        <div class="breakdown" id="breakdown"></div>
+
+        <div class="entry-actions">
+          <span class="save-state" id="saveState">Se guarda solo</span>
+          <button type="button" class="btn primary sm" id="btnSaveDay">Guardar</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= VISTA MENSUAL ================= -->
+  <section class="view" id="view-mes">
+    <div class="section-head">
+      <div>
+        <p class="eyebrow">Vista mensual</p>
+        <h2 id="monthTitle">Noviembre 2026</h2>
+      </div>
+      <div class="nav-arrows">
+        <button type="button" class="arrow-btn" id="prevMonth" aria-label="Mes anterior">‹</button>
+        <button type="button" class="arrow-btn" id="nextMonth" aria-label="Mes siguiente">›</button>
+      </div>
+    </div>
+
+    <div class="month-strip" id="monthMonths" aria-label="Elegir mes"></div>
+
+    <div class="stats-grid">
+      <div class="stat"><span>Días trabajados</span><strong id="mDays">0</strong></div>
+      <div class="stat"><span>Base</span><strong id="mBase">$ 0</strong></div>
+      <div class="stat accent" id="mPlusStat"><span>(+)</span><strong id="mPlus">—</strong></div>
+      <div class="stat total"><span>Salario del mes</span><strong id="mSalary">$ 0</strong></div>
+    </div>
+
+    <div id="plusSlot"></div>
+
+    <div class="card table-card" style="margin-top:12px">
+      <div class="card-head">
+        <h3>Días 1–31</h3>
+        <span class="hint">Toca un JND para editarlo</span>
+      </div>
+      <div class="table-wrap">
+        <table class="month-table">
+          <thead>
+            <tr><th>Día</th><th>JND</th><th class="right">Base</th></tr>
+          </thead>
+          <tbody id="monthBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= RESUMEN ANUAL ================= -->
+  <section class="view" id="view-anio">
+    <div class="section-head">
+      <div>
+        <p class="eyebrow">Resumen anual</p>
+        <h2 id="annualTitle">Año 2026</h2>
+      </div>
+    </div>
+
+    <div class="total-hero">
+      <div class="hero-top">
+        <span>Total general</span>
+        <span class="hero-year" id="heroYear">2026</span>
+      </div>
+      <div class="hero-amount" id="aTotal">$ 0</div>
+      <div class="hero-sub" id="aBreakdown"></div>
+    </div>
+
+    <div class="stats-grid">
+      <div class="stat"><span>Días trabajados</span><strong id="aDays">0</strong></div>
+      <div class="stat"><span>Base jornadas</span><strong id="aBase">$ 0</strong></div>
+      <div class="stat"><span>Pluses (+)</span><strong id="aPlus">$ 0</strong></div>
+      <div class="stat"><span>Ahorro 15%</span><strong id="aAhorro">$ 0</strong></div>
+    </div>
+
+    <div class="annual-layout">
+      <div class="card table-card">
+        <div class="card-head">
+          <h3>Totales por mes</h3>
+          <span class="hint">Cifras en $</span>
+        </div>
+        <div class="table-wrap">
+          <table class="year-table">
+            <thead>
+              <tr><th>Mes</th><th>Días</th><th>Base</th><th>(+)</th><th>Total</th></tr>
+            </thead>
+            <tbody id="yearBody"></tbody>
+            <tfoot id="yearFoot"></tfoot>
+          </table>
+        </div>
+      </div>
+
+      <div class="side-stack">
+        <div class="card prize-card">
+          <div class="prize-badge">1S</div>
+          <div>
+            <p class="eyebrow">Premio 1er semestre</p>
+            <h3 id="prize1">$ 0</h3>
+            <p class="hint" id="prize1Detail">—</p>
+          </div>
+        </div>
+        <div class="card prize-card">
+          <div class="prize-badge">2S</div>
+          <div>
+            <p class="eyebrow">Premio 2do semestre</p>
+            <h3 id="prize2">$ 0</h3>
+            <p class="hint" id="prize2Detail">—</p>
+          </div>
+        </div>
+        <div class="card ahorro-card">
+          <div class="card-head" style="margin-bottom:4px">
+            <h3>Ahorro 15%</h3>
+            <span class="tag">Solo impares</span>
+          </div>
+          <div class="ahorro-total" id="ahorroTotal">$ 0</div>
+          <p class="hint">Es informativo: no se descuenta del total.</p>
+          <details>
+            <summary>Ver detalle</summary>
+            <div id="ahorroDetail"></div>
+          </details>
+        </div>
+      </div>
+    </div>
+
+    <p class="footnote">
+      Total general = suma de los 12 meses + premio del 1er semestre + premio del 2do semestre.<br>
+      El ahorro del 15% se calcula solo con ENE, MAR, MAY, JUL, SEP y NOV.
+    </p>
+  </section>
+
+  <!-- ================= PRECIOS Y RESPALDO ================= -->
+  <section class="view" id="view-precios">
+    <div class="section-head">
+      <div>
+        <p class="eyebrow">Configuración</p>
+        <h2>Precios y respaldo</h2>
+      </div>
+    </div>
+
+    <div class="card prices-card">
+      <div class="card-head">
+        <h3>Precios de <span id="pricesYear">2026</span></h3>
+        <button type="button" class="text-btn" id="btnResetPrices">Restaurar</button>
+      </div>
+      <p class="hint" style="margin:-6px 0 8px">
+        Se guardan solo para este año. Al cambiarlos, todas las bases del año se recalculan.
+      </p>
+      <div id="priceRows"></div>
+      <div class="price-note">
+        <span aria-hidden="true">i</span>
+        <div><b>El JND se lee letra por letra.</b> Cada X, S, M, Y o P suma su precio; las repeticiones cuentan. El signo + y otros símbolos no suman.</div>
+      </div>
+      <div class="example" id="priceExample"></div>
+      <p class="hint" style="margin:9px 2px 0">Los cambios se guardan solos en este dispositivo.</p>
+    </div>
+
+    <div class="card backup-card">
+      <h3 style="margin:0 0 5px;font-size:16px">Respaldo</h3>
+      <p class="hint">
+        Exporta un CSV para guardar una copia. Si cambias de móvil o borras los datos del navegador,
+        podrás recuperarlo todo con “Importar CSV”.
+      </p>
+      <div class="backup-actions">
+        <button type="button" class="btn primary" id="btnExport">Exportar CSV</button>
+        <button type="button" class="btn ghost" id="btnImport">Importar CSV</button>
+        <input type="file" id="fileInput" accept=".csv,text/csv,text/plain" hidden>
+      </div>
+      <div class="backup-note">
+        <span aria-hidden="true">↳</span>
+        <div>En el móvil, “Exportar” abre el menú para guardar o compartir el archivo. El CSV incluye todos los años.</div>
+      </div>
+    </div>
+
+    <div class="card danger-card">
+      <h3>Borrar datos</h3>
+      <p class="hint">Estas acciones no se pueden deshacer. Exporta un respaldo antes si quieres conservar una copia.</p>
+      <div class="danger-actions">
+        <button type="button" class="btn soft-danger" id="btnClearYear">Borrar datos de <span id="clearYearLabel">2026</span></button>
+        <button type="button" class="btn soft-danger" id="btnClearAll">Borrar todos los datos</button>
+      </div>
+    </div>
+
+    <div class="card help-card">
+      <h3>¿Cómo funciona?</h3>
+      <p>
+        Elige el mes y el día, escribe el JND y la base se calcula al instante.
+        El campo (+) solo aparece en meses impares y se suma una vez al mes.
+      </p>
+      <button type="button" class="btn ghost" id="btnHelpInline">Ver ayuda rápida</button>
+    </div>
+
+    <p class="version">
+      Mi Salario · JND · Versión 1.0<br>
+      Funciona sin internet · Tus datos quedan guardados en este dispositivo.
+    </p>
+  </section>
+</main>
+
+<nav class="tabbar" aria-label="Navegación principal">
+  <button type="button" class="tab active" data-view="hoy" aria-current="page">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4.5" width="18" height="16.5" rx="2.5"/><path d="M3 9h18M8 2.8v3.4M16 2.8v3.4"/><circle cx="12" cy="14.4" r="1.4" fill="currentColor" stroke="none"/></svg>
+    Hoy
+  </button>
+  <button type="button" class="tab" data-view="mes">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6.5h16M4 12h16M4 17.5h16"/><circle cx="2" cy="6.5" r=".9" fill="currentColor" stroke="none"/><circle cx="2" cy="12" r=".9" fill="currentColor" stroke="none"/><circle cx="2" cy="17.5" r=".9" fill="currentColor" stroke="none"/></svg>
+    Mes
+  </button>
+  <button type="button" class="tab" data-view="anio">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>
+    Año
+  </button>
+  <button type="button" class="tab" data-view="precios">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.5 13.2 13.2 20.5a2 2 0 0 1-2.8 0L3.5 13.6V4.5h9.1l7.9 7.9a.6.6 0 0 1 0 .8Z"/><circle cx="8" cy="9" r="1.35"/></svg>
+    Precios
+  </button>
+</nav>
+
+<!-- Modal -->
+<div class="modal-backdrop" id="modalBackdrop" hidden>
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <h3 id="modalTitle"></h3>
+    <div class="modal-body" id="modalBody"></div>
+    <div class="modal-error" id="modalError"></div>
+    <div class="modal-actions">
+      <button type="button" class="btn ghost" id="modalCancel">Cancelar</button>
+      <button type="button" class="btn primary" id="modalConfirm">Aceptar</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+"use strict";
+
+/* ============================================================
+   Datos iniciales: jornadas de 2026 importadas del Excel
+   ============================================================ */
+const SEED_2026 = {"prices":{"X":7000,"S":5000,"M":3000,"Y":14000,"P":1500},"months":[{"name":"ENE","days":["","","","","","","X","X","","","","","","","","","","","","","","","","","","","X","X","XP","",""],"plus":7500},{"name":"FEB","days":["","","","","","","","","","","","","","","","","","X","","","X","","","","","","","","","",""],"plus":0},{"name":"MAR","days":["","X","X","","X","X","","","","","","","","X","","X","","X","X","X","","","","","","S","X","S","","X",""],"plus":19500},{"name":"ABR","days":["","","X","","","","X","","","","","","X","","","","","","","","","","","","","","","","","",""],"plus":0},{"name":"MAY","days":["","","","","","","X","","X","","","","","","","X","X","X","X","X","X","XP","X","XMP","","X","X","X","XMP","X","XM"],"plus":25500},{"name":"JUN","days":["XP","","X","S","X","S","XMP","XMP","XMP","X","XP","X","X","","XP","X","","X","X","X","","X","XP","XP","","XP","XP","XMP","XMP","XP",""],"plus":0},{"name":"JUL","days":["X","XP","XP","X","","XP","XP","X","","X","X","X","","","","","","","","XP","","XP","XP","XP","XP","","","","","",""],"plus":22500},{"name":"AGO","days":["XP","X","X","","X","X","X","","X","","X","XP","XP","X","","X","XP","X","","X","","","X","","","","","","","","X"],"plus":0},{"name":"SEP","days":["","","","X","","X","","","","X","X","X","","","","X","","","","","","","","XMPPPP","XPP","XPP","XPP","X","X","XPP",""],"plus":19500},{"name":"OCT","days":["","","XM","","","X","","","","","X","","","X","X","","X","","","","X","","","X","X","","X","X","X","XP","X"],"plus":0},{"name":"NOV","days":["X","XMP","X","","","","","","","","","","","","","","","","","","","","","","","","","","","",""],"plus":4500},{"name":"DIC","days":["","","","","","","","","","","","","","","","","","","","","","","","","","","","","","",""],"plus":0}]};
+
+/* ============================================================
+   Constantes y estado
+   ============================================================ */
+const MONTHS_SHORT = ["ENE","FEB","MAR","ABR","MAY","JUN","JUL","AGO","SEP","OCT","NOV","DIC"];
+const MONTHS_LONG  = ["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"];
+const WEEKDAYS = ["D","L","M","X","J","V","S"];
+const LETTERS = ["X","S","M","Y","P"];
+const DEFAULT_PRICES = {X:7000, S:5000, M:3000, Y:14000, P:1500};
+const PREMIUM_PER_DAY = 1500;
+const STORAGE_KEY = "mi-salario-jnd-v1";
+const START_YEAR = 2019;
+const NOW = new Date();
+const CURRENT_YEAR = NOW.getFullYear();
+const CURRENT_MONTH = NOW.getMonth();
+const CURRENT_DAY = NOW.getDate();
+const END_YEAR = Math.max(2035, CURRENT_YEAR + 9);
+
+const $ = (sel, root = document) => root.querySelector(sel);
+const $$ = (sel, root = document) => Array.from(root.querySelectorAll(sel));
+
+let state;
+let ui = {view: "hoy", month: CURRENT_MONTH, day: CURRENT_DAY};
+let saveTimer = null;
+let saveStateTimer = null;
+let toastTimer = null;
+let storageErrorShown = false;
+
+/* ============================================================
+   Utilidades
+   ============================================================ */
+function esc(value){
+  return String(value ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+}
+
+function toNumber(value, fallback = 0){
+  const n = Number(value);
+  return Number.isFinite(n) ? n : fallback;
+}
+
+function nonNeg(value, fallback = 0){
+  return Math.max(0, toNumber(value, fallback));
+}
+
+function parseAmount(value){
+  let text = String(value ?? "").trim().replace(/\s|\$/g, "");
+  if (!text) return NaN;
+  if (/^\d{1,3}(\.\d{3})+$/.test(text)){
+    text = text.replace(/\./g, "");
+  } else if (/^\d{1,3}(,\d{3})+$/.test(text)){
+    text = text.replace(/,/g, "");
+  } else if (text.includes(",") && text.includes(".")){
+    if (text.lastIndexOf(",") > text.lastIndexOf(".")){
+      text = text.replace(/\./g, "").replace(",", ".");
+    } else {
+      text = text.replace(/,/g, "");
+    }
+  } else if (text.includes(",")){
+    text = text.replace(",", ".");
+  }
+  const number = Number(text);
+  return Number.isFinite(number) ? number : NaN;
+}
+
+function normalizeJND(value){
+  return String(value ?? "").toUpperCase().replace(/\s+/g, "").slice(0, 40);
+}
+
+function clonePrices(prices){
+  const out = {};
+  for (const letter of LETTERS) out[letter] = nonNeg(prices && prices[letter], DEFAULT_PRICES[letter]);
+  return out;
+}
+
+function num(value){
+  const n = toNumber(value);
+  const rounded = Math.round(n * 100) / 100;
+  const negative = rounded < 0;
+  const absolute = Math.abs(rounded);
+  const hasDecimals = Math.abs(absolute - Math.round(absolute)) > 0.004;
+  const fixed = hasDecimals ? absolute.toFixed(2) : String(Math.round(absolute));
+  const [integer, decimals] = fixed.split(".");
+  const grouped = integer.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+  return (negative ? "-" : "") + grouped + (decimals ? "," + decimals : "");
+}
+
+function money(value){
+  return "$ " + num(value);
+}
+
+function daysInMonth(year, monthIndex){
+  return new Date(year, monthIndex + 1, 0).getDate();
+}
+
+function todayISO(){
+  const d = new Date();
+  return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0");
+}
+
+/* ============================================================
+   Modelo de datos
+   ============================================================ */
+function makeEmptyMonths(){
+  return Array.from({length: 12}, () => ({days: Array(31).fill(""), plus: 0}));
+}
+
+function makeYear(prices = DEFAULT_PRICES){
+  return {prices: clonePrices(prices), months: makeEmptyMonths()};
+}
+
+function seedYear(){
+  const months = makeEmptyMonths();
+  SEED_2026.months.forEach((source, index) => {
+    months[index].days = source.days.map(normalizeJND);
+    months[index].plus = index % 2 === 0 ? nonNeg(source.plus) : 0;
+  });
+  return {prices: clonePrices(SEED_2026.prices), months};
+}
+
+function seedState(){
+  return {version: 1, activeYear: 2026, years: {"2026": seedYear()}};
+}
+
+function normalizeYear(raw){
+  const year = makeYear(raw && raw.prices ? raw.prices : DEFAULT_PRICES);
+  if (raw && Array.isArray(raw.months)){
+    for (let m = 0; m < 12; m++){
+      const source = raw.months[m];
+      if (!source) continue;
+      if (Array.isArray(source.days)){
+        for (let d = 0; d < 31; d++){
+          year.months[m].days[d] = normalizeJND(source.days[d] ?? "");
+        }
+      }
+      year.months[m].plus = m % 2 === 0 ? nonNeg(source.plus) : 0;
+    }
+  }
+  return year;
+}
+
+function loadState(){
+  let rawText = null;
+  try {
+    rawText = localStorage.getItem(STORAGE_KEY);
+  } catch (error){
+    return {state: seedState(), fresh: true, warning: false};
+  }
+  if (!rawText) return {state: seedState(), fresh: true, warning: false};
+
+  let raw = null;
+  try {
+    raw = JSON.parse(rawText);
+  } catch (error){
+    try { localStorage.setItem(STORAGE_KEY + "-corrupt-" + Date.now(), rawText); } catch (ignore){}
+    return {state: seedState(), fresh: true, warning: true};
+  }
+
+  if (!raw || typeof raw !== "object" || !raw.years || typeof raw.years !== "object"){
+    return {state: seedState(), fresh: true, warning: true};
+  }
+
+  const years = {};
+  for (const [key, value] of Object.entries(raw.years)){
+    const year = parseInt(key, 10);
+    if (Number.isInteger(year) && year >= 2019 && year <= 2100){
+      years[String(year)] = normalizeYear(value);
+    }
+  }
+  if (!Object.keys(years).length){
+    return {state: seedState(), fresh: true, warning: true};
+  }
+
+  let activeYear = parseInt(raw.activeYear, 10);
+  if (!years[String(activeYear)]){
+    activeYear = Number(Object.keys(years).sort((a, b) => Number(a) - Number(b))[0]);
+  }
+
+  return {state: {version: 1, activeYear, years}, fresh: false, warning: false};
+}
+
+function currentYearData(){
+  return state.years[String(state.activeYear)];
+}
+
+function bestPricesFor(year){
+  const keys = Object.keys(state.years).map(Number).filter(k => k !== year);
+  if (!keys.length) return DEFAULT_PRICES;
+  keys.sort((a, b) => Math.abs(a - year) - Math.abs(b - year));
+  return state.years[String(keys[0])].prices;
+}
+
+function ensureYear(year){
+  if (!state.years[String(year)]){
+    state.years[String(year)] = makeYear(bestPricesFor(year));
+  }
+  return state.years[String(year)];
+}
+
+/* ============================================================
+   Cálculos
+   ============================================================ */
+function baseOf(jnd, prices = currentYearData().prices){
+  let total = 0;
+  for (const char of normalizeJND(jnd)){
+    if (Object.prototype.hasOwnProperty.call(prices, char)){
+      total += nonNeg(prices[char]);
+    }
+  }
+  return total;
+}
+
+function countsOf(jnd){
+  const counts = {};
+  for (const char of normalizeJND(jnd)){
+    if (LETTERS.includes(char)) counts[char] = (counts[char] || 0) + 1;
+  }
+  return counts;
+}
+
+function monthStats(yearData, monthIndex){
+  const month = yearData.months[monthIndex];
+  let base = 0;
+  let worked = 0;
+  for (const raw of month.days){
+    if (String(raw).trim() !== ""){
+      worked++;
+      base += baseOf(raw, yearData.prices);
+    }
+  }
+  const plus = monthIndex % 2 === 0 ? nonNeg(month.plus) : 0;
+  return {base, plus, salary: base + plus, worked};
+}
+
+function yearStats(yearData){
+  const months = Array.from({length: 12}, (_, m) => monthStats(yearData, m));
+  const totalBase = months.reduce((sum, m) => sum + m.base, 0);
+  const totalPlus = months.reduce((sum, m) => sum + m.plus, 0);
+  const totalSalary = months.reduce((sum, m) => sum + m.salary, 0);
+  const totalDays = months.reduce((sum, m) => sum + m.worked, 0);
+
+  const p1days = months[0].worked + months[1].worked + months[2].worked;
+  const p2days = months[6].worked + months[7].worked + months[8].worked;
+  const premio1 = p1days * PREMIUM_PER_DAY;
+  const premio2 = p2days * PREMIUM_PER_DAY;
+
+  const ahorro = months.reduce((sum, month, index) => {
+    return index % 2 === 0 ? sum + month.salary * 0.15 : sum;
+  }, 0);
+
+  return {
+    months, totalBase, totalPlus, totalSalary, totalDays,
+    p1days, p2days, premio1, premio2, ahorro,
+    totalGeneral: totalSalary + premio1 + premio2
+  };
+}
+
+/* ============================================================
+   Guardado local
+   ============================================================ */
+function setSaveBadge(kind){
+  const badge = $("#saveBadge");
+  if (!badge) return;
+  badge.classList.remove("saving", "err");
+  if (kind === "saving"){
+    badge.textContent = "Guardando…";
+    badge.classList.add("saving");
+    return;
+  }
+  if (kind === "err"){
+    badge.textContent = "Sin guardar";
+    badge.classList.add("err");
+    return;
+  }
+  badge.textContent = "Guardado";
+}
+
+function setSaveState(text, cls){
+  const node = $("#saveState");
+  if (!node) return;
+  node.textContent = text;
+  node.classList.remove("ok", "err");
+  if (cls) node.classList.add(cls);
+}
+
+function saveNow(){
+  clearTimeout(saveTimer);
+  saveTimer = null;
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    setSaveBadge("ok");
+    return true;
+  } catch (error){
+    setSaveBadge("err");
+    setSaveState("No se pudo guardar", "err");
+    if (!storageErrorShown){
+      storageErrorShown = true;
+      toast("No se pudo guardar. Revisa el espacio o la privacidad del navegador.");
+    }
+    return false;
+  }
+}
+
+function flashSaved(){
+  setSaveState("Guardado ✓", "ok");
+  clearTimeout(saveStateTimer);
+  saveStateTimer = setTimeout(() => setSaveState("Se guarda solo"), 1600);
+}
+
+function scheduleSave(){
+  setSaveBadge("saving");
+  clearTimeout(saveStateTimer);
+  setSaveState("Guardando…");
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(() => {
+    const ok = saveNow();
+    if (ok) flashSaved();
+  }, 350);
+}
+
+function toast(message){
+  const node = $("#toast");
+  if (!node) return;
+  node.textContent = message;
+  node.classList.add("show");
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => node.classList.remove("show"), 2600);
+}
+
+/* ============================================================
+   Modal
+   ============================================================ */
+let modalOpen = false;
+let modalResolve = null;
+let modalOptions = null;
+let modalPreviousFocus = null;
+
+function showModal(options = {}){
+  if (modalOpen){
+    closeModal(null);
+  }
+  return new Promise(resolve => {
+    modalOpen = true;
+    modalResolve = resolve;
+    modalOptions = options;
+    modalPreviousFocus = document.activeElement;
+
+    $("#modalTitle").textContent = options.title || "";
+    const body = $("#modalBody");
+    body.innerHTML = options.body || "";
+    $("#modalError").textContent = "";
+
+    const cancel = $("#modalCancel");
+    const confirm = $("#modalConfirm");
+    cancel.hidden = options.showCancel === false;
+    cancel.textContent = options.cancelText || "Cancelar";
+    confirm.textContent = options.confirmText || "Aceptar";
+    confirm.classList.toggle("danger", Boolean(options.danger));
+    confirm.classList.toggle("primary", !options.danger);
+
+    if (options.input){
+      const wrap = document.createElement("div");
+      wrap.className = "modal-input-wrap";
+      const label = document.createElement("label");
+      label.className = "sr-only";
+      label.textContent = options.input.label || "Valor";
+      const input = document.createElement("input");
+      input.className = "modal-input";
+      input.type = options.input.type || "text";
+      input.value = options.input.value || "";
+      input.placeholder = options.input.placeholder || "";
+      if (options.input.maxlength) input.maxLength = options.input.maxlength;
+      if (options.input.inputmode) input.inputMode = options.input.inputmode;
+      input.id = "modalInput";
+      label.htmlFor = "modalInput";
+      wrap.append(label, input);
+      body.appendChild(wrap);
+    }
+
+    const backdrop = $("#modalBackdrop");
+    backdrop.hidden = false;
+    document.body.classList.add("modal-open");
+    requestAnimationFrame(() => backdrop.classList.add("show"));
+
+    setTimeout(() => {
+      const input = $("#modalInput");
+      if (input){
+        input.focus();
+        input.select();
+      } else {
+        confirm.focus();
+      }
+    }, 60);
+  });
+}
+
+function closeModal(result){
+  if (!modalOpen) return;
+  modalOpen = false;
+  const resolve = modalResolve;
+  modalResolve = null;
+  modalOptions = null;
+
+  const backdrop = $("#modalBackdrop");
+  backdrop.classList.remove("show");
+  backdrop.hidden = true;
+  document.body.classList.remove("modal-open");
+
+  if (modalPreviousFocus && typeof modalPreviousFocus.focus === "function"){
+    try { modalPreviousFocus.focus({preventScroll: true}); } catch (ignore){}
+  }
+  modalPreviousFocus = null;
+  if (resolve) resolve(result);
+}
+
+function confirmModal(){
+  if (!modalOpen) return;
+  const input = $("#modalInput");
+  if (input){
+    const value = input.value.trim();
+    if (modalOptions && modalOptions.input && typeof modalOptions.input.validate === "function"){
+      const error = modalOptions.input.validate(value);
+      if (error){
+        $("#modalError").textContent = error;
+        input.focus();
+        return;
+      }
+    }
+    closeModal(value);
+  } else {
+    closeModal(true);
+  }
+}
+
+async function confirmDialog(title, body, confirmText = "Aceptar", danger = false){
+  const result = await showModal({title, body, confirmText, danger});
+  return result === true;
+}
+
+async function alertDialog(title, body){
+  await showModal({title, body, confirmText: "Cerrar", showCancel: false});
+}
+
+/* ============================================================
+   Render: cabecera y navegación
+   ============================================================ */
+function renderYearSelect(){
+  const active = state.activeYear;
+  const years = new Set();
+  for (let year = START_YEAR; year <= END_YEAR; year++) years.add(year);
+  years.add(active);
+  const sorted = Array.from(years).sort((a, b) => a - b);
+  const select = $("#yearSelect");
+  select.innerHTML = sorted.map(year =>
+    `<option value="${year}"${year === active ? " selected" : ""}>${year}</option>`
+  ).join("") + `<option value="new">+ Otro año…</option>`;
+  select.value = String(active);
+}
+
+function renderMonthStrip(container, activeMonth){
+  const yearData = currentYearData();
+  container.innerHTML = MONTHS_SHORT.map((name, index) => {
+    const stats = monthStats(yearData, index);
+    const classes = ["month-chip"];
+    if (index === activeMonth) classes.push("active");
+    if (stats.worked > 0) classes.push("has-data");
+    return `<button type="button" class="${classes.join(" ")}" data-month="${index}"
+      aria-pressed="${index === activeMonth}" aria-label="${MONTHS_LONG[index]}">${name}</button>`;
+  }).join("");
+}
+
+function updateNav(){
+  $$(".tab").forEach(tab => {
+    const active = tab.dataset.view === ui.view;
+    tab.classList.toggle("active", active);
+    if (active) tab.setAttribute("aria-current", "page");
+    else tab.removeAttribute("aria-current");
+  });
+  $$(".view").forEach(view => view.classList.toggle("active", view.id === "view-" + ui.view));
+}
+
+function setView(view){
+  ui.view = view;
+  updateNav();
+  if (view === "hoy") {
+    renderQuickLetters();
+    renderQuick();
+  }
+  if (view === "mes") renderMonth();
+  if (view === "anio") renderAnnual();
+  if (view === "precios") renderPrices();
+  window.scrollTo({top: 0, behavior: "smooth"});
+}
+
+/* ============================================================
+   Render: registro rápido
+   ============================================================ */
+function renderQuickLetters(){
+  const prices = currentYearData().prices;
+  $("#quickLetters").innerHTML = LETTERS.map(letter =>
+    `<button type="button" class="letter-btn" data-letter="${letter}"
+      aria-label="Agregar ${letter}, precio ${money(prices[letter])}">
+      <span>${letter}</span><small>${num(prices[letter])}</small>
+    </button>`
+  ).join("");
+}
+
+function updateDayButton(){
+  const button = $('#dayGrid .day-btn[data-day="' + ui.day + '"]');
+  if (!button) return;
+  const filled = $("#jndInput").value.trim() !== "";
+  button.classList.toggle("filled", filled);
+}
+
+function updateQuickStats(){
+  const stats = monthStats(currentYearData(), ui.month);
+  $("#quickMonthStats").textContent = `${stats.worked} día${stats.worked === 1 ? "" : "s"} · ${money(stats.salary)}`;
+  const chip = $('#quickMonths .month-chip[data-month="' + ui.month + '"]');
+  if (chip) chip.classList.toggle("has-data", stats.worked > 0);
+}
+
+function updatePreview(){
+  const raw = $("#jndInput").value;
+  const prices = currentYearData().prices;
+  const base = baseOf(raw, prices);
+  const counts = countsOf(raw);
+  $("#basePreview").textContent = money(base);
+
+  const parts = [];
+  for (const letter of LETTERS){
+    if (!counts[letter]) continue;
+    const count = counts[letter];
+    parts.push(`<span class="b-chip"><b>${letter}</b>${count > 1 ? `<em>×${count}</em>` : ""}<span>${num(prices[letter] * count)}</span></span>`);
+  }
+
+  const breakdown = $("#breakdown");
+  if (!parts.length){
+    breakdown.innerHTML = `<span class="b-empty">Escribe un JND para ver el cálculo.</span>`;
+  } else {
+    breakdown.innerHTML = parts.join('<span class="b-plus">+</span>') +
+      `<span class="b-note">· el + y otros símbolos no suman</span>`;
+  }
+  updateQuickStats();
+}
+
+function updateEntry(){
+  const yearData = currentYearData();
+  const raw = yearData.months[ui.month].days[ui.day - 1] || "";
+  $("#selectedDayBadge").textContent = ui.day;
+  $("#selectedDayTitle").textContent = `Día ${ui.day} · ${MONTHS_SHORT[ui.month]}`;
+  const input = $("#jndInput");
+  if (input.value !== raw) input.value = raw;
+  $("#entryCard").classList.toggle("has-code", raw.trim() !== "");
+  updatePreview();
+  setSaveState("Se guarda solo");
+}
+
+function renderQuick(){
+  const yearData = currentYearData();
+  const stats = monthStats(yearData, ui.month);
+  $("#quickTitle").textContent = `${MONTHS_LONG[ui.month]} ${state.activeYear}`;
+  $("#quickMonthStats").textContent = `${stats.worked} día${stats.worked === 1 ? "" : "s"} · ${money(stats.salary)}`;
+
+  $("#dayGrid").innerHTML = Array.from({length: 31}, (_, index) => {
+    const day = index + 1;
+    const raw = yearData.months[ui.month].days[index];
+    const filled = String(raw).trim() !== "";
+    const isToday = state.activeYear === CURRENT_YEAR && ui.month === CURRENT_MONTH && day === CURRENT_DAY;
+    const isSelected = day === ui.day;
+    const isOut = day > daysInMonth(state.activeYear, ui.month);
+    const classes = ["day-btn"];
+    if (filled) classes.push("filled");
+    if (isSelected) classes.push("selected");
+    if (isToday) classes.push("today");
+    if (isOut) classes.push("out");
+    return `<button type="button" class="${classes.join(" ")}" data-day="${day}"
+      aria-pressed="${isSelected}" aria-label="Día ${day}${filled ? ", con jornada" : ""}">${day}</button>`;
+  }).join("");
+
+  updateEntry();
+  updateDayButton();
+}
+
+/* ============================================================
+   Render: vista mensual
+   ============================================================ */
+function renderPlusSlot(){
+  const slot = $("#plusSlot");
+  const yearData = currentYearData();
+  const stats = monthStats(yearData, ui.month);
+
+  if (ui.month % 2 === 1){
+    slot.innerHTML = `
+      <div class="note-card">
+        <span class="note-icon" aria-hidden="true">i</span>
+        <div><b>Este mes no tiene (+).</b> El salario es solo la suma de las bases de los días.</div>
+      </div>`;
+    return;
+  }
+
+  slot.innerHTML = `
+    <div class="card plus-card">
+      <div class="plus-copy">
+        <div class="plus-badge" aria-hidden="true">(+)</div>
+        <div>
+          <h3>Plus del mes</h3>
+          <p>Se suma una sola vez al salario del mes. No es por día.</p>
+        </div>
+      </div>
+      <label class="money-field">
+        <span>$</span>
+        <input type="number" id="plusInput" inputmode="numeric" min="0" step="100"
+               value="${stats.plus}" aria-label="Plus manual del mes">
+      </label>
+    </div>`;
+
+  const input = $("#plusInput");
+  input.addEventListener("input", () => {
+    const value = input.value === "" ? 0 : Math.max(0, Math.round(Number(input.value) || 0));
+    currentYearData().months[ui.month].plus = value;
+    updateMonthTotals();
+    scheduleSave();
+  });
+  input.addEventListener("blur", () => {
+    input.value = currentYearData().months[ui.month].plus;
+    saveNow();
+    flashSaved();
+  });
+}
+
+function updateMonthTotals(){
+  const stats = monthStats(currentYearData(), ui.month);
+  $("#mDays").textContent = stats.worked;
+  $("#mBase").textContent = money(stats.base);
+  $("#mPlus").textContent = ui.month % 2 === 0 ? money(stats.plus) : "—";
+  $("#mSalary").textContent = money(stats.salary);
+  $$('#quickMonths .month-chip, #monthMonths .month-chip').forEach(chip => {
+    if (Number(chip.dataset.month) === ui.month){
+      chip.classList.toggle("has-data", stats.worked > 0);
+    }
+  });
+}
+
+function renderMonthTable(){
+  const yearData = currentYearData();
+  $("#monthBody").innerHTML = Array.from({length: 31}, (_, index) => {
+    const day = index + 1;
+    const raw = yearData.months[ui.month].days[index] || "";
+    const base = baseOf(raw, yearData.prices);
+    const isOut = day > daysInMonth(state.activeYear, ui.month);
+    const isToday = state.activeYear === CURRENT_YEAR && ui.month === CURRENT_MONTH && day === CURRENT_DAY;
+    const weekday = isOut ? "" : WEEKDAYS[new Date(state.activeYear, ui.month, day).getDay()];
+    const classes = [];
+    if (!isOut && (new Date(state.activeYear, ui.month, day).getDay() === 0 || new Date(state.activeYear, ui.month, day).getDay() === 6)) classes.push("weekend");
+    if (isToday) classes.push("today");
+    if (isOut) classes.push("out");
+    if (raw.trim() !== "") classes.push("has-data");
+    return `<tr class="${classes.join(" ")}" data-row="${day}">
+      <td class="day-cell"><span class="dnum">${day}</span>${weekday ? `<span class="wk">${weekday}</span>` : ""}</td>
+      <td><input class="jnd-cell" data-day="${day}" value="${esc(raw)}"
+        aria-label="JND del día ${day}" inputmode="text" autocapitalize="characters"
+        autocomplete="off" autocorrect="off" spellcheck="false" maxlength="40"
+        placeholder=" " enterkeyhint="done"></td>
+      <td class="base-cell">${base ? num(base) : '<span class="zero">—</span>'}</td>
+    </tr>`;
+  }).join("");
+}
+
+function renderMonth(){
+  const stats = monthStats(currentYearData(), ui.month);
+  $("#monthTitle").textContent = `${MONTHS_LONG[ui.month]} ${state.activeYear}`;
+  $("#mDays").textContent = stats.worked;
+  $("#mBase").textContent = money(stats.base);
+  $("#mPlus").textContent = ui.month % 2 === 0 ? money(stats.plus) : "—";
+  $("#mPlusStat").classList.toggle("muted", ui.month % 2 === 1);
+  $("#mSalary").textContent = money(stats.salary);
+  $("#prevMonth").disabled = ui.month === 0;
+  $("#nextMonth").disabled = ui.month === 11;
+  renderPlusSlot();
+  renderMonthTable();
+}
+
+/* ============================================================
+   Render: resumen anual
+   ============================================================ */
+function renderAnnual(){
+  const stats = yearStats(currentYearData());
+  $("#annualTitle").textContent = `Año ${state.activeYear}`;
+  $("#heroYear").textContent = state.activeYear;
+  $("#aTotal").textContent = money(stats.totalGeneral);
+  $("#aBreakdown").innerHTML =
+    `<span>Salarios <b>${money(stats.totalSalary)}</b></span>` +
+    `<span class="hero-dot">·</span>` +
+    `<span>Premios <b>${money(stats.premio1 + stats.premio2)}</b></span>`;
+
+  $("#aDays").textContent = stats.totalDays;
+  $("#aBase").textContent = money(stats.totalBase);
+  $("#aPlus").textContent = money(stats.totalPlus);
+  $("#aAhorro").textContent = money(stats.ahorro);
+
+  $("#yearBody").innerHTML = stats.months.map((month, index) => {
+    const plus = index % 2 === 0 ? num(month.plus) : '<span class="dash">—</span>';
+    return `<tr class="${index % 2 === 0 ? "odd" : "even"}">
+      <td>${MONTHS_SHORT[index]}</td>
+      <td class="days">${month.worked}</td>
+      <td>${num(month.base)}</td>
+      <td class="plus">${plus}</td>
+      <td class="total">${num(month.salary)}</td>
+    </tr>`;
+  }).join("");
+
+  $("#yearFoot").innerHTML = `<tr>
+    <td>TOTAL</td>
+    <td class="days">${stats.totalDays}</td>
+    <td>${num(stats.totalBase)}</td>
+    <td class="plus">${num(stats.totalPlus)}</td>
+    <td class="total">${num(stats.totalSalary)}</td>
+  </tr>`;
+
+  $("#prize1").textContent = money(stats.premio1);
+  $("#prize1Detail").textContent = `${stats.p1days} días (ENE + FEB + MAR) × ${money(PREMIUM_PER_DAY)}`;
+  $("#prize2").textContent = money(stats.premio2);
+  $("#prize2Detail").textContent = `${stats.p2days} días (JUL + AGO + SEP) × ${money(PREMIUM_PER_DAY)}`;
+
+  $("#ahorroTotal").textContent = money(stats.ahorro);
+  $("#ahorroDetail").innerHTML = stats.months.map((month, index) => {
+    if (index % 2 === 1) return "";
+    return `<div class="ahorro-row">
+      <span>${MONTHS_SHORT[index]}</span>
+      <span>${num(month.salary)}</span>
+      <span>${num(month.salary * 0.15)}</span>
+    </div>`;
+  }).join("");
+}
+
+/* ============================================================
+   Render: precios y respaldo
+   ============================================================ */
+function updatePriceExample(){
+  const prices = currentYearData().prices;
+  const counts = countsOf("XMPPPP");
+  const parts = LETTERS.filter(letter => counts[letter]).map(letter => {
+    const count = counts[letter];
+    return `${letter}${count > 1 ? "×" + count : ""} ${num(prices[letter] * count)}`;
+  });
+  $("#priceExample").innerHTML =
+    `<span class="example-code">XMPPPP</span> = ${parts.join(" + ")} = <b>${money(baseOf("XMPPPP", prices))}</b>`;
+}
+
+function renderPrices(){
+  const yearData = currentYearData();
+  $("#pricesYear").textContent = state.activeYear;
+  $("#clearYearLabel").textContent = state.activeYear;
+
+  $("#priceRows").innerHTML = LETTERS.map(letter => `
+    <div class="price-row">
+      <div class="letter-badge" aria-hidden="true">${letter}</div>
+      <label class="price-field">
+        <span class="sr-only">Precio de ${letter}</span>
+        <span class="money-field">
+          <span>$</span>
+          <input type="number" data-letter="${letter}" inputmode="numeric" min="0" step="100"
+                 value="${yearData.prices[letter]}" aria-label="Precio de ${letter}">
+        </span>
+      </label>
+    </div>`).join("");
+
+  $$("#priceRows input").forEach(input => {
+    input.addEventListener("input", () => {
+      const letter = input.dataset.letter;
+      const value = input.value === "" ? 0 : Math.max(0, Math.round(Number(input.value) || 0));
+      currentYearData().prices[letter] = value;
+      updatePriceExample();
+      scheduleSave();
+    });
+    input.addEventListener("blur", () => {
+      input.value = currentYearData().prices[input.dataset.letter];
+      saveNow();
+      flashSaved();
+    });
+  });
+
+  updatePriceExample();
+}
+
+/* ============================================================
+   Render general
+   ============================================================ */
+function renderAll(){
+  renderYearSelect();
+  renderQuickLetters();
+  renderMonthStrip($("#quickMonths"), ui.month);
+  renderMonthStrip($("#monthMonths"), ui.month);
+  renderQuick();
+  renderMonth();
+  renderAnnual();
+  renderPrices();
+  updateNav();
+}
+
+/* ============================================================
+   Acciones de UI
+   ============================================================ */
+function setYear(year){
+  if (year === state.activeYear) return;
+  let created = false;
+  if (!state.years[String(year)]){
+    ensureYear(year);
+    created = true;
+  }
+  state.activeYear = year;
+  ui.day = Math.min(ui.day, daysInMonth(year, ui.month));
+  saveNow();
+  renderAll();
+  if (created) toast(`Año ${year} creado con los precios del año más cercano.`);
+}
+
+function setMonth(month){
+  if (month === ui.month) return;
+  ui.month = Math.max(0, Math.min(11, month));
+  ui.day = Math.min(ui.day, daysInMonth(state.activeYear, ui.month));
+  renderAll();
+}
+
+function selectDay(day){
+  ui.day = day;
+  const button = $('#dayGrid .day-btn[data-day="' + day + '"]');
+  if (button){
+    $$("#dayGrid .day-btn").forEach(item => {
+      const selected = Number(item.dataset.day) === day;
+      item.classList.toggle("selected", selected);
+      item.setAttribute("aria-pressed", String(selected));
+    });
+  }
+  const raw = currentYearData().months[ui.month].days[day - 1] || "";
+  const input = $("#jndInput");
+  input.value = raw;
+  $("#selectedDayBadge").textContent = day;
+  $("#selectedDayTitle").textContent = `Día ${day} · ${MONTHS_SHORT[ui.month]}`;
+  $("#entryCard").classList.toggle("has-code", raw.trim() !== "");
+  updatePreview();
+  setSaveState("Se guarda solo");
+  input.focus({preventScroll: true});
+  const card = $("#entryCard");
+  if (card) card.scrollIntoView({behavior: "smooth", block: "nearest"});
+}
+
+async function clearSelectedDay(){
+  const raw = currentYearData().months[ui.month].days[ui.day - 1] || "";
+  if (raw.trim() === ""){
+    toast("Ese día ya está vacío.");
+    return;
+  }
+  const ok = await confirmDialog(
+    "Borrar jornada",
+    `<p>Se quitará el JND <b>${esc(raw)}</b> del día <b>${ui.day} de ${MONTHS_LONG[ui.month]}</b>.</p><p>La base de ese día volverá a $ 0.</p>`,
+    "Borrar",
+    true
+  );
+  if (!ok) return;
+  currentYearData().months[ui.month].days[ui.day - 1] = "";
+  $("#jndInput").value = "";
+  updatePreview();
+  updateDayButton();
+  saveNow();
+  flashSaved();
+  toast("Día borrado.");
+}
+
+function appendLetter(letter){
+  const input = $("#jndInput");
+  if (input.value.length >= 40) return;
+  input.value += letter;
+  currentYearData().months[ui.month].days[ui.day - 1] = input.value;
+  updatePreview();
+  updateDayButton();
+  scheduleSave();
+  input.focus();
+  input.setSelectionRange(input.value.length, input.value.length);
+}
+
+async function goToday(){
+  if (state.activeYear !== CURRENT_YEAR){
+    ensureYear(CURRENT_YEAR);
+    state.activeYear = CURRENT_YEAR;
+  }
+  ui.month = CURRENT_MONTH;
+  ui.day = CURRENT_DAY;
+  saveNow();
+  renderAll();
+  toast(`Fuiste a hoy: ${CURRENT_DAY} de ${MONTHS_LONG[CURRENT_MONTH]} de ${CURRENT_YEAR}.`);
+}
+
+/* ============================================================
+   CSV
+   ============================================================ */
+function csvCell(value){
+  const text = String(value ?? "");
+  return /[";\r\n]/.test(text) ? '"' + text.replace(/"/g, '""') + '"' : text;
+}
+
+function buildCSV(){
+  const rows = [["anio","mes","dia","jnd","plus_mes","precio_x","precio_s","precio_m","precio_y","precio_p","base"]];
+  const years = Object.keys(state.years).map(Number).sort((a, b) => a - b);
+
+  for (const yearNumber of years){
+    const yearData = state.years[String(yearNumber)];
+    const prices = yearData.prices;
+    for (let month = 0; month < 12; month++){
+      const stats = monthStats(yearData, month);
+      const plus = month % 2 === 0 ? stats.plus : 0;
+      rows.push([yearNumber, month + 1, 0, "", plus, prices.X, prices.S, prices.M, prices.Y, prices.P, stats.base]);
+      for (let day = 1; day <= 31; day++){
+        const jnd = normalizeJND(yearData.months[month].days[day - 1]);
+        if (!jnd) continue;
+        rows.push([yearNumber, month + 1, day, jnd, plus, prices.X, prices.S, prices.M, prices.Y, prices.P, baseOf(jnd, prices)]);
+      }
+    }
+  }
+  return "\uFEFF" + rows.map(row => row.map(csvCell).join(";")).join("\r\n") + "\r\n";
+}
+
+function detectDelimiter(text){
+  const firstLine = text.split(/\r?\n/)[0] || "";
+  let semicolons = 0;
+  let commas = 0;
+  let quoted = false;
+  for (const char of firstLine){
+    if (char === '"') quoted = !quoted;
+    else if (!quoted && char === ";") semicolons++;
+    else if (!quoted && char === ",") commas++;
+  }
+  return semicolons >= commas ? ";" : ",";
+}
+
+function parseCSV(text){
+  const source = text.replace(/^\uFEFF/, "");
+  const delimiter = detectDelimiter(source);
+  const rows = [];
+  let row = [];
+  let field = "";
+  let quoted = false;
+
+  for (let i = 0; i < source.length; i++){
+    const char = source[i];
+    if (quoted){
+      if (char === '"'){
+        if (source[i + 1] === '"'){
+          field += '"';
+          i++;
+        } else {
+          quoted = false;
+        }
+      } else {
+        field += char;
+      }
+    } else {
+      if (char === '"'){
+        quoted = true;
+      } else if (char === delimiter){
+        row.push(field);
+        field = "";
+      } else if (char === "\n"){
+        row.push(field);
+        rows.push(row);
+        row = [];
+        field = "";
+      } else if (char === "\r"){
+        // se ignora; el salto de línea se maneja con \n
+      } else {
+        field += char;
+      }
+    }
+  }
+  if (field !== "" || row.length){
+    row.push(field);
+    rows.push(row);
+  }
+  return rows.filter(item => item.some(cell => String(cell).trim() !== ""));
+}
+
+function normalizeHeader(value){
+  return String(value ?? "")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "_")
+    .replace(/^_+|_+$/g, "");
+}
+
+function parseMonth(value){
+  const raw = String(value ?? "").trim();
+  const normalized = normalizeHeader(raw);
+  const names = {ene: 1, enero: 1, feb: 2, febrero: 2, mar: 3, marzo: 3, abr: 4, abril: 4, may: 5, mayo: 5, jun: 6, junio: 6, jul: 7, julio: 7, ago: 8, agosto: 8, sep: 9, septiembre: 9, set: 9, oct: 10, octubre: 10, nov: 11, noviembre: 11, dic: 12, diciembre: 12};
+  if (names[normalized]) return names[normalized];
+  const number = parseInt(raw, 10);
+  return number >= 1 && number <= 12 ? number : 0;
+}
+
+function parseImport(text){
+  const rows = parseCSV(text);
+  if (rows.length < 2) throw new Error("El archivo está vacío o no tiene datos.");
+
+  const headers = rows[0].map(normalizeHeader);
+  const index = {};
+  headers.forEach((header, position) => {
+    if (!(header in index)) index[header] = position;
+  });
+  const find = (...names) => {
+    for (const name of names){
+      if (index[name] !== undefined) return index[name];
+    }
+    return -1;
+  };
+
+  const iYear = find("anio","ano","year");
+  const iMonth = find("mes","month");
+  const iDay = find("dia","day");
+  const iJnd = find("jnd","codigo","code");
+  if ([iYear, iMonth, iDay, iJnd].some(position => position < 0)){
+    throw new Error("Faltan columnas. El CSV debe tener: anio, mes, dia y jnd.");
+  }
+
+  const priceIndexes = {
+    X: find("precio_x","px"),
+    S: find("precio_s","ps"),
+    M: find("precio_m","pm"),
+    Y: find("precio_y","py"),
+    P: find("precio_p","pp")
+  };
+  const iPlus = find("plus_mes","plus","mas");
+
+  const imported = new Map();
+  let invalid = 0;
+  let dayCount = 0;
+
+  for (let r = 1; r < rows.length; r++){
+    const row = rows[r];
+    const year = parseInt(row[iYear], 10);
+    const month = parseMonth(row[iMonth]);
+    const day = parseInt(row[iDay], 10);
+    if (!(year >= 2019 && year <= 2100) || !month || !(day >= 0 && day <= 31)){
+      invalid++;
+      continue;
+    }
+
+    if (!imported.has(year)){
+      imported.set(year, {prices: null, months: makeEmptyMonths(), plusSet: Array(12).fill(false)});
+    }
+    const record = imported.get(year);
+
+    if (LETTERS.every(letter => priceIndexes[letter] >= 0)){
+      const values = {};
+      for (const letter of LETTERS){
+        const raw = String(row[priceIndexes[letter]] ?? "").trim();
+        const number = parseAmount(raw);
+        values[letter] = raw !== "" && Number.isFinite(number) && number >= 0 ? Math.round(number) : null;
+      }
+      if (LETTERS.every(letter => values[letter] !== null)) record.prices = values;
+    }
+
+    const monthIndex = month - 1;
+    if (iPlus >= 0){
+      const rawPlus = String(row[iPlus] ?? "").trim();
+      if (rawPlus !== "" && !record.plusSet[monthIndex]){
+        const number = parseAmount(rawPlus);
+        if (Number.isFinite(number)){
+          record.months[monthIndex].plus = monthIndex % 2 === 0 ? Math.max(0, Math.round(number)) : 0;
+          record.plusSet[monthIndex] = true;
+        }
+      }
+    }
+
+    if (day === 0){
+      record.plusSet[monthIndex] = true;
+      if (!record.months[monthIndex].plus) record.months[monthIndex].plus = 0;
+      continue;
+    }
+
+    const jnd = normalizeJND(row[iJnd]);
+    if (jnd){
+      record.months[monthIndex].days[day - 1] = jnd;
+      dayCount++;
+    }
+  }
+
+  if (!imported.size) throw new Error("No se encontró ninguna fila válida.");
+  return {imported, invalid, dayCount};
+}
+
+function applyImport(parsed){
+  const years = Array.from(parsed.imported.keys()).sort((a, b) => a - b);
+
+  for (const yearNumber of years){
+    const record = parsed.imported.get(yearNumber);
+    const fallback = state.years[String(yearNumber)]
+      ? state.years[String(yearNumber)].prices
+      : bestPricesFor(yearNumber);
+    const yearData = makeYear(record.prices || fallback);
+    for (let month = 0; month < 12; month++){
+      yearData.months[month].days = record.months[month].days.slice();
+      yearData.months[month].plus = month % 2 === 0 ? record.months[month].plus : 0;
+    }
+    state.years[String(yearNumber)] = yearData;
+  }
+
+  if (!years.includes(state.activeYear)){
+    state.activeYear = years.includes(CURRENT_YEAR) ? CURRENT_YEAR : years[0];
+  }
+  saveNow();
+  renderAll();
+}
+
+async function handleImportFile(file){
+  try {
+    const text = await file.text();
+    const parsed = parseImport(text);
+    const years = Array.from(parsed.imported.keys()).sort((a, b) => a - b);
+    const warning = parsed.invalid
+      ? `<p class="warn">Se ignorarán ${parsed.invalid} fila(s) con datos inválidos.</p>`
+      : "";
+    const ok = await confirmDialog(
+      "Importar respaldo",
+      `<p>Se reemplazarán por completo los datos de: <b>${years.join(", ")}</b>.</p>
+       <p>Jornadas a importar: <b>${parsed.dayCount}</b>.</p>
+       ${warning}
+       <p class="hint">Los demás años no se tocan. Esta acción no se puede deshacer.</p>`,
+      "Importar",
+      false
+    );
+    if (!ok){
+      $("#fileInput").value = "";
+      return;
+    }
+    applyImport(parsed);
+    toast(`Respaldo importado: ${parsed.dayCount} jornadas.`);
+  } catch (error){
+    await alertDialog("No se pudo importar", `<p>${esc(error.message)}</p><p class="hint">Elige un CSV exportado por esta app.</p>`);
+  } finally {
+    $("#fileInput").value = "";
+  }
+}
+
+async function exportCSV(){
+  const csv = buildCSV();
+  const filename = `Salario-JND-${todayISO()}.csv`;
+  const blob = new Blob([csv], {type: "text/csv;charset=utf-8"});
+  const file = new File([blob], filename, {type: "text/csv"});
+
+  if (navigator.maxTouchPoints > 0 && navigator.canShare && navigator.canShare({files: [file]})){
+    try {
+      await navigator.share({files: [file], title: "Respaldo de Mi Salario"});
+      toast("Respaldo compartido.");
+      return;
+    } catch (error){
+      if (error && error.name === "AbortError") return;
+    }
+  }
+
+  const url = URL.createObjectURL(blob);
+  const anchor = document.createElement("a");
+  anchor.href = url;
+  anchor.download = filename;
+  document.body.appendChild(anchor);
+  anchor.click();
+  anchor.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 1200);
+  toast("CSV descargado.");
+}
+
+/* ============================================================
+   Borrar datos
+   ============================================================ */
+async function clearYearData(){
+  const year = state.activeYear;
+  const ok = await confirmDialog(
+    `Borrar datos de ${year}`,
+    `<p>Se borrarán todas las jornadas, los (+) y los totales de <b>${year}</b>.</p>
+     <p>Los precios de ese año se conservan. Los demás años no se tocan.</p>
+     <p class="warn">Esta acción no se puede deshacer.</p>`,
+    "Borrar",
+    true
+  );
+  if (!ok) return;
+  state.years[String(year)] = makeYear(state.years[String(year)].prices);
+  saveNow();
+  renderAll();
+  toast(`Datos de ${year} borrados.`);
+}
+
+async function clearAllData(){
+  const first = await confirmDialog(
+    "Borrar todos los datos",
+    `<p>Se borrarán <b>todos los años</b>, todas las jornadas y todos los (+).</p>
+     <p class="warn">Esta acción no se puede deshacer.</p>`,
+    "Continuar",
+    true
+  );
+  if (!first) return;
+
+  const typed = await showModal({
+    title: "Confirmación final",
+    body: `<p>Escribe <b>BORRAR</b> para confirmar que quieres borrar todo.</p>`,
+    input: {
+      value: "",
+      placeholder: "BORRAR",
+      maxlength: 8,
+      label: "Escribe BORRAR",
+      validate: value => String(value).toUpperCase() === "BORRAR"
+        ? ""
+        : "Escribe BORRAR para confirmar."
+    },
+    confirmText: "Borrar todo",
+    danger: true
+  });
+  if (typed === null) return;
+
+  state = {
+    version: 1,
+    activeYear: CURRENT_YEAR,
+    years: {[String(CURRENT_YEAR)]: makeYear(DEFAULT_PRICES)}
+  };
+  ui.month = CURRENT_MONTH;
+  ui.day = CURRENT_DAY;
+  saveNow();
+  renderAll();
+  toast("Todos los datos fueron borrados.");
+}
+
+async function resetPrices(){
+  const year = state.activeYear;
+  const ok = await confirmDialog(
+    `Restaurar precios de ${year}`,
+    `<p>Se usarán los precios originales: X $7.000, S $5.000, M $3.000, Y $14.000, P $1.500.</p>
+     <p>Las jornadas no se borran; solo se recalculan las bases.</p>`,
+    "Restaurar",
+    false
+  );
+  if (!ok) return;
+  currentYearData().prices = clonePrices(DEFAULT_PRICES);
+  saveNow();
+  renderPrices();
+  renderQuickLetters();
+  renderQuick();
+  renderMonth();
+  renderAnnual();
+  toast("Precios restaurados.");
+}
+
+/* ============================================================
+   Ayuda
+   ============================================================ */
+function openHelp(){
+  showModal({
+    title: "Ayuda rápida",
+    body: `
+      <p><b>1.</b> Elige el mes y toca un día.</p>
+      <p><b>2.</b> Escribe el JND (X, XP, XMP…) o usa los botones X, S, M, Y, P.</p>
+      <p><b>3.</b> La base se calcula al instante. Se guarda sola.</p>
+      <p><b>El (+)</b> solo aparece en ENE, MAR, MAY, JUL, SEP y NOV. Se suma una vez al mes.</p>
+      <p><b>El ahorro 15%</b> es informativo: se calcula solo con esos meses impares y no se resta del total.</p>
+      <p><b>Respaldo:</b> exporta un CSV de vez en cuando. Si borras los datos del navegador, el CSV es tu copia de seguridad.</p>
+    `,
+    confirmText: "Entendido",
+    showCancel: false
+  });
+}
+
+/* ============================================================
+   Eventos
+   ============================================================ */
+function bindEvents(){
+  $("#yearSelect").addEventListener("change", async event => {
+    if (event.target.value === "new"){
+      const value = await showModal({
+        title: "Abrir otro año",
+        body: `<p>Escribe un año entre 2019 y 2100. Si no existe, se crea vacío con los precios del año más cercano.</p>`,
+        input: {
+          value: String(state.activeYear),
+          placeholder: "2030",
+          maxlength: 4,
+          inputmode: "numeric",
+          label: "Año",
+          validate: value => {
+            const number = Number(value);
+            return /^\d{4}$/.test(value) && number >= 2019 && number <= 2100
+              ? ""
+              : "Escribe un año válido (2019–2100).";
+          }
+        },
+        confirmText: "Abrir"
+      });
+      if (!value){
+        renderYearSelect();
+        return;
+      }
+      setYear(Number(value));
+      return;
+    }
+    setYear(Number(event.target.value));
+  });
+
+  $$(".tab").forEach(tab => {
+    tab.addEventListener("click", () => setView(tab.dataset.view));
+  });
+
+  [["#quickMonths"], ["#monthMonths"]].forEach(([selector]) => {
+    $(selector).addEventListener("click", event => {
+      const chip = event.target.closest(".month-chip");
+      if (!chip) return;
+      setMonth(Number(chip.dataset.month));
+    });
+  });
+
+  $("#dayGrid").addEventListener("click", event => {
+    const button = event.target.closest(".day-btn");
+    if (!button) return;
+    selectDay(Number(button.dataset.day));
+  });
+
+  $("#quickLetters").addEventListener("click", event => {
+    const button = event.target.closest(".letter-btn");
+    if (!button) return;
+    appendLetter(button.dataset.letter);
+  });
+
+  const input = $("#jndInput");
+  input.addEventListener("input", () => {
+    currentYearData().months[ui.month].days[ui.day - 1] = input.value;
+    updatePreview();
+    updateDayButton();
+    scheduleSave();
+  });
+  input.addEventListener("blur", () => {
+    const value = normalizeJND(input.value);
+    input.value = value;
+    currentYearData().months[ui.month].days[ui.day - 1] = value;
+    updatePreview();
+    updateDayButton();
+    saveNow();
+    flashSaved();
+  });
+  input.addEventListener("keydown", event => {
+    if (event.key === "Enter"){
+      event.preventDefault();
+      input.blur();
+    }
+  });
+
+  $("#btnSaveDay").addEventListener("click", () => {
+    const value = normalizeJND(input.value);
+    input.value = value;
+    currentYearData().months[ui.month].days[ui.day - 1] = value;
+    updatePreview();
+    updateDayButton();
+    saveNow();
+    flashSaved();
+    toast("Jornada guardada.");
+  });
+
+  $("#btnClearDay").addEventListener("click", clearSelectedDay);
+  $("#btnToday").addEventListener("click", goToday);
+  $("#prevMonth").addEventListener("click", () => setMonth(ui.month - 1));
+  $("#nextMonth").addEventListener("click", () => setMonth(ui.month + 1));
+
+  $("#monthBody").addEventListener("input", event => {
+    const field = event.target.closest(".jnd-cell");
+    if (!field) return;
+    const day = Number(field.dataset.day);
+    currentYearData().months[ui.month].days[day - 1] = field.value;
+    const row = field.closest("tr");
+    const base = baseOf(field.value, currentYearData().prices);
+    row.classList.toggle("has-data", field.value.trim() !== "");
+    row.querySelector(".base-cell").innerHTML = base ? num(base) : '<span class="zero">—</span>';
+    updateMonthTotals();
+    scheduleSave();
+  });
+  $("#monthBody").addEventListener("blur", event => {
+    const field = event.target.closest(".jnd-cell");
+    if (!field) return;
+    const day = Number(field.dataset.day);
+    const value = normalizeJND(field.value);
+    field.value = value;
+    currentYearData().months[ui.month].days[day - 1] = value;
+    const row = field.closest("tr");
+    const base = baseOf(value, currentYearData().prices);
+    row.querySelector(".base-cell").innerHTML = base ? num(base) : '<span class="zero">—</span>';
+    updateMonthTotals();
+    saveNow();
+    flashSaved();
+  }, true);
+  $("#monthBody").addEventListener("keydown", event => {
+    if (event.key === "Enter" && event.target.classList.contains("jnd-cell")){
+      event.preventDefault();
+      event.target.blur();
+    }
+  });
+
+  $("#plusSlot").addEventListener("keydown", event => {
+    if (event.key === "Enter" && event.target.id === "plusInput"){
+      event.preventDefault();
+      event.target.blur();
+    }
+  });
+
+  $("#btnExport").addEventListener("click", exportCSV);
+  $("#btnImport").addEventListener("click", () => $("#fileInput").click());
+  $("#fileInput").addEventListener("change", event => {
+    const file = event.target.files && event.target.files[0];
+    if (file) handleImportFile(file);
+  });
+
+  $("#btnResetPrices").addEventListener("click", resetPrices);
+  $("#btnClearYear").addEventListener("click", clearYearData);
+  $("#btnClearAll").addEventListener("click", clearAllData);
+  $("#btnHelpInline").addEventListener("click", openHelp);
+
+  $("#modalConfirm").addEventListener("click", confirmModal);
+  $("#modalCancel").addEventListener("click", () => closeModal(null));
+  $("#modalBackdrop").addEventListener("click", event => {
+    if (event.target === $("#modalBackdrop")) closeModal(null);
+  });
+  $("#modalBody").addEventListener("keydown", event => {
+    if (event.key === "Enter" && event.target.id === "modalInput"){
+      event.preventDefault();
+      confirmModal();
+    }
+  });
+  document.addEventListener("keydown", event => {
+    if (event.key === "Escape" && modalOpen) closeModal(null);
+  });
+
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "hidden" && saveTimer){
+      saveNow();
+    }
+  });
+  window.addEventListener("beforeunload", () => {
+    if (saveTimer) saveNow();
+  });
+}
+
+/* ============================================================
+   Inicio
+   ============================================================ */
+function init(){
+  const loaded = loadState();
+  state = loaded.state;
+
+  if (loaded.warning){
+    setTimeout(() => toast("No se pudieron leer los datos guardados. Se cargó el respaldo de 2026."), 900);
+  }
+
+  if (state.activeYear === CURRENT_YEAR){
+    ui.month = CURRENT_MONTH;
+    ui.day = CURRENT_DAY;
+  } else {
+    ui.month = 0;
+    ui.day = 1;
+  }
+
+  bindEvents();
+  renderAll();
+  setSaveBadge("ok");
+
+  if (loaded.fresh){
+    setTimeout(() => toast("Datos de 2026 cargados desde tu Excel."), 700);
+  }
+}
+
+init();
+</script>
+</body>
+</html>
