@@ -571,6 +571,13 @@
 
   /* ---------- Precios / respaldo ---------- */
   .prices-card{padding-bottom:12px}
+  .price-grid{
+    display:grid;grid-template-columns:1fr 1fr;
+    grid-template-rows:repeat(5,auto);grid-auto-flow:column;
+    gap:0 12px;
+  }
+  .price-grid .price-row:nth-child(5),
+  .price-grid .price-row:nth-child(10){border-bottom:0}
   .price-row{
     display:grid;grid-template-columns:48px 1fr;gap:11px;align-items:center;
     padding:9px 0;border-bottom:1px solid var(--line-2);
@@ -853,7 +860,11 @@
     .backup-actions{grid-template-columns:1fr 1fr}
     .danger-actions{grid-template-columns:1fr 1fr}
     .help-card .btn{width:auto}
-    .price-field .money-field{max-width:260px}
+    .price-grid{gap:0 8px}
+  .price-row{grid-template-columns:38px 1fr;gap:7px}
+  .letter-badge{width:38px;height:38px;border-radius:11px;font-size:17px}
+  .price-field .money-field input{height:42px;font-size:15px}
+  .price-field .money-field{max-width:260px}
   }
   @media (max-width:600px){
     .save-badge{display:none}
@@ -1246,7 +1257,7 @@
       <p class="hint" style="margin:-6px 0 8px" data-i18n="pricesNote">
         Se guardan solo para este año. Al cambiarlos, todas las bases del año se recalculan.
       </p>
-      <div id="priceRows"></div>
+      <div id="priceRows" class="price-grid"></div>
       <div class="price-note">
         <span aria-hidden="true">i</span>
         <div><b data-i18n="jndLetterByLetter">El JND se lee letra por letra.</b> <span data-i18n="jndNote">Cada X, S, M, Y o P suma su precio; las repeticiones cuentan. El signo + y otros símbolos no suman.</span></div>
@@ -1452,7 +1463,7 @@ const I18N = {
       restore: "Reset",
       pricesNote: "Saved for this year only. Changing them recalculates every base in the year.",
       jndLetterByLetter: "The JND is read letter by letter.",
-      jndNote: "Each X, S, M, Y or P adds its price; repeats count. The + sign and other symbols add nothing.",
+      jndNote: "Each letter with a price adds its value; repeats count. The + sign and other symbols add nothing.",
       changesSaved: "Changes are saved automatically on this device.",
       backup: "Backup",
       backupNote: "Export a CSV to keep a copy. If you change phones or clear your browser data, you can restore everything with “Import CSV”.",
@@ -1671,7 +1682,7 @@ const I18N = {
       restore: "Restaurar",
       pricesNote: "Se guardan solo para este año. Al cambiarlos, todas las bases del año se recalculan.",
       jndLetterByLetter: "El JND se lee letra por letra.",
-      jndNote: "Cada X, S, M, Y o P suma su precio; las repeticiones cuentan. El signo + y otros símbolos no suman.",
+      jndNote: "Cada letra con precio suma su valor; las repeticiones cuentan. El signo + y otros símbolos no suman.",
       changesSaved: "Los cambios se guardan solos en este dispositivo.",
       backup: "Respaldo",
       backupNote: "Exporta un CSV para guardar una copia. Si cambias de móvil o borras los datos del navegador, podrás recuperarlo todo con “Importar CSV”.",
@@ -1889,7 +1900,7 @@ const I18N = {
       restore: "Tiklash",
       pricesNote: "Faqat shu yil uchun saqlanadi. O‘zgartirsangiz, yil bo‘yicha barcha bazalar qayta hisoblanadi.",
       jndLetterByLetter: "JND harflar bo‘yicha o‘qiladi.",
-      jndNote: "Har bir X, S, M, Y yoki P o‘z narxini qo‘shadi; takrorlar hisobga olinadi. + belgisi va boshqa belgilar hech narsa qo‘shmaydi.",
+      jndNote: "Narxi belgilangan har bir harf o‘z qiymatini qo‘shadi; takrorlar hisobga olinadi. + belgisi va boshqa belgilar hech narsa qo‘shmaydi.",
       changesSaved: "O‘zgarishlar shu qurilmada avtomatik saqlanadi.",
       backup: "Zaxira nusxa",
       backupNote: "Nusxa saqlash uchun CSV yuklab oling. Telefonni almashtirsangiz yoki brauzer ma’lumotlarini tozalasangiz, hammasini “CSV import” orqali tiklash mumkin.",
@@ -2108,7 +2119,7 @@ const I18N = {
       restore: "Сбросить",
       pricesNote: "Сохраняются только для этого года. При изменении пересчитываются все базы за год.",
       jndLetterByLetter: "JND читается по буквам.",
-      jndNote: "Каждая X, S, M, Y или P добавляет свою цену; повторы учитываются. Знак + и другие символы ничего не добавляют.",
+      jndNote: "Каждая буква с ценой добавляет свою стоимость; повторы учитываются. Знак + и другие символы ничего не добавляют.",
       changesSaved: "Изменения сохраняются на этом устройстве автоматически.",
       backup: "Резервная копия",
       backupNote: "Экспортируйте CSV, чтобы сохранить копию. Если вы смените телефон или очистите данные браузера, всё можно восстановить через «Импорт CSV».",
@@ -2307,8 +2318,8 @@ function applyStaticTranslations(){
   $$("[data-i18n-ph]").forEach(el => { el.placeholder = t(el.dataset.i18nPh); });
 }
 
-const LETTERS = ["X","S","M","Y","P"];
-const DEFAULT_PRICES = {X:7000, S:5000, M:3000, Y:14000, P:1500};
+const LETTERS = ["X","S","M","Y","P","G","Z","E","F","T"];
+const DEFAULT_PRICES = {X:7000, S:5000, M:3000, Y:14000, P:1500, G:0, Z:0, E:0, F:0, T:0};
 const PREMIUM_PER_DAY = 1500;
 const DEFAULT_OFFICIAL_SALARY = 60000;
 const STORAGE_KEY = "mi-salario-jnd-v1";
@@ -2922,12 +2933,14 @@ function setView(view){
    ============================================================ */
 function renderQuickLetters(){
   const prices = currentYearData().prices;
-  $("#quickLetters").innerHTML = LETTERS.map(letter =>
-    `<button type="button" class="letter-btn" data-letter="${letter}"
-      aria-label="${esc(t("addLetterAria", {letter, price: money(prices[letter])}))}">
-      <span>${letter}</span><small>${num(prices[letter])}</small>
-    </button>`
-  ).join("");
+  $("#quickLetters").innerHTML = LETTERS
+    .filter(letter => nonNeg(prices[letter]) > 0)
+    .map(letter =>
+      `<button type="button" class="letter-btn" data-letter="${letter}"
+        aria-label="${esc(t("addLetterAria", {letter, price: money(prices[letter])}))}">
+        <span>${letter}</span><small>${num(prices[letter])}</small>
+      </button>`
+    ).join("");
 }
 
 function updateDayButton(){
@@ -3205,6 +3218,7 @@ function renderPrices(){
       const value = input.value === "" ? 0 : Math.max(0, Math.round(Number(input.value) || 0));
       currentYearData().prices[letter] = value;
       updatePriceExample();
+      renderQuickLetters();
       scheduleSave();
     });
     input.addEventListener("blur", () => {
@@ -3830,7 +3844,7 @@ function csvCell(value){
 }
 
 function buildCSV(){
-  const rows = [["anio","mes","dia","jnd","plus_mes","precio_x","precio_s","precio_m","precio_y","precio_p","base","tipo","nota","importe","pagada","pago","auto","extra"]];
+  const rows = [["anio","mes","dia","jnd","plus_mes","precio_x","precio_s","precio_m","precio_y","precio_p","base","tipo","nota","importe","pagada","pago","auto","extra","precio_g","precio_z","precio_e","precio_f","precio_t"]];
   const years = Object.keys(state.years).map(Number).sort((a, b) => a - b);
 
   for (const yearNumber of years){
@@ -3839,11 +3853,11 @@ function buildCSV(){
     for (let month = 0; month < 12; month++){
       const stats = monthStats(yearData, month);
       const plus = month % 2 === 0 ? stats.plus : 0;
-      rows.push([yearNumber, month + 1, 0, "", plus, prices.X, prices.S, prices.M, prices.Y, prices.P, stats.base, "", "", "", "", "", "", ""]);
+      rows.push([yearNumber, month + 1, 0, "", plus, prices.X, prices.S, prices.M, prices.Y, prices.P, stats.base, "", "", "", "", "", "", "", prices.G, prices.Z, prices.E, prices.F, prices.T]);
       for (let day = 1; day <= 31; day++){
         const jnd = normalizeJND(yearData.months[month].days[day - 1]);
         if (!jnd) continue;
-        rows.push([yearNumber, month + 1, day, jnd, plus, prices.X, prices.S, prices.M, prices.Y, prices.P, baseOf(jnd, prices), "", "", "", "", "", "", ""]);
+        rows.push([yearNumber, month + 1, day, jnd, plus, prices.X, prices.S, prices.M, prices.Y, prices.P, baseOf(jnd, prices), "", "", "", "", "", "", "", prices.G, prices.Z, prices.E, prices.F, prices.T]);
       }
     }
   }
@@ -3853,14 +3867,15 @@ function buildCSV(){
       debt.year, debt.month, 0, "", 0,
       prices.X, prices.S, prices.M, prices.Y, prices.P, 0,
       "deuda", debt.note || "", debt.amount, debt.paid ? 1 : 0, debt.paidAmount || 0,
-      debt.auto ? 1 : 0, debt.extraPaid || 0
+      debt.auto ? 1 : 0, debt.extraPaid || 0,
+      prices.G, prices.Z, prices.E, prices.F, prices.T
     ]);
   }
   const salaryPrices = currentYearData().prices;
   rows.push([
     state.activeYear, 1, 0, "", 0,
     salaryPrices.X, salaryPrices.S, salaryPrices.M, salaryPrices.Y, salaryPrices.P, 0,
-    "salario", "", officialSalary(), "", "", "", ""
+    "salario", "", officialSalary(), "", "", "", "", "", "", "", "", ""
   ]);
   for (const job of allExtra()){
     const prices = (state.years[String(job.year)] || {prices: DEFAULT_PRICES}).prices;
@@ -3868,7 +3883,7 @@ function buildCSV(){
     rows.push([
       job.year, job.month, job.day, "", 0,
       prices.X, prices.S, prices.M, prices.Y, prices.P, 0,
-      "extra", note, job.amount, job.collected ? 1 : 0, "", "", ""
+      "extra", note, job.amount, job.collected ? 1 : 0, "", "", "", "", "", "", ""
     ]);
   }
   return "\uFEFF" + rows.map(row => row.map(csvCell).join(";")).join("\r\n") + "\r\n";
@@ -3980,7 +3995,12 @@ function parseImport(text){
     S: find("precio_s","ps"),
     M: find("precio_m","pm"),
     Y: find("precio_y","py"),
-    P: find("precio_p","pp")
+    P: find("precio_p","pp"),
+    G: find("precio_g","pg"),
+    Z: find("precio_z","pz"),
+    E: find("precio_e","pe"),
+    F: find("precio_f","pf"),
+    T: find("precio_t","pt")
   };
   const iPlus = find("plus_mes","plus","mas");
   const iTipo = find("tipo");
@@ -4072,14 +4092,20 @@ function parseImport(text){
     }
     const record = imported.get(year);
 
-    if (LETTERS.every(letter => priceIndexes[letter] >= 0)){
+    {
       const values = {};
+      let foundPrice = false;
       for (const letter of LETTERS){
+        if (priceIndexes[letter] < 0) continue;
         const raw = String(row[priceIndexes[letter]] ?? "").trim();
+        if (raw === "") continue;
         const number = parseAmount(raw);
-        values[letter] = raw !== "" && Number.isFinite(number) && number >= 0 ? Math.round(number) : null;
+        if (Number.isFinite(number) && number >= 0){
+          values[letter] = Math.round(number);
+          foundPrice = true;
+        }
       }
-      if (LETTERS.every(letter => values[letter] !== null)) record.prices = values;
+      if (foundPrice) record.prices = values;
     }
 
     const monthIndex = month - 1;
