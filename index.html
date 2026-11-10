@@ -662,6 +662,35 @@
     font-size:11px;line-height:1.5;color:var(--muted);
   }
   .backup-note b{color:var(--ink-2)}
+  .sync-card{margin-top:12px;padding:0;overflow:hidden}
+  .sync-card summary{
+    list-style:none;cursor:pointer;padding:14px 15px;
+    display:flex;align-items:center;justify-content:space-between;gap:10px;
+    font-size:15px;font-weight:850;color:var(--ink);
+  }
+  .sync-card summary::-webkit-details-marker{display:none}
+  .sync-card summary::after{content:"▾";color:var(--muted);font-size:13px;transition:transform .15s ease}
+  .sync-card[open] summary::after{transform:rotate(180deg)}
+  .sync-card summary b{
+    font-size:10px;font-weight:900;color:var(--muted);
+    background:var(--bg-2);border:1px solid var(--line);border-radius:999px;padding:4px 8px;
+  }
+  .sync-body{padding:0 15px 15px}
+  .sync-body .hint{margin:0 0 8px}
+  .sync-label{display:block;margin:10px 0 5px;font-size:11px;font-weight:850;color:var(--ink-2)}
+  .sync-input{
+    width:100%;height:44px;border:1px solid var(--line);border-radius:10px;
+    background:#fff;padding:0 11px;font:inherit;font-size:13px;color:var(--ink);
+  }
+  .sync-input:focus{outline:none;border-color:var(--brand);box-shadow:0 0 0 3px var(--brand-soft)}
+  .sync-wide{width:100%;margin-top:8px}
+  .sync-divider{display:flex;align-items:center;gap:8px;margin:14px 0 2px;color:var(--muted);font-size:10px;font-weight:800}
+  .sync-divider::before,.sync-divider::after{content:"";height:1px;background:var(--line);flex:1}
+  .sync-code-out{font-size:12px;font-family:ui-monospace,SFMono-Regular,Consolas,monospace}
+  .sync-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}
+  .sync-actions .btn{width:100%;min-height:42px;padding:0 8px;font-size:12px}
+  html[data-theme="dark"] .sync-input{background:var(--bg-2);border-color:var(--line);color:var(--ink)}
+  html[data-theme="dark"] .sync-card summary b{background:var(--bg-2);border-color:var(--line)}
   .danger-card{margin-top:12px;border-color:#ecd5ce;background:#fffaf8}
   .danger-card h3{color:var(--danger)}
   .danger-actions{display:grid;gap:8px;margin-top:10px}
@@ -1087,6 +1116,9 @@
           <button type="button" class="app-menu-action" id="btnTheme" role="menuitemcheckbox" aria-checked="false">
             <span data-i18n="darkMode">Modo oscuro</span><b class="menu-check" id="themeCheck">✓</b>
           </button>
+          <button type="button" class="app-menu-action" id="btnSync" role="menuitem">
+            <span>Sincronizar</span><b>☁</b>
+          </button>
           <button type="button" class="app-menu-action" id="btnUpdate" role="menuitem">
             <span data-i18n="updateApp">Actualizar</span><b>↻</b>
           </button>
@@ -1461,6 +1493,38 @@
         <div data-i18n="backupMobile">En el móvil, “Exportar” abre el menú para guardar o compartir el archivo. El CSV incluye todos los años.</div>
       </div>
     </div>
+
+    <details class="card sync-card" id="syncCard">
+      <summary>
+        <span>Sincronizar móvil y PC</span>
+        <b id="syncBadge">Sin conectar</b>
+      </summary>
+      <div class="sync-body">
+        <p class="hint">Guardá tus datos en un Gist privado de GitHub y mantené el móvil y la computadora conectados. Los datos se cifran antes de subirlos.</p>
+        <div id="syncSetup">
+          <label class="sync-label" for="syncToken">Token de GitHub</label>
+          <input class="sync-input" id="syncToken" type="password" autocomplete="off" spellcheck="false" placeholder="ghp_…">
+          <p class="hint">Creá un token con permiso <b>Gists</b>. Se guarda solo en este dispositivo.</p>
+          <button type="button" class="btn primary sync-wide" id="syncCreate">Crear nube</button>
+          <div class="sync-divider"><span>o conectar con un código</span></div>
+          <label class="sync-label" for="syncCodeInput">Código de sincronización</label>
+          <input class="sync-input" id="syncCodeInput" type="text" autocomplete="off" spellcheck="false" placeholder="ID.secreto">
+          <button type="button" class="btn ghost sync-wide" id="syncConnect">Conectar</button>
+        </div>
+        <div id="syncConnected" hidden>
+          <p class="hint" id="syncStatus"></p>
+          <label class="sync-label" for="syncCodeOut">Código para el otro dispositivo</label>
+          <input class="sync-input sync-code-out" id="syncCodeOut" type="text" readonly>
+          <div class="sync-actions">
+            <button type="button" class="btn ghost" id="syncCopy">Copiar código</button>
+            <button type="button" class="btn primary" id="syncPush">Subir</button>
+            <button type="button" class="btn ghost" id="syncPull">Bajar</button>
+            <button type="button" class="btn soft-danger" id="syncDisconnect">Desconectar</button>
+          </div>
+        </div>
+        <p class="modal-error" id="syncError"></p>
+      </div>
+    </details>
 
     <div class="card danger-card">
       <h3 data-i18n="deleteData">Borrar datos</h3>
@@ -2971,6 +3035,9 @@ const DEFAULT_PRICES = {X:7000, S:5000, M:3000, Y:14000, "+":1500, G:0, Z:0, E:0
 const PREMIUM_PER_DAY = 1500;
 const DEFAULT_OFFICIAL_SALARY = 60000;
 const STORAGE_KEY = "mi-salario-jnd-v1";
+const SYNC_ENABLED = true;
+const SYNC_STORAGE_KEY = STORAGE_KEY + "-sync";
+const SYNC_FILE = "mi-salario-sync.json";
 const THEME_KEY = STORAGE_KEY + "-theme";
 const START_YEAR = 2019;
 const NOW = new Date();
@@ -3362,6 +3429,7 @@ function saveNow(){
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
     setSaveBadge("ok");
+    if (typeof queueSyncPush === "function") queueSyncPush();
     return true;
   } catch (error){
     setSaveBadge("err");
@@ -5272,6 +5340,462 @@ function bindEvents(){
 /* ============================================================
    Inicio
    ============================================================ */
+/* ============================================================
+   Sincronización móvil ↔ PC con GitHub Gist
+   ============================================================ */
+let syncConfig = null;
+let syncBusy = false;
+let syncApplying = false;
+let syncPushTimer = null;
+let syncLastAutoPull = 0;
+
+function loadSyncConfig(){
+  try {
+    const raw = localStorage.getItem(SYNC_STORAGE_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    return parsed && typeof parsed === "object" ? parsed : null;
+  } catch (error){
+    return null;
+  }
+}
+
+function persistSyncConfig(config){
+  syncConfig = config;
+  try {
+    if (config) localStorage.setItem(SYNC_STORAGE_KEY, JSON.stringify(config));
+    else localStorage.removeItem(SYNC_STORAGE_KEY);
+  } catch (error){}
+}
+
+function syncIsConnected(){
+  return !!(syncConfig && syncConfig.token && syncConfig.gistId && syncConfig.secret);
+}
+
+function syncCodeText(){
+  return syncConfig ? `${syncConfig.gistId}.${syncConfig.secret}` : "";
+}
+
+function syncSetError(message){
+  const node = $("#syncError");
+  if (node) node.textContent = message || "";
+}
+
+function syncNotice(message){
+  const node = $("#syncStatus");
+  if (node) node.textContent = message || "";
+}
+
+function syncSetBusy(value){
+  syncBusy = value;
+  ["syncCreate", "syncConnect", "syncPush", "syncPull", "syncCopy", "syncDisconnect"].forEach(id => {
+    const node = $("#" + id);
+    if (node) node.disabled = value;
+  });
+}
+
+function syncRender(){
+  if (!SYNC_ENABLED) return;
+  const connected = syncIsConnected();
+  const setup = $("#syncSetup");
+  const panel = $("#syncConnected");
+  if (setup) setup.hidden = connected;
+  if (panel) panel.hidden = !connected;
+  const badge = $("#syncBadge");
+  if (badge) badge.textContent = connected ? "Conectado" : "Sin conectar";
+  if (!connected){
+    syncSetError("");
+    return;
+  }
+  const tokenInput = $("#syncToken");
+  if (tokenInput) tokenInput.value = syncConfig.token || "";
+  const codeInput = $("#syncCodeOut");
+  if (codeInput) codeInput.value = syncCodeText();
+  if (syncConfig.lastSyncAt){
+    syncNotice("Conectado · última sincronización: " + new Date(syncConfig.lastSyncAt).toLocaleString());
+  } else {
+    syncNotice("Conectado. Tocá Bajar para traer los datos de la nube.");
+  }
+}
+
+function syncData(){
+  return {
+    activeYear: state.activeYear,
+    years: JSON.parse(JSON.stringify(state.years)),
+    debts: JSON.parse(JSON.stringify(state.debts || [])),
+    extra: JSON.parse(JSON.stringify(state.extra || [])),
+    officialSalary: state.officialSalary
+  };
+}
+
+async function syncHash(value){
+  const bytes = new TextEncoder().encode(JSON.stringify(value));
+  const digest = await crypto.subtle.digest("SHA-256", bytes);
+  return [...new Uint8Array(digest)].map(byte => byte.toString(16).padStart(2, "0")).join("");
+}
+
+function bytesToB64Url(bytes){
+  let binary = "";
+  for (const byte of bytes) binary += String.fromCharCode(byte);
+  return btoa(binary).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+}
+
+function b64UrlToBytes(value){
+  const text = String(value || "").replace(/-/g, "+").replace(/_/g, "/");
+  const pad = "=".repeat((4 - text.length % 4) % 4);
+  const binary = atob(text + pad);
+  const out = new Uint8Array(binary.length);
+  for (let i = 0; i < binary.length; i++) out[i] = binary.charCodeAt(i);
+  return out;
+}
+
+function syncRandomSecret(){
+  const bytes = new Uint8Array(32);
+  crypto.getRandomValues(bytes);
+  return bytesToB64Url(bytes);
+}
+
+async function syncImportKey(secret){
+  const raw = b64UrlToBytes(secret);
+  if (raw.length < 16) throw new Error("Código de sincronización inválido.");
+  return crypto.subtle.importKey("raw", raw, { name: "AES-GCM" }, false, ["encrypt", "decrypt"]);
+}
+
+async function syncEncrypt(data, secret){
+  const key = await syncImportKey(secret);
+  const iv = crypto.getRandomValues(new Uint8Array(12));
+  const encoded = new TextEncoder().encode(JSON.stringify({ schema: 1, savedAt: new Date().toISOString(), data }));
+  const encrypted = await crypto.subtle.encrypt({ name: "AES-GCM", iv }, key, encoded);
+  return { v: 1, iv: bytesToB64Url(iv), data: bytesToB64Url(new Uint8Array(encrypted)) };
+}
+
+async function syncDecrypt(encrypted, secret){
+  if (!encrypted || encrypted.v !== 1 || !encrypted.iv || !encrypted.data){
+    throw new Error("El archivo de la nube no es válido.");
+  }
+  const key = await syncImportKey(secret);
+  let decrypted;
+  try {
+    decrypted = await crypto.subtle.decrypt(
+      { name: "AES-GCM", iv: b64UrlToBytes(encrypted.iv) },
+      key,
+      b64UrlToBytes(encrypted.data)
+    );
+  } catch (error){
+    throw new Error("No se pudo descifrar. El código no corresponde a esta nube.");
+  }
+  const payload = JSON.parse(new TextDecoder().decode(decrypted));
+  if (!payload || !payload.data || !payload.data.years){
+    throw new Error("El archivo de la nube no contiene datos de Mi Salario.");
+  }
+  return payload;
+}
+
+function syncGithubHeaders(token, hasBody){
+  return {
+    "Authorization": "Bearer " + token,
+    "Accept": "application/vnd.github+json",
+    "X-GitHub-Api-Version": "2022-11-28",
+    ...(hasBody ? { "Content-Type": "application/json" } : {})
+  };
+}
+
+async function syncGithub(method, path, token, body){
+  const response = await fetch("https://api.github.com" + path, {
+    method,
+    headers: syncGithubHeaders(token, !!body),
+    body: body ? JSON.stringify(body) : undefined
+  });
+  if (!response.ok){
+    if (response.status === 401) throw new Error("Token de GitHub inválido.");
+    if (response.status === 404) throw new Error("El token no tiene permiso Gists o el código no existe.");
+    if (response.status === 403) throw new Error("GitHub rechazó la operación. Revisá el permiso Gists o el límite de uso.");
+    let message = "GitHub respondió " + response.status + ".";
+    try { const data = await response.json(); if (data && data.message) message = data.message; } catch (error){}
+    throw new Error(message);
+  }
+  if (response.status === 204) return null;
+  return response.json();
+}
+
+async function syncFetchRemote(token, gistId, secret){
+  const gist = await syncGithub("GET", "/gists/" + encodeURIComponent(gistId), token);
+  const file = gist && gist.files && gist.files[SYNC_FILE];
+  if (!file) throw new Error("El Gist no tiene el archivo de Mi Salario.");
+  let content = file.content;
+  if (file.truncated && file.raw_url){
+    const raw = await fetch(file.raw_url, { headers: syncGithubHeaders(token, false) });
+    if (!raw.ok) throw new Error("No se pudo leer el contenido completo del Gist.");
+    content = await raw.text();
+  }
+  let encrypted;
+  try { encrypted = JSON.parse(content); } catch (error){ throw new Error("El archivo de la nube está dañado."); }
+  const payload = await syncDecrypt(encrypted, secret);
+  return {
+    data: payload.data,
+    hash: await syncHash(payload.data),
+    savedAt: payload.savedAt || gist.updated_at || ""
+  };
+}
+
+async function syncWriteGist(token, gistId, data, secret){
+  const encrypted = await syncEncrypt(data, secret);
+  return syncGithub("PATCH", "/gists/" + encodeURIComponent(gistId), token, {
+    files: { [SYNC_FILE]: { content: JSON.stringify(encrypted) } }
+  });
+}
+
+function applySyncData(data){
+  if (!data || !data.years || typeof data.years !== "object") throw new Error("La nube no tiene datos válidos.");
+  const years = {};
+  for (const [key, value] of Object.entries(data.years)){
+    const year = parseInt(key, 10);
+    if (Number.isInteger(year) && year >= 2019 && year <= 2100){
+      years[String(year)] = normalizeYear(value);
+    }
+  }
+  if (!Object.keys(years).length) throw new Error("La nube no tiene años válidos.");
+  let activeYear = parseInt(data.activeYear, 10);
+  if (!years[String(activeYear)]) activeYear = Number(Object.keys(years).sort((a, b) => Number(a) - Number(b))[0]);
+  syncApplying = true;
+  try {
+    state = {
+      version: 1,
+      activeYear,
+      years,
+      debts: normalizeDebts(data.debts),
+      extra: normalizeExtra(data.extra),
+      officialSalary: normalizeOfficialSalary(data.officialSalary)
+    };
+    ui.month = Math.min(11, Math.max(0, ui.month));
+    ui.day = Math.max(1, Math.min(ui.day, daysInMonth(state.activeYear, ui.month)));
+    saveNow();
+    renderAll();
+  } finally {
+    syncApplying = false;
+  }
+}
+
+async function syncCreateNew(){
+  if (syncBusy) return;
+  const tokenInput = $("#syncToken");
+  const token = tokenInput ? tokenInput.value.trim() : "";
+  if (!token){ syncSetError("Pegá un token de GitHub."); return; }
+  syncSetBusy(true);
+  syncSetError("");
+  try {
+    const secret = syncRandomSecret();
+    const data = syncData();
+    const hash = await syncHash(data);
+    const encrypted = await syncEncrypt(data, secret);
+    const gist = await syncGithub("POST", "/gists", token, {
+      description: "Mi Salario · sincronización cifrada",
+      public: false,
+      files: { [SYNC_FILE]: { content: JSON.stringify(encrypted) } }
+    });
+    persistSyncConfig({ token, gistId: gist.id, secret, lastHash: hash, lastSyncAt: Date.now() });
+    syncRender();
+    syncNotice("Nube creada. Copiá el código en el otro dispositivo.");
+    toast("Nube creada. Copiá el código de sincronización.");
+  } catch (error){
+    syncSetError(error.message);
+  } finally {
+    syncSetBusy(false);
+  }
+}
+
+async function syncConnectExisting(){
+  if (syncBusy) return;
+  const tokenInput = $("#syncToken");
+  const codeInput = $("#syncCodeInput");
+  const token = tokenInput ? tokenInput.value.trim() : "";
+  const code = codeInput ? codeInput.value.trim() : "";
+  if (!token){ syncSetError("Pegá un token de GitHub."); return; }
+  const split = code.lastIndexOf(".");
+  if (split <= 0 || split >= code.length - 1){ syncSetError("Pegá un código de sincronización válido."); return; }
+  const gistId = code.slice(0, split);
+  const secret = code.slice(split + 1);
+  syncSetBusy(true);
+  syncSetError("");
+  try {
+    await syncFetchRemote(token, gistId, secret);
+    persistSyncConfig({ token, gistId, secret, lastHash: "", lastSyncAt: 0 });
+    if (codeInput) codeInput.value = "";
+    syncRender();
+    syncNotice("Conectado. Tocá Bajar para traer los datos de la nube.");
+    toast("Sincronización conectada.");
+  } catch (error){
+    syncSetError(error.message);
+  } finally {
+    syncSetBusy(false);
+  }
+}
+
+async function syncPush(manual = false){
+  if (syncBusy || !syncIsConnected()) return;
+  syncSetBusy(true);
+  syncSetError("");
+  try {
+    const data = syncData();
+    const hash = await syncHash(data);
+    if (hash === syncConfig.lastHash){
+      syncNotice("Sin cambios para subir.");
+      return;
+    }
+    let remote = null;
+    try {
+      remote = await syncFetchRemote(syncConfig.token, syncConfig.gistId, syncConfig.secret);
+    } catch (error){
+      if (manual) throw error;
+    }
+    if (remote && remote.hash !== syncConfig.lastHash && remote.hash !== hash){
+      syncSetError("La nube tiene cambios. Usá Bajar o Subir.");
+      if (!manual) return;
+      const overwrite = await confirmDialog(
+        "La nube tiene cambios",
+        "Si subís ahora, reemplazás los datos de la nube por los de este dispositivo. ¿Continuar?",
+        "Subir igual"
+      );
+      if (!overwrite) return;
+    }
+    await syncWriteGist(syncConfig.token, syncConfig.gistId, data, syncConfig.secret);
+    persistSyncConfig({ ...syncConfig, lastHash: hash, lastSyncAt: Date.now() });
+    syncRender();
+    syncNotice("Datos subidos a la nube.");
+    if (manual) toast("Datos subidos a la nube.");
+  } catch (error){
+    syncSetError(error.message);
+    if (manual) toast(error.message);
+  } finally {
+    syncSetBusy(false);
+  }
+}
+
+async function syncPull(manual = false){
+  if (syncBusy || !syncIsConnected()) return;
+  syncSetBusy(true);
+  syncSetError("");
+  try {
+    const remote = await syncFetchRemote(syncConfig.token, syncConfig.gistId, syncConfig.secret);
+    const localHash = await syncHash(syncData());
+    if (remote.hash === localHash){
+      persistSyncConfig({ ...syncConfig, lastHash: localHash, lastSyncAt: Date.now() });
+      syncRender();
+      syncNotice("Los datos ya están actualizados.");
+      return;
+    }
+    if (!manual && localHash !== syncConfig.lastHash){
+      syncSetError("Hay cambios locales y en la nube. Usá Bajar o Subir.");
+      return;
+    }
+    if (localHash !== syncConfig.lastHash || manual){
+      const confirmed = await confirmDialog(
+        "Bajar de la nube",
+        "Se reemplazarán los datos de este dispositivo por los de la nube. ¿Continuar?",
+        "Bajar"
+      );
+      if (!confirmed) return;
+    }
+    applySyncData(remote.data);
+    persistSyncConfig({ ...syncConfig, lastHash: remote.hash, lastSyncAt: Date.now() });
+    syncRender();
+    syncNotice("Datos bajados de la nube.");
+    if (manual) toast("Datos actualizados desde la nube.");
+  } catch (error){
+    syncSetError(error.message);
+    if (manual) toast(error.message);
+  } finally {
+    syncSetBusy(false);
+  }
+}
+
+async function syncDisconnect(){
+  const confirmed = await confirmDialog(
+    "Desconectar sincronización",
+    "Se dejará de sincronizar este dispositivo. Los datos locales no se borran. ¿Continuar?",
+    "Desconectar",
+    true
+  );
+  if (!confirmed) return;
+  persistSyncConfig(null);
+  const tokenInput = $("#syncToken");
+  if (tokenInput) tokenInput.value = "";
+  syncRender();
+  syncSetError("");
+  toast("Sincronización desconectada.");
+}
+
+async function syncCopyCode(){
+  const code = syncCodeText();
+  if (!code) return;
+  try {
+    await navigator.clipboard.writeText(code);
+    toast("Código copiado.");
+  } catch (error){
+    const input = $("#syncCodeOut");
+    if (input){ input.select(); document.execCommand("copy"); toast("Código copiado."); }
+  }
+}
+
+function queueSyncPush(){
+  if (!SYNC_ENABLED || !syncIsConnected() || syncApplying || syncBusy) return;
+  clearTimeout(syncPushTimer);
+  syncPushTimer = setTimeout(() => {
+    syncPush(false).catch(error => syncSetError(error.message));
+  }, 1400);
+}
+
+function syncAutoPull(){
+  if (!SYNC_ENABLED || !syncIsConnected() || syncBusy || syncApplying) return;
+  if (Date.now() - syncLastAutoPull < 15000) return;
+  syncLastAutoPull = Date.now();
+  syncPull(false).catch(error => syncSetError(error.message));
+}
+
+function bindSyncEvents(){
+  const syncButton = $("#btnSync");
+  if (syncButton){
+    syncButton.addEventListener("click", () => {
+      closeAppMenu();
+      setView("precios");
+      const card = $("#syncCard");
+      if (card){
+        card.open = true;
+        card.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+      setTimeout(() => {
+        if (syncIsConnected()) $("#syncPull").focus();
+        else $("#syncToken").focus();
+      }, 250);
+    });
+  }
+  $("#syncCreate")?.addEventListener("click", syncCreateNew);
+  $("#syncConnect")?.addEventListener("click", syncConnectExisting);
+  $("#syncPush")?.addEventListener("click", () => syncPush(true));
+  $("#syncPull")?.addEventListener("click", () => syncPull(true));
+  $("#syncCopy")?.addEventListener("click", syncCopyCode);
+  $("#syncDisconnect")?.addEventListener("click", syncDisconnect);
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "visible") syncAutoPull();
+  });
+  window.addEventListener("focus", syncAutoPull);
+}
+
+function syncInit(){
+  if (!SYNC_ENABLED){
+    $("#btnSync")?.remove();
+    $("#syncCard")?.remove();
+    return;
+  }
+  syncConfig = loadSyncConfig();
+  syncRender();
+  bindSyncEvents();
+  if (syncIsConnected()){
+    setTimeout(() => syncPull(false).catch(error => syncSetError(error.message)), 900);
+  }
+}
+
+
 function init(){
   const loaded = loadState();
   state = loaded.state;
@@ -5293,6 +5817,7 @@ function init(){
   bindEvents();
   renderAll();
   setSaveBadge("ok");
+  syncInit();
 
 }
 
