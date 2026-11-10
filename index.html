@@ -998,7 +998,14 @@
   html[data-theme="dark"] input,
   html[data-theme="dark"] select,
   html[data-theme="dark"] textarea{
-    background:var(--bg-2);border-color:var(--line);color:var(--ink);
+    background-color:var(--bg-2);border-color:var(--line);color:var(--ink);
+  }
+  html[data-theme="dark"] .month-chip.active{
+    background-color:var(--brand);border-color:var(--brand);color:#fff;
+    box-shadow:0 4px 12px rgba(0,0,0,.28);
+  }
+  html[data-theme="dark"] .year-select{
+    background-color:rgba(255,255,255,.11);color:#fff;
   }
   html[data-theme="dark"] .jnd-input::placeholder,
   html[data-theme="dark"] .jnd-cell::placeholder{color:#8b968e}
@@ -1007,6 +1014,11 @@
   html[data-theme="dark"] .day-btn.filled{background:var(--brand-soft);border-color:#3d6a60;color:var(--brand)}
   html[data-theme="dark"] .day-btn.out{color:#7f8a82}
   html[data-theme="dark"] .day-btn.out:not(.filled){background:#292f2b;border-color:#3a423c}
+  html[data-theme="dark"] .day-btn.selected,
+  html[data-theme="dark"] .day-btn.out.selected{
+    background-color:var(--brand);border-color:var(--brand);color:#fff;
+    box-shadow:0 0 0 3px rgba(74,168,153,.25);
+  }
   html[data-theme="dark"] .month-table tr.today{background:#3a3323}
   html[data-theme="dark"] .month-table th,
   html[data-theme="dark"] .month-table td{border-color:var(--line-2)}
@@ -1127,7 +1139,7 @@
         </div>
 
         <label class="sr-only" for="jndInput" data-i18n="jndDayLabel">Código JND del día</label>
-        <input class="jnd-input" id="jndInput" type="text" placeholder="X, XP, XMP…"
+        <input class="jnd-input" id="jndInput" type="text" placeholder="X, X+, XM+…"
                inputmode="text" autocapitalize="characters" autocomplete="off"
                autocorrect="off" spellcheck="false" maxlength="40" enterkeyhint="done">
 
@@ -4457,7 +4469,6 @@ function selectDay(day){
   $("#entryCard").classList.toggle("has-code", raw.trim() !== "");
   updatePreview();
   setSaveState(t("autosave"));
-  input.focus({preventScroll: true});
   const card = $("#entryCard");
   if (card) card.scrollIntoView({behavior: "smooth", block: "nearest"});
 }
@@ -4496,8 +4507,6 @@ function appendLetter(letter){
   updatePreview();
   updateDayButton();
   scheduleSave();
-  input.focus();
-  input.setSelectionRange(input.value.length, input.value.length);
 }
 
 async function goToday(){
