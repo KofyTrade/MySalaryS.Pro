@@ -289,7 +289,7 @@
     padding:2px 2px 10px;margin:0 -2px;
     scrollbar-width:none;-ms-overflow-style:none;
     scroll-snap-type:x proximity;
-    touch-action:pan-x;
+    touch-action:auto;
   }
   #view-hoy{touch-action:auto}
   .month-strip::-webkit-scrollbar{display:none}
@@ -3880,9 +3880,6 @@ function centerMonthStrip(selector){
   if (!strip || !strip.clientWidth) return;
   const active = strip.querySelector(".month-chip.active");
   if (!active) return;
-  try {
-    active.scrollIntoView({ behavior: "auto", block: "nearest", inline: "center" });
-  } catch (error){}
   const stripRect = strip.getBoundingClientRect();
   const activeRect = active.getBoundingClientRect();
   const left = strip.scrollLeft + (activeRect.left - stripRect.left) - (strip.clientWidth - activeRect.width) / 2;
@@ -3896,7 +3893,7 @@ function centerMonthStrips(){
   };
   requestAnimationFrame(() => {
     run();
-    setTimeout(run, 180);
+    setTimeout(run, 120);
     setTimeout(run, 600);
   });
 }
@@ -5543,14 +5540,8 @@ function bindEvents(){
       setMonth(Number(chip.dataset.month));
     });
   });
-  window.addEventListener("resize", centerMonthStrips);
   window.addEventListener("load", () => setTimeout(centerMonthStrips, 50));
-  if (window.visualViewport) window.visualViewport.addEventListener("resize", centerMonthStrips);
-  if (window.ResizeObserver){
-    const monthResizeObserver = new ResizeObserver(() => centerMonthStrips());
-    monthResizeObserver.observe($("#quickMonths"));
-    monthResizeObserver.observe($("#monthMonths"));
-  }
+  window.addEventListener("orientationchange", () => setTimeout(centerMonthStrips, 150));
   setupHoySwipe();
 
   $("#dayGrid").addEventListener("click", event => {
