@@ -3878,11 +3878,18 @@ function renderMonthStrip(container, activeMonth){
 function centerMonthStrip(selector){
   const strip = $(selector);
   if (!strip || !strip.clientWidth) return;
-  const active = strip.querySelector(".month-chip.active");
-  if (!active) return;
+  const chips = [...strip.querySelectorAll(".month-chip")];
+  const index = chips.findIndex(chip => chip.classList.contains("active"));
+  if (index < 0) return;
+  const active = chips[index];
   const stripRect = strip.getBoundingClientRect();
   const activeRect = active.getBoundingClientRect();
-  const left = strip.scrollLeft + (activeRect.left - stripRect.left) - (strip.clientWidth - activeRect.width) / 2;
+  const fallbackWidth = active.offsetWidth || 50;
+  const fallbackLeft = index * (fallbackWidth + 7) - (strip.clientWidth - fallbackWidth) / 2;
+  const hasLayout = activeRect.width > 0 && stripRect.width > 0;
+  const left = hasLayout
+    ? strip.scrollLeft + (activeRect.left - stripRect.left) - (strip.clientWidth - activeRect.width) / 2
+    : fallbackLeft;
   strip.scrollLeft = Math.max(0, left);
 }
 
