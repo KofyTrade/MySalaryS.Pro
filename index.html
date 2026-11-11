@@ -364,6 +364,24 @@
   .jnd-input::placeholder{color:#c3bcae;font-weight:700;letter-spacing:.10em;font-size:15px;text-transform:none}
   .jnd-input:focus{outline:none;border-color:var(--brand);box-shadow:0 0 0 4px var(--brand-soft)}
   .quick-letters{display:grid;grid-template-columns:repeat(5,1fr);gap:7px;margin-top:9px}
+  .desc-field{margin-top:12px}
+  .desc-label{
+    display:block;margin-bottom:5px;
+    font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);
+  }
+  .desc-input{
+    width:100%;height:46px;border:1px solid var(--line);border-radius:12px;
+    background:#fff;padding:0 12px;font:inherit;font-size:14px;color:var(--ink);
+  }
+  .desc-input::placeholder{color:#b9b1a3;font-weight:500}
+  .desc-input:focus{outline:none;border-color:var(--brand);box-shadow:0 0 0 3px var(--brand-soft)}
+  .jnd-cell-wrap{min-width:170px}
+  .day-desc{
+    display:block;margin-top:3px;max-width:250px;
+    font-size:10px;line-height:1.35;color:var(--muted);
+    overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+  }
+  @media (max-width:520px){.desc-input{font-size:16px}}
   .letter-btn{
     min-height:56px;border-radius:14px;border:1px solid var(--line);
     background:#fff;color:var(--brand);
@@ -620,6 +638,22 @@
   }
   .price-grid .price-row:nth-child(5),
   .price-grid .price-row:nth-child(10){border-bottom:0}
+  .premium-prices-block{
+    margin-top:14px;padding-top:12px;border-top:1px dashed var(--line);
+  }
+  .premium-prices-block h4{
+    margin:0 0 3px;font-size:13px;font-weight:900;color:var(--ink);
+  }
+  .premium-prices-block .hint{margin:0 0 8px}
+  .premium-price-grid{display:grid;grid-template-columns:1fr;gap:7px}
+  .premium-price-row{
+    display:grid;grid-template-columns:38px 1fr minmax(110px,150px);
+    align-items:center;gap:8px;
+  }
+  .premium-price-row .letter-badge{width:38px;height:38px;border-radius:11px;font-size:17px}
+  .premium-price-name{font-size:12px;font-weight:750;color:var(--ink-2);line-height:1.25}
+  .premium-price-row .money-field{min-width:0}
+  .premium-price-row .money-field input{height:42px;font-size:14px}
   .price-row{
     display:grid;grid-template-columns:48px 1fr;gap:11px;align-items:center;
     padding:9px 0;border-bottom:1px solid var(--line-2);
@@ -1037,7 +1071,8 @@
     background-color:rgba(255,255,255,.11);color:#fff;
   }
   html[data-theme="dark"] .jnd-input::placeholder,
-  html[data-theme="dark"] .jnd-cell::placeholder{color:#8b968e}
+  html[data-theme="dark"] .jnd-cell::placeholder,
+  html[data-theme="dark"] .desc-input::placeholder{color:#8b968e}
   html[data-theme="dark"] .jnd-input{color:var(--brand)}
   html[data-theme="dark"] .jnd-cell:focus{background:var(--card)}
   html[data-theme="dark"] .day-btn.filled{background:var(--brand-soft);border-color:#3d6a60;color:var(--brand)}
@@ -1171,11 +1206,19 @@
         </div>
 
         <label class="sr-only" for="jndInput" data-i18n="jndDayLabel">Código JND del día</label>
-        <input class="jnd-input" id="jndInput" type="text" placeholder="X, X+, XM+…"
+        <input class="jnd-input" id="jndInput" type="text" placeholder="C, C+, CM+…"
                inputmode="text" autocapitalize="characters" autocomplete="off"
                autocorrect="off" spellcheck="false" maxlength="40" enterkeyhint="done">
 
         <div class="quick-letters" id="quickLetters" aria-label="Agregar letra" data-i18n-aria="addLetter"></div>
+
+        <div class="desc-field">
+          <label class="desc-label" for="dayDescription" data-i18n="dayDescription">Programa / Jefe / Dirección</label>
+          <input class="desc-input" id="dayDescription" type="text" maxlength="300"
+                 data-i18n-ph="dayDescriptionPlaceholder"
+                 placeholder="Ej.: Escenario principal · Jefe: ... · Dirección: ..."
+                 autocomplete="off" autocapitalize="sentences" enterkeyhint="next">
+        </div>
 
         <div class="base-preview">
           <span data-i18n="dayBase">Base del día</span>
@@ -1469,9 +1512,32 @@
         Se guardan solo para este año. Al cambiarlos, todas las bases del año se recalculan.
       </p>
       <div id="priceRows" class="price-grid"></div>
+
+      <div class="premium-prices-block">
+        <h4 data-i18n="premiumPricesTitle">Precios de premios</h4>
+        <p class="hint" data-i18n="premiumPricesNote">Valor del premio para cada tipo de jornada.</p>
+        <div class="premium-price-grid" id="premiumPrices">
+          <label class="premium-price-row">
+            <span class="letter-badge" aria-hidden="true">C</span>
+            <span class="premium-price-name" data-i18n="premiumX">Jornada entera</span>
+            <span class="money-field"><span>₽</span><input type="number" data-premium="X" inputmode="numeric" min="0" step="100" value="1000" aria-label="Premio C"></span>
+          </label>
+          <label class="premium-price-row">
+            <span class="letter-badge" aria-hidden="true">S</span>
+            <span class="premium-price-name" data-i18n="premiumS">Media jornada</span>
+            <span class="money-field"><span>₽</span><input type="number" data-premium="S" inputmode="numeric" min="0" step="100" value="800" aria-label="Premio S"></span>
+          </label>
+          <label class="premium-price-row">
+            <span class="letter-badge" aria-hidden="true">M</span>
+            <span class="premium-price-name" data-i18n="premiumM">Jornada mínima</span>
+            <span class="money-field"><span>₽</span><input type="number" data-premium="M" inputmode="numeric" min="0" step="100" value="600" aria-label="Premio M"></span>
+          </label>
+        </div>
+      </div>
+
       <div class="price-note">
         <span aria-hidden="true">i</span>
-        <div><b data-i18n="jndLetterByLetter">El JND se lee letra por letra.</b> <span data-i18n="jndNote">Cada X, S, M, Y o P suma su precio; las repeticiones cuentan. El signo + y otros símbolos no suman.</span></div>
+        <div><b data-i18n="jndLetterByLetter">El JND se lee letra por letra.</b> <span data-i18n="jndNote">Cada C, S, M, Y o P suma su precio; las repeticiones cuentan. El signo + y otros símbolos no suman.</span></div>
       </div>
       <div class="example" id="priceExample"></div>
       <p class="hint" style="margin:9px 2px 0" data-i18n="changesSaved">Los cambios se guardan solos en este dispositivo.</p>
@@ -1596,7 +1662,7 @@
 /* ============================================================
    Datos iniciales: año 2026 vacío
    ============================================================ */
-const SEED_2026 = {"prices":{"X":7000,"S":5000,"M":3000,"Y":14000,"P":1500},"months":[{"name":"ENE","days":["","","","","","","X","X","","","","","","","","","","","","","","","","","","","X","X","XP","",""],"plus":7500},{"name":"FEB","days":["","","","","","","","","","","","","","","","","","X","","","X","","","","","","","","","",""],"plus":0},{"name":"MAR","days":["","X","X","","X","X","","","","","","","","X","","X","","X","X","X","","","","","","S","X","S","","X",""],"plus":19500},{"name":"ABR","days":["","","X","","","","X","","","","","","X","","","","","","","","","","","","","","","","","",""],"plus":0},{"name":"MAY","days":["","","","","","","X","","X","","","","","","","X","X","X","X","X","X","XP","X","XMP","","X","X","X","XMP","X","XM"],"plus":25500},{"name":"JUN","days":["XP","","X","S","X","S","XMP","XMP","XMP","X","XP","X","X","","XP","X","","X","X","X","","X","XP","XP","","XP","XP","XMP","XMP","XP",""],"plus":0},{"name":"JUL","days":["X","XP","XP","X","","XP","XP","X","","X","X","X","","","","","","","","XP","","XP","XP","XP","XP","","","","","",""],"plus":22500},{"name":"AGO","days":["XP","X","X","","X","X","X","","X","","X","XP","XP","X","","X","XP","X","","X","","","X","","","","","","","","X"],"plus":0},{"name":"SEP","days":["","","","X","","X","","","","X","X","X","","","","X","","","","","","","","XMPPPP","XPP","XPP","XPP","X","X","XPP",""],"plus":19500},{"name":"OCT","days":["","","XM","","","X","","","","","X","","","X","X","","X","","","","X","","","X","X","","X","X","X","XP","X"],"plus":0},{"name":"NOV","days":["X","XMP","X","","","","","","","","","","","","","","","","","","","","","","","","","","","",""],"plus":4500},{"name":"DIC","days":["","","","","","","","","","","","","","","","","","","","","","","","","","","","","","",""],"plus":0}]};
+const SEED_2026 = {"prices":{"X":7000,"S":5000,"M":3000,"Y":0,"P":1500},"months":[{"name":"ENE","days":["","","","","","","X","X","","","","","","","","","","","","","","","","","","","X","X","XP","",""],"plus":7500},{"name":"FEB","days":["","","","","","","","","","","","","","","","","","X","","","X","","","","","","","","","",""],"plus":0},{"name":"MAR","days":["","X","X","","X","X","","","","","","","","X","","X","","X","X","X","","","","","","S","X","S","","X",""],"plus":19500},{"name":"ABR","days":["","","X","","","","X","","","","","","X","","","","","","","","","","","","","","","","","",""],"plus":0},{"name":"MAY","days":["","","","","","","X","","X","","","","","","","X","X","X","X","X","X","XP","X","XMP","","X","X","X","XMP","X","XM"],"plus":25500},{"name":"JUN","days":["XP","","X","S","X","S","XMP","XMP","XMP","X","XP","X","X","","XP","X","","X","X","X","","X","XP","XP","","XP","XP","XMP","XMP","XP",""],"plus":0},{"name":"JUL","days":["X","XP","XP","X","","XP","XP","X","","X","X","X","","","","","","","","XP","","XP","XP","XP","XP","","","","","",""],"plus":22500},{"name":"AGO","days":["XP","X","X","","X","X","X","","X","","X","XP","XP","X","","X","XP","X","","X","","","X","","","","","","","","X"],"plus":0},{"name":"SEP","days":["","","","X","","X","","","","X","X","X","","","","X","","","","","","","","XMPPPP","XPP","XPP","XPP","X","X","XPP",""],"plus":19500},{"name":"OCT","days":["","","XM","","","X","","","","","X","","","X","X","","X","","","","X","","","X","X","","X","X","X","XP","X"],"plus":0},{"name":"NOV","days":["X","XMP","X","","","","","","","","","","","","","","","","","","","","","","","","","","","",""],"plus":4500},{"name":"DIC","days":["","","","","","","","","","","","","","","","","","","","","","","","","","","","","","",""],"plus":0}]};
 
 /* ============================================================
    Constantes y estado
@@ -1667,6 +1733,8 @@ const I18N = {
       shift: "Shift",
       delete: "Delete",
       jndDayLabel: "JND code for the day",
+      dayDescription: "Program / Crew chief / Address",
+      dayDescriptionPlaceholder: "E.g.: Main stage · Chief: ... · Address: ...",
       dayBase: "Day base",
       autosave: "Saves automatically",
       save: "Save",
@@ -1701,7 +1769,7 @@ const I18N = {
       total: "Total",
       bonus1: "1st half bonus",
       bonus2: "2nd half bonus",
-      prizeDetail: "{days} ({months}) × {money}",
+      prizeDetail: "{days} ({months})",
       oddOnly: "Odd months only",
       savingsNote: "For information only: not deducted from the total.",
       seeDetail: "See details",
@@ -1710,6 +1778,11 @@ const I18N = {
       pricesFor: "Prices for",
       restore: "Reset",
       pricesNote: "Saved for this year only. Changing them recalculates every base in the year.",
+      premiumPricesTitle: "Prize prices",
+      premiumPricesNote: "Prize value for each type of shift.",
+      premiumX: "Full shift (12 h)",
+      premiumS: "Half shift (over 7 h)",
+      premiumM: "Minimum shift (3–6 h)",
       jndLetterByLetter: "The JND is read letter by letter.",
       jndNote: "Each sign with a price adds its value; repeats count. Other symbols add nothing.",
       changesSaved: "Changes are saved automatically on this device.",
@@ -1778,11 +1851,11 @@ const I18N = {
       confirmWord: "DELETE",
       allDeleted: "All data has been deleted.",
       restoreTitle: "Reset prices for {year}",
-      restoreBody: "<p>The original prices will be used: X {x}, S {s}, M {m}, Y {y}, + {p}.</p><p>Shifts are not deleted; only the bases are recalculated.</p>",
+      restoreBody: "<p>The original prices will be used: C {x}, S {s}, M {m}, Y {y}, + {p}.</p><p>Shifts are not deleted; only the bases are recalculated.</p>",
       restored: "Prices reset.",
       helpTitle: "Quick help",
       help1: "1. Choose the month and tap a day.",
-      help2: "2. Type the JND (X, X+, XM+…) or use the X, S, M, Y, + buttons.",
+      help2: "2. Type the JND (C, C+, CM+…) or use the C, S, M, Y, + buttons.",
       help3: "3. The base is calculated instantly and saved automatically.",
       help4: "The monthly prize only appears in JAN, MAR, MAY, JUL, SEP and NOV. It is added once per month.",
       help5: "The 15% savings is for information only: it uses only those odd months and is not subtracted from the total.",
@@ -1891,6 +1964,8 @@ const I18N = {
       shift: "Jornada",
       delete: "Borrar",
       jndDayLabel: "Código JND del día",
+      dayDescription: "Programa / Jefe / Dirección",
+      dayDescriptionPlaceholder: "Ej.: Escenario principal · Jefe: ... · Dirección: ...",
       dayBase: "Base del día",
       autosave: "Se guarda solo",
       save: "Guardar",
@@ -1925,7 +2000,7 @@ const I18N = {
       total: "Total",
       bonus1: "Premio 1er semestre",
       bonus2: "Premio 2do semestre",
-      prizeDetail: "{days} ({months}) × {money}",
+      prizeDetail: "{days} ({months})",
       oddOnly: "Solo impares",
       savingsNote: "Es informativo: no se descuenta del total.",
       seeDetail: "Ver detalle",
@@ -1934,6 +2009,11 @@ const I18N = {
       pricesFor: "Precios de",
       restore: "Restaurar",
       pricesNote: "Se guardan solo para este año. Al cambiarlos, todas las bases del año se recalculan.",
+      premiumPricesTitle: "Precios de premios",
+      premiumPricesNote: "Valor del premio para cada tipo de jornada.",
+      premiumX: "Jornada entera (12 h)",
+      premiumS: "Media jornada (más de 7 h)",
+      premiumM: "Jornada mínima (3–6 h)",
       jndLetterByLetter: "El JND se lee letra por letra.",
       jndNote: "Cada signo con precio suma su valor; las repeticiones cuentan. Los demás símbolos no suman.",
       changesSaved: "Los cambios se guardan solos en este dispositivo.",
@@ -1968,7 +2048,7 @@ const I18N = {
       otherYear: "+ Otro año…",
       yearCreated: "Año {year} creado con los precios del año más cercano.",
       dayDot: "Día {day} · {month}",
-      loadWarning: "No se pudieron leer los datos guardados. Se cargó el respaldo de 2026.",
+      loadWarning: "No se pudieron leer los datos guardados. Se empezó de cero.",
       continue: "Continuar",
       deleteEverything: "Borrar todo",
       gotIt: "Entendido",
@@ -2002,11 +2082,11 @@ const I18N = {
       confirmWord: "BORRAR",
       allDeleted: "Todos los datos fueron borrados.",
       restoreTitle: "Restaurar precios de {year}",
-      restoreBody: "<p>Se usarán los precios originales: X {x}, S {s}, M {m}, Y {y}, + {p}.</p><p>Las jornadas no se borran; solo se recalculan las bases.</p>",
+      restoreBody: "<p>Se usarán los precios originales: C {x}, S {s}, M {m}, Y {y}, + {p}.</p><p>Las jornadas no se borran; solo se recalculan las bases.</p>",
       restored: "Precios restaurados.",
       helpTitle: "Ayuda rápida",
       help1: "1. Elige el mes y toca un día.",
-      help2: "2. Escribe el JND (X, X+, XM+…) o usa los botones X, S, M, Y, +.",
+      help2: "2. Escribe el JND (C, C+, CM+…) o usa los botones C, S, M, Y, +.",
       help3: "3. La base se calcula al instante. Se guarda sola.",
       help4: "El Premio del mes solo aparece en ENE, MAR, MAY, JUL, SEP y NOV. Se suma una vez al mes.",
       help5: "El ahorro 15% es informativo: se calcula solo con esos meses impares y no se resta del total.",
@@ -2114,6 +2194,8 @@ const I18N = {
       shift: "Smena",
       delete: "O‘chirish",
       jndDayLabel: "Kun uchun JND kodi",
+      dayDescription: "Dastur / Brigada boshlig‘i / Manzil",
+      dayDescriptionPlaceholder: "Masalan: Asosiy sahna · Boshliq: ... · Manzil: ...",
       dayBase: "Kunlik baza",
       autosave: "Avtomatik saqlanadi",
       save: "Saqlash",
@@ -2148,7 +2230,7 @@ const I18N = {
       total: "Jami",
       bonus1: "1-yarim yillik mukofoti",
       bonus2: "2-yarim yillik mukofoti",
-      prizeDetail: "{days} ({months}) × {money}",
+      prizeDetail: "{days} ({months})",
       oddOnly: "Faqat toq oylar",
       savingsNote: "Faqat ma’lumot uchun: jamidan ayirilmaydi.",
       seeDetail: "Batafsil",
@@ -2157,6 +2239,11 @@ const I18N = {
       pricesFor: "Narxlar:",
       restore: "Tiklash",
       pricesNote: "Faqat shu yil uchun saqlanadi. O‘zgartirsangiz, yil bo‘yicha barcha bazalar qayta hisoblanadi.",
+      premiumPricesTitle: "Mukofot narxlari",
+      premiumPricesNote: "Har bir ish smenasi turi uchun mukofot qiymati.",
+      premiumX: "To‘liq smena (12 soat)",
+      premiumS: "Yarim smena (7 soatdan ortiq)",
+      premiumM: "Minimal smena (3–6 soat)",
       jndLetterByLetter: "JND harflar bo‘yicha o‘qiladi.",
       jndNote: "Narxi belgilangan har bir belgi o‘z qiymatini qo‘shadi; takrorlar hisobga olinadi. Boshqa belgilar hech narsa qo‘shmaydi.",
       changesSaved: "O‘zgarishlar shu qurilmada avtomatik saqlanadi.",
@@ -2191,7 +2278,7 @@ const I18N = {
       otherYear: "+ Boshqa yil…",
       yearCreated: "{year}-yil eng yaqin yil narxlari bilan yaratildi.",
       dayDot: "{day}-kun · {month}",
-      loadWarning: "Saqlangan ma’lumotlarni o‘qib bo‘lmadi. 2026-yil zaxirasi yuklandi.",
+      loadWarning: "Saqlangan ma’lumotlarni o‘qib bo‘lmadi. Noldan boshlandi.",
       continue: "Davom etish",
       deleteEverything: "Hammasini o‘chirish",
       gotIt: "Tushundim",
@@ -2225,11 +2312,11 @@ const I18N = {
       confirmWord: "OCHIRISH",
       allDeleted: "Barcha ma’lumotlar o‘chirildi.",
       restoreTitle: "{year}-yil narxlarini tiklash",
-      restoreBody: "<p>Asl narxlar ishlatiladi: X {x}, S {s}, M {m}, Y {y}, + {p}.</p><p>Smenalar o‘chirilmaydi; faqat bazalar qayta hisoblanadi.</p>",
+      restoreBody: "<p>Asl narxlar ishlatiladi: C {x}, S {s}, M {m}, Y {y}, + {p}.</p><p>Smenalar o‘chirilmaydi; faqat bazalar qayta hisoblanadi.</p>",
       restored: "Narxlar tiklandi.",
       helpTitle: "Tezkor yordam",
       help1: "1. Oy va kunni tanlang.",
-      help2: "2. JND kiriting (X, X+, XM+…) yoki X, S, M, Y, + tugmalaridan foydalaning.",
+      help2: "2. JND kiriting (C, C+, CM+…) yoki C, S, M, Y, + tugmalaridan foydalaning.",
       help3: "3. Baza darhol hisoblanadi va avtomatik saqlanadi.",
       help4: "Oylik mukofot faqat YAN, MAR, MAY, IYUL, SEN va NOY oylarida chiqadi. Oyiga bir marta qo‘shiladi.",
       help5: "15% jamg‘arma faqat ma’lumot uchun: toq oylar bo‘yicha hisoblanadi va jamidan ayirilmaydi.",
@@ -2338,6 +2425,8 @@ const I18N = {
       shift: "Смена",
       delete: "Удалить",
       jndDayLabel: "Код JND за день",
+      dayDescription: "Программа / Бригадир / Адрес",
+      dayDescriptionPlaceholder: "Напр.: Главная сцена · Бригадир: ... · Адрес: ...",
       dayBase: "База за день",
       autosave: "Сохраняется автоматически",
       save: "Сохранить",
@@ -2372,7 +2461,7 @@ const I18N = {
       total: "Итого",
       bonus1: "Премия за 1-е полугодие",
       bonus2: "Премия за 2-е полугодие",
-      prizeDetail: "{days} ({months}) × {money}",
+      prizeDetail: "{days} ({months})",
       oddOnly: "Только нечётные",
       savingsNote: "Только для информации: не вычитается из итога.",
       seeDetail: "Подробнее",
@@ -2381,6 +2470,11 @@ const I18N = {
       pricesFor: "Цены за",
       restore: "Сбросить",
       pricesNote: "Сохраняются только для этого года. При изменении пересчитываются все базы за год.",
+      premiumPricesTitle: "Цены премий",
+      premiumPricesNote: "Стоимость премии для каждого типа смены.",
+      premiumX: "Полная смена (12 ч)",
+      premiumS: "Половина смены (более 7 ч)",
+      premiumM: "Минимальная смена (3–6 ч)",
       jndLetterByLetter: "JND читается по буквам.",
       jndNote: "Каждый знак с ценой добавляет свою стоимость; повторы учитываются. Остальные символы ничего не добавляют.",
       changesSaved: "Изменения сохраняются на этом устройстве автоматически.",
@@ -2415,7 +2509,7 @@ const I18N = {
       otherYear: "+ Другой год…",
       yearCreated: "Год {year} создан с ценами ближайшего года.",
       dayDot: "День {day} · {month}",
-      loadWarning: "Не удалось прочитать сохранённые данные. Загружена копия 2026 года.",
+      loadWarning: "Не удалось прочитать сохранённые данные. Начинаем с нуля.",
       continue: "Продолжить",
       deleteEverything: "Удалить всё",
       gotIt: "Понятно",
@@ -2449,11 +2543,11 @@ const I18N = {
       confirmWord: "УДАЛИТЬ",
       allDeleted: "Все данные удалены.",
       restoreTitle: "Сбросить цены за {year}",
-      restoreBody: "<p>Будут использованы исходные цены: X {x}, S {s}, M {m}, Y {y}, + {p}.</p><p>Смены не удаляются; базы будут пересчитаны.</p>",
+      restoreBody: "<p>Будут использованы исходные цены: C {x}, S {s}, M {m}, Y {y}, + {p}.</p><p>Смены не удаляются; базы будут пересчитаны.</p>",
       restored: "Цены сброшены.",
       helpTitle: "Быстрая помощь",
       help1: "1. Выберите месяц и нажмите на день.",
-      help2: "2. Введите JND (X, X+, XM+…) или используйте кнопки X, S, M, Y, +.",
+      help2: "2. Введите JND (C, C+, CM+…) или используйте кнопки C, S, M, Y, +.",
       help3: "3. База рассчитается сразу и сохранится автоматически.",
       help4: "Премия за месяц появляется только в янв., мар., мае, июле, сент. и нояб. Прибавляется один раз за месяц.",
       help5: "Накопления 15% — только для информации: считаются по нечётным месяцам и не вычитаются из итога.",
@@ -2563,6 +2657,8 @@ I18N.ky = {
             "shift": "Жумуш күнү",
             "delete": "Жок кылуу",
             "jndDayLabel": "Күндүн JND коду",
+      "dayDescription": "Программа / Бригада башчысы / Дарек",
+      "dayDescriptionPlaceholder": "Мисалы: Негизги сахна · Башчы: ... · Дарек: ...",
             "dayBase": "Күндүк база",
             "autosave": "Автоматтык түрдө сакталат",
             "save": "Сактоо",
@@ -2597,7 +2693,7 @@ I18N.ky = {
             "total": "Жалпы",
             "bonus1": "1-жарым жылдык бонус",
             "bonus2": "2-жарым жылдык бонус",
-            "prizeDetail": "{days} ({months}) × {money}",
+            "prizeDetail": "{days} ({months})",
             "oddOnly": "Тек гана так айлар",
             "savingsNote": "Маалымат үчүн гана: жалпы суммадан кармалбайт.",
             "seeDetail": "Толук көрүү",
@@ -2606,6 +2702,11 @@ I18N.ky = {
             "pricesFor": "Баалар:",
             "restore": "Кайтаруу",
             "pricesNote": "Тек ушул жыл үчүн сакталат. Аларды өзгөртүү жыл ичиндеги бардык базаларды кайра эсептейт.",
+      "premiumPricesTitle": "Сыйлык баалары",
+      "premiumPricesNote": "Ар бир смена түрү үчүн сыйлыктын баасы.",
+      "premiumX": "Толук смена (12 саат)",
+      "premiumS": "Жарым смена (7 сааттан көп)",
+      "premiumM": "Минималдуу смена (3–6 саат)",
             "jndLetterByLetter": "JND тамга-тамга боюнча окулат.",
             "jndNote": "Баасы бар ар бир белги өз маанисин кошот; кайталануулар эсептелет. Башка символдор эч нерсе кошпойт.",
             "changesSaved": "Өзгөртүүлөр ушул түзмөктө автоматтык түрдө сакталат.",
@@ -2674,11 +2775,11 @@ I18N.ky = {
             "confirmWord": "ӨЧҮРҮҮ",
             "allDeleted": "Бардык маалымат жок кылынды.",
             "restoreTitle": "{year} жылынын бааларын кайтаруу",
-            "restoreBody": "<p>Баштапкы баалар колдонулат: X {x}, S {s}, M {m}, Y {y}, + {p}.</p><p>Жумуш күндөрү жок кылынбайт; тек базалар кайра эсептелет.</p>",
+            "restoreBody": "<p>Баштапкы баалар колдонулат: C {x}, S {s}, M {m}, Y {y}, + {p}.</p><p>Жумуш күндөрү жок кылынбайт; тек базалар кайра эсептелет.</p>",
             "restored": "Баалар кайтарылды.",
             "helpTitle": "Тез жардам",
             "help1": "1. Айды тандап, күндү басыңыз.",
-            "help2": "2. JND киргизиңиз (X, X+, XM+…) же X, S, M, Y, + баскычтарын колдонуңуз.",
+            "help2": "2. JND киргизиңиз (C, C+, CM+…) же C, S, M, Y, + баскычтарын колдонуңуз.",
             "help3": "3. База дароо эсептелип, автоматтык түрдө сакталат.",
             "help4": "Айдын сыйлыгы тек ЯНВ, МАР, МАЙ, ИЮЛ, СЕН жана НОЯ айларында чыгат. Ал айына бир жолу кошулат.",
             "help5": "15% сактоо маалымат үчүн гана: ал тек ошол так айларды колдонуп, жалпы суммадан кармалбайт.",
@@ -2787,6 +2888,8 @@ I18N.ro = {
             "shift": "Tură",
             "delete": "Șterge",
             "jndDayLabel": "Codul JND pentru zi",
+      "dayDescription": "Program / Șef de brigadă / Adresă",
+      "dayDescriptionPlaceholder": "Ex.: Scena principală · Șef: ... · Adresă: ...",
             "dayBase": "Baza zilei",
             "autosave": "Se salvează automat",
             "save": "Salvează",
@@ -2821,7 +2924,7 @@ I18N.ro = {
             "total": "Total",
             "bonus1": "Bonus semestrul I",
             "bonus2": "Bonus semestrul II",
-            "prizeDetail": "{days} ({months}) × {money}",
+            "prizeDetail": "{days} ({months})",
             "oddOnly": "Doar lunile impare",
             "savingsNote": "Doar informativ: nu se scade din total.",
             "seeDetail": "Vezi detalii",
@@ -2830,6 +2933,11 @@ I18N.ro = {
             "pricesFor": "Prețuri pentru",
             "restore": "Resetează",
             "pricesNote": "Salvate doar pentru acest an. Modificarea lor recalculează toate bazele din an.",
+      "premiumPricesTitle": "Prețuri premii",
+      "premiumPricesNote": "Valoarea premiului pentru fiecare tip de tură.",
+      "premiumX": "Tură completă (12 h)",
+      "premiumS": "Jumătate de tură (peste 7 h)",
+      "premiumM": "Tură minimă (3–6 h)",
             "jndLetterByLetter": "JND se citește literă cu literă.",
             "jndNote": "Fiecare semn cu preț își adaugă valoarea; repetările contează. Alte simboluri nu adaugă nimic.",
             "changesSaved": "Modificările se salvează automat pe acest dispozitiv.",
@@ -2898,11 +3006,11 @@ I18N.ro = {
             "confirmWord": "ȘTERGE",
             "allDeleted": "Toate datele au fost șterse.",
             "restoreTitle": "Resetează prețurile pentru {year}",
-            "restoreBody": "<p>Vor fi folosite prețurile originale: X {x}, S {s}, M {m}, Y {y}, + {p}.</p><p>Turele nu sunt șterse; doar bazele sunt recalculate.</p>",
+            "restoreBody": "<p>Vor fi folosite prețurile originale: C {x}, S {s}, M {m}, Y {y}, + {p}.</p><p>Turele nu sunt șterse; doar bazele sunt recalculate.</p>",
             "restored": "Prețuri resetate.",
             "helpTitle": "Ajutor rapid",
             "help1": "1. Alege luna și atinge o zi.",
-            "help2": "2. Introdu JND (X, X+, XM+…) sau folosește butoanele X, S, M, Y, +.",
+            "help2": "2. Introdu JND (C, C+, CM+…) sau folosește butoanele C, S, M, Y, +.",
             "help3": "3. Baza se calculează instant și se salvează automat.",
             "help4": "Premiul lunar apare doar în IAN, MAR, MAI, IUL, SEP și NOI. Se adaugă o dată pe lună.",
             "help5": "Economiile de 15% sunt doar informative: folosesc doar acele luni impare și nu se scad din total.",
@@ -3031,8 +3139,8 @@ function applyStaticTranslations(){
 }
 
 const LETTERS = ["X","S","M","Y","+","G","Z","E","F","T"];
-const DEFAULT_PRICES = {X:7000, S:5000, M:3000, Y:14000, "+":1500, G:0, Z:0, E:0, F:0, T:0};
-const PREMIUM_PER_DAY = 1500;
+const DEFAULT_PRICES = {X:7000, S:5000, M:3000, Y:0, "+":1500, G:0, Z:0, E:0, F:0, T:0};
+const DEFAULT_PREMIUM_PRICES = {X: 1000, S: 800, M: 600};
 const DEFAULT_OFFICIAL_SALARY = 60000;
 const STORAGE_KEY = "mi-salario-jnd-v1";
 const SYNC_ENABLED = true;
@@ -3098,7 +3206,19 @@ function parseAmount(value){
 }
 
 function normalizeJND(value){
-  return String(value ?? "").toUpperCase().replace(/P/g, "+").replace(/\s+/g, "").slice(0, 40);
+  return String(value ?? "").toUpperCase().replace(/C/g, "X").replace(/P/g, "+").replace(/\s+/g, "").slice(0, 40);
+}
+
+function displayLetter(letter){
+  return letter === "X" ? "C" : letter;
+}
+
+function displayJND(value){
+  return normalizeJND(value).replace(/X/g, "C");
+}
+
+function normalizeDescription(value){
+  return String(value ?? "").replace(/[\r\n]+/g, " ").replace(/\s+/g, " ").trim().slice(0, 300);
 }
 
 function clonePrices(prices){
@@ -3108,6 +3228,14 @@ function clonePrices(prices){
       ? (prices[letter] !== undefined ? prices[letter] : (letter === "+" ? prices.P : undefined))
       : undefined;
     out[letter] = nonNeg(raw, DEFAULT_PRICES[letter]);
+  }
+  return out;
+}
+
+function clonePremiumPrices(values){
+  const out = {};
+  for (const letter of ["X", "S", "M"]){
+    out[letter] = nonNeg(values && values[letter], DEFAULT_PREMIUM_PRICES[letter]);
   }
   return out;
 }
@@ -3139,20 +3267,31 @@ function todayISO(){
    Modelo de datos
    ============================================================ */
 function makeEmptyMonths(){
-  return Array.from({length: 12}, () => ({days: Array(31).fill(""), plus: 0}));
+  return Array.from({length: 12}, () => ({days: Array(31).fill(""), descriptions: Array(31).fill(""), plus: 0}));
 }
 
-function makeYear(prices = DEFAULT_PRICES){
-  return {prices: clonePrices(prices), months: makeEmptyMonths()};
+function makeYear(prices = DEFAULT_PRICES, premiumPrices = DEFAULT_PREMIUM_PRICES){
+  return {
+    prices: clonePrices(prices),
+    premiumPrices: clonePremiumPrices(premiumPrices),
+    months: makeEmptyMonths()
+  };
 }
 
 function seedYear(){
   const months = makeEmptyMonths();
   SEED_2026.months.forEach((source, index) => {
     months[index].days = source.days.map(normalizeJND);
+    if (Array.isArray(source.descriptions)){
+      months[index].descriptions = Array.from({length: 31}, (_, day) => normalizeDescription(source.descriptions[day] ?? ""));
+    }
     months[index].plus = index % 2 === 0 ? nonNeg(source.plus) : 0;
   });
-  return {prices: clonePrices(SEED_2026.prices), months};
+  return {
+    prices: clonePrices(SEED_2026.prices),
+    premiumPrices: clonePremiumPrices(DEFAULT_PREMIUM_PRICES),
+    months
+  };
 }
 
 function seedState(){
@@ -3160,7 +3299,10 @@ function seedState(){
 }
 
 function normalizeYear(raw){
-  const year = makeYear(raw && raw.prices ? raw.prices : DEFAULT_PRICES);
+  const year = makeYear(
+    raw && raw.prices ? raw.prices : DEFAULT_PRICES,
+    raw && raw.premiumPrices ? raw.premiumPrices : DEFAULT_PREMIUM_PRICES
+  );
   if (raw && Array.isArray(raw.months)){
     for (let m = 0; m < 12; m++){
       const source = raw.months[m];
@@ -3170,10 +3312,25 @@ function normalizeYear(raw){
           year.months[m].days[d] = normalizeJND(source.days[d] ?? "");
         }
       }
+      if (Array.isArray(source.descriptions)){
+        for (let d = 0; d < 31; d++){
+          year.months[m].descriptions[d] = normalizeDescription(source.descriptions[d] ?? "");
+        }
+      }
       year.months[m].plus = m % 2 === 0 ? nonNeg(source.plus) : 0;
     }
   }
+  normalizeLegacyYPrice(year);
   return year;
+}
+
+function normalizeLegacyYPrice(yearData){
+  if (!yearData || !yearData.prices) return;
+  if (nonNeg(yearData.prices.Y) !== 14000) return;
+  const hasY = yearData.months.some(month =>
+    month.days.some(day => normalizeJND(day).includes("Y"))
+  );
+  if (!hasY) yearData.prices.Y = 0;
 }
 
 function normalizeDebts(raw){
@@ -3355,20 +3512,42 @@ function countsOf(jnd){
   return counts;
 }
 
+function premiumOfJND(jnd, premiumPrices = currentYearData().premiumPrices){
+  const prices = premiumPrices || DEFAULT_PREMIUM_PRICES;
+  const counts = countsOf(jnd);
+  return (counts.X || 0) * nonNeg(prices.X) +
+    (counts.S || 0) * nonNeg(prices.S) +
+    (counts.M || 0) * nonNeg(prices.M);
+}
+
 function monthStats(yearData, monthIndex){
   const month = yearData.months[monthIndex];
   let base = 0;
   let pSum = 0;
+  let premium = 0;
   let worked = 0;
   for (const raw of month.days){
     if (String(raw).trim() !== ""){
       worked++;
       base += baseOf(raw, yearData.prices);
       pSum += pSumOf(raw, yearData.prices);
+      if (monthIndex % 2 === 0) premium += premiumOfJND(raw, yearData.premiumPrices);
     }
   }
-  const premium = monthIndex % 2 === 0 ? worked * PREMIUM_PER_DAY : 0;
   return {base, pSum, premium, salary: base + pSum + premium, worked};
+}
+
+function premiumInMonths(yearData, monthIndexes){
+  let days = 0;
+  let amount = 0;
+  for (const monthIndex of monthIndexes){
+    for (const raw of yearData.months[monthIndex].days){
+      if (String(raw).trim() === "") continue;
+      days++;
+      amount += premiumOfJND(raw, yearData.premiumPrices);
+    }
+  }
+  return {days, amount};
 }
 
 function yearStats(yearData){
@@ -3379,10 +3558,12 @@ function yearStats(yearData){
   const totalSalary = months.reduce((sum, m) => sum + m.salary, 0);
   const totalDays = months.reduce((sum, m) => sum + m.worked, 0);
 
-  const p1days = months[1].worked + months[3].worked + months[5].worked;
-  const p2days = months[7].worked + months[9].worked + months[11].worked;
-  const premio1 = p1days * PREMIUM_PER_DAY;
-  const premio2 = p2days * PREMIUM_PER_DAY;
+  const p1 = premiumInMonths(yearData, [1, 3, 5]);
+  const p2 = premiumInMonths(yearData, [7, 9, 11]);
+  const p1days = p1.days;
+  const p2days = p2.days;
+  const premio1 = p1.amount;
+  const premio2 = p2.amount;
 
   const ahorro = months.reduce((sum, month, index) => {
     return index % 2 === 0 ? sum + month.salary * 0.15 : sum;
@@ -3729,8 +3910,8 @@ function renderQuickLetters(){
     .filter(letter => nonNeg(prices[letter]) > 0)
     .map(letter =>
       `<button type="button" class="letter-btn" data-letter="${letter}"
-        aria-label="${esc(t("addLetterAria", {letter, price: money(prices[letter])}))}">
-        <span>${letter}</span><small>${num(prices[letter])}</small>
+        aria-label="${esc(t("addLetterAria", {letter: displayLetter(letter), price: money(prices[letter])}))}">
+        <span>${displayLetter(letter)}</span><small>${num(prices[letter])}</small>
       </button>`
     ).join("");
 }
@@ -3760,7 +3941,7 @@ function updatePreview(){
   for (const letter of LETTERS){
     if (!counts[letter]) continue;
     const count = counts[letter];
-    parts.push(`<span class="b-chip"><b>${letter}</b>${count > 1 ? `<em>×${count}</em>` : ""}<span>${num(prices[letter] * count)}</span></span>`);
+    parts.push(`<span class="b-chip"><b>${displayLetter(letter)}</b>${count > 1 ? `<em>×${count}</em>` : ""}<span>${num(prices[letter] * count)}</span></span>`);
   }
 
   const breakdown = $("#breakdown");
@@ -3779,7 +3960,11 @@ function updateEntry(){
   $("#selectedDayBadge").textContent = ui.day;
   $("#selectedDayTitle").textContent = t("dayDot", {day: ui.day, month: MONTHS_SHORT[ui.month]});
   const input = $("#jndInput");
-  if (input.value !== raw) input.value = raw;
+  const display = displayJND(raw);
+  if (input.value !== display) input.value = display;
+  const description = yearData.months[ui.month].descriptions?.[ui.day - 1] || "";
+  const descInput = $("#dayDescription");
+  if (descInput && descInput.value !== description) descInput.value = description;
   $("#entryCard").classList.toggle("has-code", raw.trim() !== "");
   updatePreview();
   setSaveState(t("autosave"));
@@ -3838,6 +4023,7 @@ function renderMonthTable(){
   $("#monthBody").innerHTML = Array.from({length: count}, (_, index) => {
     const day = index + 1;
     const raw = yearData.months[ui.month].days[index] || "";
+    const description = normalizeDescription(yearData.months[ui.month].descriptions?.[index] || "");
     const base = baseOf(raw, yearData.prices);
     const isToday = state.activeYear === CURRENT_YEAR && ui.month === CURRENT_MONTH && day === CURRENT_DAY;
     const weekdayIndex = new Date(state.activeYear, ui.month, day).getDay();
@@ -3848,10 +4034,10 @@ function renderMonthTable(){
     if (raw.trim() !== "") classes.push("has-data");
     return `<tr class="${classes.join(" ")}" data-row="${day}">
       <td class="day-cell"><span class="dnum">${day}</span><span class="wk">${weekday}</span></td>
-      <td><input class="jnd-cell" data-day="${day}" value="${esc(raw)}"
+      <td class="jnd-cell-wrap"><input class="jnd-cell" data-day="${day}" value="${esc(displayJND(raw))}"
         aria-label="${esc(t("jndAria", {day}))}" inputmode="text" autocapitalize="characters"
         autocomplete="off" autocorrect="off" spellcheck="false" maxlength="40"
-        placeholder=" " enterkeyhint="done"></td>
+        placeholder=" " enterkeyhint="done">${description ? `<span class="day-desc" title="${esc(description)}">${esc(description)}</span>` : ""}</td>
       <td class="base-cell">${base ? num(base) : '<span class="zero">—</span>'}</td>
     </tr>`;
   }).join("");
@@ -3916,14 +4102,12 @@ function renderAnnual(){
   $("#prize1").textContent = money(stats.premio1);
   $("#prize1Detail").textContent = t("prizeDetail", {
     days: daysText(stats.p1days),
-    months: [MONTHS_SHORT[1], MONTHS_SHORT[3], MONTHS_SHORT[5]].join(" + "),
-    money: money(PREMIUM_PER_DAY)
+    months: [MONTHS_SHORT[1], MONTHS_SHORT[3], MONTHS_SHORT[5]].join(" + ")
   });
   $("#prize2").textContent = money(stats.premio2);
   $("#prize2Detail").textContent = t("prizeDetail", {
     days: daysText(stats.p2days),
-    months: [MONTHS_SHORT[7], MONTHS_SHORT[9], MONTHS_SHORT[11]].join(" + "),
-    money: money(PREMIUM_PER_DAY)
+    months: [MONTHS_SHORT[7], MONTHS_SHORT[9], MONTHS_SHORT[11]].join(" + ")
   });
 
   $("#ahorroTotal").textContent = money(stats.ahorro);
@@ -3945,10 +4129,10 @@ function updatePriceExample(){
   const counts = countsOf("XM++++");
   const parts = LETTERS.filter(letter => counts[letter]).map(letter => {
     const count = counts[letter];
-    return `${letter}${count > 1 ? "×" + count : ""} ${num(prices[letter] * count)}`;
+    return `${displayLetter(letter)}${count > 1 ? "×" + count : ""} ${num(prices[letter] * count)}`;
   });
   $("#priceExample").innerHTML =
-    `<span class="example-code">XM++++</span> = ${parts.join(" + ")} = <b>${money(totalOf("XM++++", prices))}</b>`;
+    `<span class="example-code">${displayJND("XM++++")}</span> = ${parts.join(" + ")} = <b>${money(totalOf("XM++++", prices))}</b>`;
 }
 
 function renderPrices(){
@@ -3958,9 +4142,9 @@ function renderPrices(){
 
   $("#priceRows").innerHTML = LETTERS.map(letter => `
     <div class="price-row">
-      <div class="letter-badge" aria-hidden="true">${letter}</div>
+      <div class="letter-badge" aria-hidden="true">${displayLetter(letter)}</div>
       <label class="price-field">
-        <span class="sr-only">${esc(t("priceAria", {letter}))}</span>
+        <span class="sr-only">${esc(t("priceAria", {letter: displayLetter(letter)}))}</span>
         <span class="money-field">
           <span>${currencySymbol()}</span>
           <input type="number" data-letter="${letter}" inputmode="numeric" min="0" step="100"
@@ -3980,6 +4164,22 @@ function renderPrices(){
     });
     input.addEventListener("blur", () => {
       input.value = currentYearData().prices[input.dataset.letter];
+      saveNow();
+      flashSaved();
+    });
+  });
+
+  const premiumPrices = yearData.premiumPrices || DEFAULT_PREMIUM_PRICES;
+  $$("#premiumPrices input[data-premium]").forEach(input => {
+    input.value = premiumPrices[input.dataset.premium];
+    input.addEventListener("input", () => {
+      const letter = input.dataset.premium;
+      const value = input.value === "" ? 0 : Math.max(0, Math.round(Number(input.value) || 0));
+      currentYearData().premiumPrices[letter] = value;
+      scheduleSave();
+    });
+    input.addEventListener("blur", () => {
+      input.value = currentYearData().premiumPrices[input.dataset.premium];
       saveNow();
       flashSaved();
     });
@@ -4531,7 +4731,10 @@ function selectDay(day){
   }
   const raw = currentYearData().months[ui.month].days[day - 1] || "";
   const input = $("#jndInput");
-  input.value = raw;
+  input.value = displayJND(raw);
+  const description = currentYearData().months[ui.month].descriptions?.[day - 1] || "";
+  const descInput = $("#dayDescription");
+  if (descInput) descInput.value = description;
   $("#selectedDayBadge").textContent = day;
   $("#selectedDayTitle").textContent = `Día ${day} · ${MONTHS_SHORT[ui.month]}`;
   $("#entryCard").classList.toggle("has-code", raw.trim() !== "");
@@ -4543,7 +4746,8 @@ function selectDay(day){
 
 async function clearSelectedDay(){
   const raw = currentYearData().months[ui.month].days[ui.day - 1] || "";
-  if (raw.trim() === ""){
+  const description = currentYearData().months[ui.month].descriptions?.[ui.day - 1] || "";
+  if (raw.trim() === "" && description.trim() === ""){
     toast(t("emptyDay"));
     return;
   }
@@ -4559,9 +4763,12 @@ async function clearSelectedDay(){
   );
   if (!ok) return;
   currentYearData().months[ui.month].days[ui.day - 1] = "";
+  currentYearData().months[ui.month].descriptions[ui.day - 1] = "";
   $("#jndInput").value = "";
+  $("#dayDescription").value = "";
   updatePreview();
   updateDayButton();
+  renderMonthTable();
   saveNow();
   flashSaved();
   toast(t("dayDeleted"));
@@ -4570,8 +4777,9 @@ async function clearSelectedDay(){
 function appendLetter(letter){
   const input = $("#jndInput");
   if (input.value.length >= 40) return;
-  input.value += letter;
-  currentYearData().months[ui.month].days[ui.day - 1] = input.value;
+  const value = normalizeJND(input.value + letter);
+  input.value = displayJND(value);
+  currentYearData().months[ui.month].days[ui.day - 1] = value;
   updatePreview();
   updateDayButton();
   scheduleSave();
@@ -4598,46 +4806,56 @@ function csvCell(value){
 }
 
 function buildCSV(){
-  const rows = [["anio","mes","dia","jnd","plus_mes","precio_x","precio_s","precio_m","precio_y","precio_plus","base","tipo","nota","importe","pagada","pago","auto","extra","precio_g","precio_z","precio_e","precio_f","precio_t"]];
+  const rows = [["anio","mes","dia","jnd","plus_mes","precio_x","precio_s","precio_m","precio_y","precio_plus","base","tipo","nota","importe","pagada","pago","auto","extra","precio_g","precio_z","precio_e","precio_f","precio_t","premio_x","premio_s","premio_m"]];
   const years = Object.keys(state.years).map(Number).sort((a, b) => a - b);
 
   for (const yearNumber of years){
     const yearData = state.years[String(yearNumber)];
     const prices = yearData.prices;
+    const premiumPrices = yearData.premiumPrices || DEFAULT_PREMIUM_PRICES;
     for (let month = 0; month < 12; month++){
       const stats = monthStats(yearData, month);
       const plus = month % 2 === 0 ? stats.premium : 0;
-      rows.push([yearNumber, month + 1, 0, "", plus, prices.X, prices.S, prices.M, prices.Y, prices["+"], stats.base, "", "", "", "", "", "", "", prices.G, prices.Z, prices.E, prices.F, prices.T]);
+      rows.push([yearNumber, month + 1, 0, "", plus, prices.X, prices.S, prices.M, prices.Y, prices["+"], stats.base, "", "", "", "", "", "", "", prices.G, prices.Z, prices.E, prices.F, prices.T, premiumPrices.X, premiumPrices.S, premiumPrices.M]);
       for (let day = 1; day <= 31; day++){
         const jnd = normalizeJND(yearData.months[month].days[day - 1]);
-        if (!jnd) continue;
-        rows.push([yearNumber, month + 1, day, jnd, plus, prices.X, prices.S, prices.M, prices.Y, prices["+"], baseOf(jnd, prices), "", "", "", "", "", "", "", prices.G, prices.Z, prices.E, prices.F, prices.T]);
+        const description = normalizeDescription(yearData.months[month].descriptions?.[day - 1]);
+        if (!jnd && !description) continue;
+        rows.push([yearNumber, month + 1, day, jnd, plus, prices.X, prices.S, prices.M, prices.Y, prices["+"], baseOf(jnd, prices), "", description, "", "", "", "", "", prices.G, prices.Z, prices.E, prices.F, prices.T, premiumPrices.X, premiumPrices.S, premiumPrices.M]);
       }
     }
   }
   for (const debt of allDebts()){
-    const prices = (state.years[String(debt.year)] || {prices: DEFAULT_PRICES}).prices;
+    const yearData = state.years[String(debt.year)];
+    const prices = (yearData || {prices: DEFAULT_PRICES}).prices;
+    const premiumPrices = (yearData && yearData.premiumPrices) || DEFAULT_PREMIUM_PRICES;
     rows.push([
       debt.year, debt.month, 0, "", 0,
       prices.X, prices.S, prices.M, prices.Y, prices["+"], 0,
       "deuda", debt.note || "", debt.amount, debt.paid ? 1 : 0, debt.paidAmount || 0,
       debt.auto ? 1 : 0, debt.extraPaid || 0,
-      prices.G, prices.Z, prices.E, prices.F, prices.T
+      prices.G, prices.Z, prices.E, prices.F, prices.T,
+      premiumPrices.X, premiumPrices.S, premiumPrices.M
     ]);
   }
   const salaryPrices = currentYearData().prices;
+  const salaryPremiumPrices = currentYearData().premiumPrices || DEFAULT_PREMIUM_PRICES;
   rows.push([
     state.activeYear, 1, 0, "", 0,
     salaryPrices.X, salaryPrices.S, salaryPrices.M, salaryPrices.Y, salaryPrices["+"], 0,
-    "salario", "", officialSalary(), "", "", "", "", "", "", "", "", ""
+    "salario", "", officialSalary(), "", "", "", "", "", "", "", "", "",
+    salaryPremiumPrices.X, salaryPremiumPrices.S, salaryPremiumPrices.M
   ]);
   for (const job of allExtra()){
-    const prices = (state.years[String(job.year)] || {prices: DEFAULT_PRICES}).prices;
+    const yearData = state.years[String(job.year)];
+    const prices = (yearData || {prices: DEFAULT_PRICES}).prices;
+    const premiumPrices = (yearData && yearData.premiumPrices) || DEFAULT_PREMIUM_PRICES;
     const note = [job.client, job.concept].filter(Boolean).join(" · ").slice(0, 80);
     rows.push([
       job.year, job.month, job.day, "", 0,
       prices.X, prices.S, prices.M, prices.Y, prices["+"], 0,
-      "extra", note, job.amount, job.collected ? 1 : 0, "", "", "", "", "", "", ""
+      "extra", note, job.amount, job.collected ? 1 : 0, "", "", "", "", "", "", "",
+      premiumPrices.X, premiumPrices.S, premiumPrices.M
     ]);
   }
   return "\uFEFF" + rows.map(row => row.map(csvCell).join(";")).join("\r\n") + "\r\n";
@@ -4756,6 +4974,11 @@ function parseImport(text){
     F: find("precio_f","pf"),
     T: find("precio_t","pt")
   };
+  const premiumIndexes = {
+    X: find("premio_x","premio_px"),
+    S: find("premio_s","premio_ps"),
+    M: find("premio_m","premio_pm")
+  };
   const iPlus = find("plus_mes","plus","mas");
   const iTipo = find("tipo");
   const iNota = find("nota");
@@ -4842,7 +5065,7 @@ function parseImport(text){
     }
 
     if (!imported.has(year)){
-      imported.set(year, {prices: null, months: makeEmptyMonths(), plusSet: Array(12).fill(false)});
+      imported.set(year, {prices: null, premiumPrices: null, months: makeEmptyMonths(), plusSet: Array(12).fill(false)});
     }
     const record = imported.get(year);
 
@@ -4860,6 +5083,20 @@ function parseImport(text){
         }
       }
       if (foundPrice) record.prices = values;
+
+      const premiumValues = {};
+      let foundPremium = false;
+      for (const letter of ["X", "S", "M"]){
+        if (premiumIndexes[letter] < 0) continue;
+        const raw = String(row[premiumIndexes[letter]] ?? "").trim();
+        if (raw === "") continue;
+        const number = parseAmount(raw);
+        if (Number.isFinite(number) && number >= 0){
+          premiumValues[letter] = Math.round(number);
+          foundPremium = true;
+        }
+      }
+      if (foundPremium) record.premiumPrices = premiumValues;
     }
 
     const monthIndex = month - 1;
@@ -4881,6 +5118,10 @@ function parseImport(text){
     }
 
     const jnd = normalizeJND(row[iJnd]);
+    const description = iNota >= 0 ? normalizeDescription(row[iNota]) : "";
+    if (description){
+      record.months[monthIndex].descriptions[day - 1] = description;
+    }
     if (jnd){
       record.months[monthIndex].days[day - 1] = jnd;
       dayCount++;
@@ -4899,11 +5140,16 @@ function applyImport(parsed){
     const fallback = state.years[String(yearNumber)]
       ? state.years[String(yearNumber)].prices
       : bestPricesFor(yearNumber);
-    const yearData = makeYear(record.prices || fallback);
+    const yearData = makeYear(
+      record.prices || fallback,
+      record.premiumPrices || DEFAULT_PREMIUM_PRICES
+    );
     for (let month = 0; month < 12; month++){
       yearData.months[month].days = record.months[month].days.slice();
+      yearData.months[month].descriptions = (record.months[month].descriptions || Array(31).fill("")).slice();
       yearData.months[month].plus = month % 2 === 0 ? record.months[month].plus : 0;
     }
+    normalizeLegacyYPrice(yearData);
     state.years[String(yearNumber)] = yearData;
   }
 
@@ -5058,6 +5304,7 @@ async function resetPrices(){
   );
   if (!ok) return;
   currentYearData().prices = clonePrices(DEFAULT_PRICES);
+  currentYearData().premiumPrices = clonePremiumPrices(DEFAULT_PREMIUM_PRICES);
   saveNow();
   renderPrices();
   renderQuickLetters();
@@ -5222,14 +5469,21 @@ function bindEvents(){
 
   const input = $("#jndInput");
   input.addEventListener("input", () => {
-    currentYearData().months[ui.month].days[ui.day - 1] = input.value;
+    const value = normalizeJND(input.value);
+    const display = displayJND(value);
+    if (input.value !== display){
+      const position = input.selectionStart;
+      input.value = display;
+      try { input.setSelectionRange(position, position); } catch (error){}
+    }
+    currentYearData().months[ui.month].days[ui.day - 1] = value;
     updatePreview();
     updateDayButton();
     scheduleSave();
   });
   input.addEventListener("blur", () => {
     const value = normalizeJND(input.value);
-    input.value = value;
+    input.value = displayJND(value);
     currentYearData().months[ui.month].days[ui.day - 1] = value;
     updatePreview();
     updateDayButton();
@@ -5240,6 +5494,26 @@ function bindEvents(){
     if (event.key === "Enter"){
       event.preventDefault();
       input.blur();
+    }
+  });
+
+  const descriptionInput = $("#dayDescription");
+  descriptionInput.addEventListener("input", () => {
+    currentYearData().months[ui.month].descriptions[ui.day - 1] = String(descriptionInput.value).slice(0, 300);
+    scheduleSave();
+  });
+  descriptionInput.addEventListener("blur", () => {
+    const value = normalizeDescription(descriptionInput.value);
+    descriptionInput.value = value;
+    currentYearData().months[ui.month].descriptions[ui.day - 1] = value;
+    saveNow();
+    flashSaved();
+    renderMonthTable();
+  });
+  descriptionInput.addEventListener("keydown", event => {
+    if (event.key === "Enter"){
+      event.preventDefault();
+      descriptionInput.blur();
     }
   });
 
@@ -5263,10 +5537,17 @@ function bindEvents(){
     const field = event.target.closest(".jnd-cell");
     if (!field) return;
     const day = Number(field.dataset.day);
-    currentYearData().months[ui.month].days[day - 1] = field.value;
+    const value = normalizeJND(field.value);
+    const display = displayJND(value);
+    if (field.value !== display){
+      const position = field.selectionStart;
+      field.value = display;
+      try { field.setSelectionRange(position, position); } catch (error){}
+    }
+    currentYearData().months[ui.month].days[day - 1] = value;
     const row = field.closest("tr");
-    const base = baseOf(field.value, currentYearData().prices);
-    row.classList.toggle("has-data", field.value.trim() !== "");
+    const base = baseOf(value, currentYearData().prices);
+    row.classList.toggle("has-data", value.trim() !== "");
     row.querySelector(".base-cell").innerHTML = base ? num(base) : '<span class="zero">—</span>';
     updateMonthTotals();
     scheduleSave();
@@ -5276,7 +5557,7 @@ function bindEvents(){
     if (!field) return;
     const day = Number(field.dataset.day);
     const value = normalizeJND(field.value);
-    field.value = value;
+    field.value = displayJND(value);
     currentYearData().months[ui.month].days[day - 1] = value;
     const row = field.closest("tr");
     const base = baseOf(value, currentYearData().prices);
