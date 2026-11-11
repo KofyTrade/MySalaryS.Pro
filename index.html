@@ -475,7 +475,7 @@
   .plus-copy h3{margin:0;font-size:14px;font-weight:850}
   .plus-copy p{margin:2px 0 0;font-size:11px;color:var(--muted);line-height:1.35}
   .money-field{
-    position:relative;flex:0 0 auto;width:132px;
+    position:relative;display:flex;align-items:center;flex:0 0 auto;width:132px;
   }
   .money-field > span{
     position:absolute;left:11px;top:50%;transform:translateY(-50%);
@@ -866,11 +866,12 @@
     padding:5px 7px;font-size:9px;font-weight:850;color:var(--muted);white-space:nowrap;
   }
   .extra-state.collected{background:var(--brand-soft);border-color:#99f6e4;color:var(--brand)}
-  .extra-del{
+  .extra-del,.extra-edit{
     width:26px;height:26px;border:0;border-radius:50%;
     background:transparent;color:var(--muted);font-size:18px;line-height:1;
   }
-  .extra-del:active{background:var(--line-2)}
+  .extra-edit{font-size:16px}
+  .extra-del:active,.extra-edit:active{background:var(--line-2)}
   .extra-empty{padding:14px 4px;color:var(--muted);font-size:13px;text-align:center}
   @media (max-width:520px){
     .extra-row{grid-template-columns:auto 1fr auto;grid-template-areas:"date main money" "actions actions actions";row-gap:6px}
@@ -1399,7 +1400,7 @@
 
     <div class="card">
       <div class="card-head">
-        <h3 data-i18n="extraAddTitle">Anotar trabajo extra</h3>
+        <h3 id="extraFormTitle" data-i18n="extraAddTitle">Anotar trabajo extra</h3>
         <button type="button" class="mini-btn" id="extraAutofill" data-i18n="extraAutofill">Usar últimos datos</button>
       </div>
       <div class="extra-form">
@@ -1423,10 +1424,11 @@
           </span>
         </label>
         <label class="check-field">
-          <input id="extraCollected" type="checkbox" checked>
+          <input id="extraCollected" type="checkbox">
           <span data-i18n="extraCollected">Cobrado</span>
         </label>
         <button class="btn primary" id="extraAdd" type="button" data-i18n="extraAddButton">Agregar extra</button>
+        <button class="btn ghost" id="extraCancelEdit" type="button" data-i18n="cancel" hidden>Cancelar</button>
       </div>
     </div>
 
@@ -1739,6 +1741,10 @@ const I18N = {
       extraConceptRequired: "Enter a description or a client.",
       extraAmountRequired: "Enter an amount greater than zero.",
       extraAdded: "Extra job added.",
+      edit: "Edit",
+      extraEditTitle: "Edit extra job",
+      extraSaveChanges: "Save changes",
+      extraUpdated: "Extra job updated.",
       extraCollectedToast: "Marked as collected.",
       extraPendingToast: "Marked as pending.",
       extraDeleteTitle: "Delete extra job",
@@ -1972,6 +1978,10 @@ const I18N = {
       extraConceptRequired: "Escribe un concepto o un cliente.",
       extraAmountRequired: "Escribe un importe mayor que cero.",
       extraAdded: "Trabajo extra agregado.",
+      edit: "Editar",
+      extraEditTitle: "Editar trabajo extra",
+      extraSaveChanges: "Guardar cambios",
+      extraUpdated: "Trabajo extra actualizado.",
       extraCollectedToast: "Marcado como cobrado.",
       extraPendingToast: "Marcado como pendiente.",
       extraDeleteTitle: "Borrar trabajo extra",
@@ -2204,6 +2214,10 @@ const I18N = {
       extraConceptRequired: "Tavsif yoki mijoz kiriting.",
       extraAmountRequired: "Noldan katta summa kiriting.",
       extraAdded: "Qo‘shimcha ish qo‘shildi.",
+      edit: "Tahrirlash",
+      extraEditTitle: "Qo‘shimcha ishni tahrirlash",
+      extraSaveChanges: "O‘zgarishlarni saqlash",
+      extraUpdated: "Qo‘shimcha ish yangilandi.",
       extraCollectedToast: "Olingan deb belgilandi.",
       extraPendingToast: "Kutilmoqda deb belgilandi.",
       extraDeleteTitle: "Qo‘shimcha ishni o‘chirish",
@@ -2437,6 +2451,10 @@ const I18N = {
       extraConceptRequired: "Введите описание или клиента.",
       extraAmountRequired: "Введите сумму больше нуля.",
       extraAdded: "Халтура добавлена.",
+      edit: "Изменить",
+      extraEditTitle: "Изменить халтуру",
+      extraSaveChanges: "Сохранить изменения",
+      extraUpdated: "Халтура обновлена.",
       extraCollectedToast: "Отмечено как получено.",
       extraPendingToast: "Отмечено как ожидает.",
       extraDeleteTitle: "Удалить халтуру",
@@ -2671,6 +2689,10 @@ I18N.ky = {
             "extraConceptRequired": "Түшүндүрмө же кардар киргизиңиз.",
             "extraAmountRequired": "Нөлдөн чоң сумма киргизиңиз.",
             "extraAdded": "Кошумча жумуш кошулду.",
+      "edit": "Өзгөртүү",
+      "extraEditTitle": "Кошумча жумушту өзгөртүү",
+      "extraSaveChanges": "Өзгөртүүлөрдү сактоо",
+      "extraUpdated": "Кошумча жумуш жаңыртылды.",
             "extraCollectedToast": "Алынды деп белгиленди.",
             "extraPendingToast": "Күтүүдө деп белгиленди.",
             "extraDeleteTitle": "Кошумча жумушту жок кылуу",
@@ -2904,6 +2926,10 @@ I18N.ro = {
             "extraConceptRequired": "Introdu o descriere sau un client.",
             "extraAmountRequired": "Introdu o sumă mai mare decât zero.",
             "extraAdded": "Lucrare suplimentară adăugată.",
+      "edit": "Editează",
+      "extraEditTitle": "Editează lucrarea extra",
+      "extraSaveChanges": "Salvează modificările",
+      "extraUpdated": "Lucrare extra actualizată.",
             "extraCollectedToast": "Marcat ca încasat.",
             "extraPendingToast": "Marcat ca în așteptare.",
             "extraDeleteTitle": "Șterge lucrarea suplimentară",
@@ -4643,6 +4669,8 @@ async function deleteDebt(id){
 /* ============================================================
    Render general
    ============================================================ */
+let extraEditingId = null;
+
 function allExtra(){
   return Array.isArray(state.extra) ? state.extra : [];
 }
@@ -4682,6 +4710,7 @@ function renderExtraMonths(){
     return `<button type="button" class="${classes.join(" ")}" data-month="${index}"
       aria-pressed="${index === ui.extraMonth}" aria-label="${MONTHS_LONG[index]}">${name}</button>`;
   }).join("");
+  requestAnimationFrame(() => centerMonthStrip("#extraMonths"));
 }
 
 function renderExtraList(){
@@ -4708,6 +4737,7 @@ function renderExtraList(){
       <div class="extra-money">${money(job.amount)}<small class="${job.collected ? "collected" : ""}">${esc(job.collected ? t("extraCollected") : t("extraPending"))}</small></div>
       <div class="extra-actions">
         <button type="button" class="extra-state${job.collected ? " collected" : ""}" data-act="toggle">${esc(job.collected ? t("extraCollected") : t("extraPending"))}</button>
+        <button type="button" class="extra-edit" data-act="edit" aria-label="${esc(t("edit"))}">✎</button>
         <button type="button" class="extra-del" data-act="del" aria-label="${esc(t("delete"))}">×</button>
       </div>
     </div>`;
@@ -4715,6 +4745,15 @@ function renderExtraList(){
 }
 
 function renderExtra(){
+  const editing = extraEditingId ? allExtra().find(job => job.id === extraEditingId) : null;
+  if (extraEditingId && !editing) extraEditingId = null;
+  const formTitle = $("#extraFormTitle");
+  if (formTitle) formTitle.textContent = t(editing ? "extraEditTitle" : "extraAddTitle");
+  const addButton = $("#extraAdd");
+  if (addButton) addButton.textContent = t(editing ? "extraSaveChanges" : "extraAddButton");
+  const cancelButton = $("#extraCancelEdit");
+  if (cancelButton) cancelButton.hidden = !editing;
+
   const stats = extraMonthStats(state.activeYear, ui.extraMonth + 1);
   $("#extraMonthTotal").textContent = money(stats.total);
   $("#extraCountHero").textContent = stats.count;
@@ -4735,6 +4774,33 @@ function renderExtra(){
 
   renderExtraMonths();
   renderExtraList();
+}
+
+function clearExtraForm(){
+  extraEditingId = null;
+  $("#extraClient").value = "";
+  $("#extraConcept").value = "";
+  $("#extraAmount").value = "";
+  $("#extraCollected").checked = false;
+  $("#extraDate").value = extraDefaultDate(state.activeYear, ui.extraMonth);
+}
+
+function startEditExtra(id){
+  const job = allExtra().find(item => item.id === id);
+  if (!job) return;
+  extraEditingId = id;
+  ui.extraMonth = job.month - 1;
+  $("#extraDate").value = `${job.year}-${String(job.month).padStart(2, "0")}-${String(job.day).padStart(2, "0")}`;
+  $("#extraClient").value = job.client || "";
+  $("#extraConcept").value = job.concept || "";
+  $("#extraAmount").value = job.amount;
+  $("#extraCollected").checked = Boolean(job.collected);
+  renderExtra();
+}
+
+function cancelEditExtra(){
+  clearExtraForm();
+  renderExtra();
 }
 
 function addExtra(){
@@ -4760,26 +4826,31 @@ function addExtra(){
     return;
   }
 
-  state.extra = allExtra().concat([{
-    id: "extra-" + Date.now() + "-" + Math.random().toString(36).slice(2, 7),
+  const editing = extraEditingId ? allExtra().find(item => item.id === extraEditingId) : null;
+  const data = {
     year,
     month,
     day,
     client,
     concept,
     amount,
-    collected: $("#extraCollected").checked,
-    createdAt: Date.now()
-  }]);
+    collected: $("#extraCollected").checked
+  };
+  if (editing){
+    Object.assign(editing, data);
+  } else {
+    state.extra = allExtra().concat([{
+      id: "extra-" + Date.now() + "-" + Math.random().toString(36).slice(2, 7),
+      ...data,
+      createdAt: Date.now()
+    }]);
+  }
   saveNow();
   ui.extraMonth = month - 1;
-  $("#extraClient").value = "";
-  $("#extraConcept").value = "";
-  $("#extraAmount").value = "";
-  $("#extraCollected").checked = true;
+  clearExtraForm();
   renderExtra();
-  $("#extraDate").value = extraDefaultDate(year, month - 1);
-  toast(t("extraAdded"));
+  $("#extraDate").value = extraDefaultDate(state.activeYear, ui.extraMonth);
+  toast(t(editing ? "extraUpdated" : "extraAdded"));
 }
 
 function autofillExtra(){
@@ -4791,7 +4862,7 @@ function autofillExtra(){
   }
   $("#extraClient").value = last.client || "";
   $("#extraConcept").value = last.concept || "";
-  $("#extraCollected").checked = last.collected !== false;
+  $("#extraCollected").checked = false;
   $("#extraAmount").value = "";
   $("#extraAmount").focus();
   toast(t("extraAutofilled"));
@@ -4801,6 +4872,7 @@ function toggleExtra(id){
   const job = allExtra().find(item => item.id === id);
   if (!job) return;
   job.collected = !job.collected;
+  if (extraEditingId === id) $("#extraCollected").checked = job.collected;
   saveNow();
   renderExtra();
   toast(job.collected ? t("extraCollectedToast") : t("extraPendingToast"));
@@ -4821,6 +4893,7 @@ async function deleteExtra(id){
   );
   if (!ok) return;
   state.extra = allExtra().filter(item => item.id !== id);
+  if (extraEditingId === id) clearExtraForm();
   saveNow();
   renderExtra();
   toast(t("extraDeleted"));
@@ -5625,6 +5698,7 @@ function bindEvents(){
   });
 
   $("#extraAdd").addEventListener("click", addExtra);
+  $("#extraCancelEdit").addEventListener("click", cancelEditExtra);
   $("#extraAutofill").addEventListener("click", autofillExtra);
   $("#extraMonths").addEventListener("click", event => {
     const chip = event.target.closest(".month-chip");
@@ -5644,6 +5718,7 @@ function bindEvents(){
     const row = event.target.closest("[data-id]");
     if (!button || !row) return;
     if (button.dataset.act === "toggle") toggleExtra(row.dataset.id);
+    else if (button.dataset.act === "edit") startEditExtra(row.dataset.id);
     else if (button.dataset.act === "del") deleteExtra(row.dataset.id);
   });
 
