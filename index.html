@@ -5545,6 +5545,12 @@ function bindEvents(){
   });
   window.addEventListener("resize", centerMonthStrips);
   window.addEventListener("load", () => setTimeout(centerMonthStrips, 50));
+  if (window.visualViewport) window.visualViewport.addEventListener("resize", centerMonthStrips);
+  if (window.ResizeObserver){
+    const monthResizeObserver = new ResizeObserver(() => centerMonthStrips());
+    monthResizeObserver.observe($("#quickMonths"));
+    monthResizeObserver.observe($("#monthMonths"));
+  }
   setupHoySwipe();
 
   $("#dayGrid").addEventListener("click", event => {
