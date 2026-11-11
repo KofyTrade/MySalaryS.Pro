@@ -640,6 +640,17 @@
   }
   .price-grid .price-row:nth-child(5),
   .price-grid .price-row:nth-child(10){border-bottom:0}
+  .price-effective{
+    display:grid;grid-template-columns:1fr auto;gap:4px 10px;align-items:center;
+    margin:0 0 12px;padding:10px 11px;border:1px solid var(--line);border-radius:10px;
+    background:var(--bg-2);
+  }
+  .price-effective label{font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:.08em;color:var(--ink-2)}
+  .price-effective select{
+    min-width:128px;height:36px;border:1px solid var(--line);border-radius:8px;
+    background:#fff;color:var(--ink);font:inherit;font-size:13px;font-weight:800;padding:0 8px;
+  }
+  .price-effective .hint{grid-column:1/-1;margin:0}
   .premium-prices-block{
     margin-top:14px;padding-top:12px;border-top:1px dashed var(--line);
   }
@@ -1513,6 +1524,11 @@
       <p class="hint" style="margin:-6px 0 8px" data-i18n="pricesNote">
         Se guardan solo para este año. Al cambiarlos, todas las bases del año se recalculan.
       </p>
+      <div class="price-effective">
+        <label for="priceEffectiveMonth" data-i18n="applyChangesFrom">Aplicar cambios desde</label>
+        <select id="priceEffectiveMonth"></select>
+        <p class="hint" data-i18n="applyChangesNote">Los meses anteriores mantienen sus precios.</p>
+      </div>
       <div id="priceRows" class="price-grid"></div>
 
       <div class="premium-prices-block">
@@ -1779,12 +1795,14 @@ const I18N = {
       pricesBackup: "Prices and backup",
       pricesFor: "Prices for",
       restore: "Reset",
-      pricesNote: "Saved for this year only. Changing them recalculates every base in the year.",
+      pricesNote: "Saved for this year only. Changes apply from the selected month onward.",
       premiumPricesTitle: "Prize prices",
       premiumPricesNote: "Prize value for each type of shift.",
       premiumX: "Full shift (12 h)",
       premiumS: "Half shift (over 7 h)",
       premiumM: "Minimum shift (3–6 h)",
+      applyChangesFrom: "Apply changes from",
+      applyChangesNote: "Earlier months keep their prices.",
       jndLetterByLetter: "The JND is read letter by letter.",
       jndNote: "Each sign with a price adds its value; repeats count. Other symbols add nothing.",
       changesSaved: "Changes are saved automatically on this device.",
@@ -2010,12 +2028,14 @@ const I18N = {
       pricesBackup: "Precios y respaldo",
       pricesFor: "Precios de",
       restore: "Restaurar",
-      pricesNote: "Se guardan solo para este año. Al cambiarlos, todas las bases del año se recalculan.",
+      pricesNote: "Se guardan solo para este año. Los cambios se aplican desde el mes elegido.",
       premiumPricesTitle: "Precios de premios",
       premiumPricesNote: "Valor del premio para cada tipo de jornada.",
       premiumX: "Jornada entera (12 h)",
       premiumS: "Media jornada (más de 7 h)",
       premiumM: "Jornada mínima (3–6 h)",
+      applyChangesFrom: "Aplicar cambios desde",
+      applyChangesNote: "Los meses anteriores mantienen sus precios.",
       jndLetterByLetter: "El JND se lee letra por letra.",
       jndNote: "Cada signo con precio suma su valor; las repeticiones cuentan. Los demás símbolos no suman.",
       changesSaved: "Los cambios se guardan solos en este dispositivo.",
@@ -2240,12 +2260,14 @@ const I18N = {
       pricesBackup: "Narxlar va zaxira nusxa",
       pricesFor: "Narxlar:",
       restore: "Tiklash",
-      pricesNote: "Faqat shu yil uchun saqlanadi. O‘zgartirsangiz, yil bo‘yicha barcha bazalar qayta hisoblanadi.",
+      pricesNote: "Faqat shu yil uchun saqlanadi. O‘zgarishlar tanlangan oydan boshlab qo‘llanadi.",
       premiumPricesTitle: "Mukofot narxlari",
       premiumPricesNote: "Har bir ish smenasi turi uchun mukofot qiymati.",
       premiumX: "To‘liq smena (12 soat)",
       premiumS: "Yarim smena (7 soatdan ortiq)",
       premiumM: "Minimal smena (3–6 soat)",
+      applyChangesFrom: "O‘zgartirishlar boshlanadigan oy",
+      applyChangesNote: "Oldingi oylarda eski narxlar qoladi.",
       jndLetterByLetter: "JND harflar bo‘yicha o‘qiladi.",
       jndNote: "Narxi belgilangan har bir belgi o‘z qiymatini qo‘shadi; takrorlar hisobga olinadi. Boshqa belgilar hech narsa qo‘shmaydi.",
       changesSaved: "O‘zgarishlar shu qurilmada avtomatik saqlanadi.",
@@ -2471,12 +2493,14 @@ const I18N = {
       pricesBackup: "Цены и резервная копия",
       pricesFor: "Цены за",
       restore: "Сбросить",
-      pricesNote: "Сохраняются только для этого года. При изменении пересчитываются все базы за год.",
+      pricesNote: "Сохраняются только для этого года. Изменения применяются с выбранного месяца.",
       premiumPricesTitle: "Цены премий",
       premiumPricesNote: "Стоимость премии для каждого типа смены.",
       premiumX: "Полная смена (12 ч)",
       premiumS: "Половина смены (более 7 ч)",
       premiumM: "Минимальная смена (3–6 ч)",
+      applyChangesFrom: "Применять изменения с",
+      applyChangesNote: "В предыдущих месяцах остаются прежние цены.",
       jndLetterByLetter: "JND читается по буквам.",
       jndNote: "Каждый знак с ценой добавляет свою стоимость; повторы учитываются. Остальные символы ничего не добавляют.",
       changesSaved: "Изменения сохраняются на этом устройстве автоматически.",
@@ -2703,12 +2727,14 @@ I18N.ky = {
             "pricesBackup": "Баалар жана резервдик көчүрмө",
             "pricesFor": "Баалар:",
             "restore": "Кайтаруу",
-            "pricesNote": "Тек ушул жыл үчүн сакталат. Аларды өзгөртүү жыл ичиндеги бардык базаларды кайра эсептейт.",
+            "pricesNote": "Тек ушул жыл үчүн сакталат. Өзгөртүүлөр тандалган айдан баштап колдонулат.",
       "premiumPricesTitle": "Сыйлык баалары",
       "premiumPricesNote": "Ар бир смена түрү үчүн сыйлыктын баасы.",
       "premiumX": "Толук смена (12 саат)",
       "premiumS": "Жарым смена (7 сааттан көп)",
       "premiumM": "Минималдуу смена (3–6 саат)",
+      "applyChangesFrom": "Өзгөртүүлөрдү баштоо",
+      "applyChangesNote": "Мурунку айларда мурунку баалар калат.",
             "jndLetterByLetter": "JND тамга-тамга боюнча окулат.",
             "jndNote": "Баасы бар ар бир белги өз маанисин кошот; кайталануулар эсептелет. Башка символдор эч нерсе кошпойт.",
             "changesSaved": "Өзгөртүүлөр ушул түзмөктө автоматтык түрдө сакталат.",
@@ -2934,12 +2960,14 @@ I18N.ro = {
             "pricesBackup": "Prețuri și copie de rezervă",
             "pricesFor": "Prețuri pentru",
             "restore": "Resetează",
-            "pricesNote": "Salvate doar pentru acest an. Modificarea lor recalculează toate bazele din an.",
+            "pricesNote": "Salvate doar pentru acest an. Modificările se aplică din luna selectată.",
       "premiumPricesTitle": "Prețuri premii",
       "premiumPricesNote": "Valoarea premiului pentru fiecare tip de tură.",
       "premiumX": "Tură completă (12 h)",
       "premiumS": "Jumătate de tură (peste 7 h)",
       "premiumM": "Tură minimă (3–6 h)",
+      "applyChangesFrom": "Aplică modificările din",
+      "applyChangesNote": "Lunile anterioare păstrează prețurile vechi.",
             "jndLetterByLetter": "JND se citește literă cu literă.",
             "jndNote": "Fiecare semn cu preț își adaugă valoarea; repetările contează. Alte simboluri nu adaugă nimic.",
             "changesSaved": "Modificările se salvează automat pe acest dispozitiv.",
@@ -3160,7 +3188,7 @@ const $ = (sel, root = document) => root.querySelector(sel);
 const $$ = (sel, root = document) => Array.from(root.querySelectorAll(sel));
 
 let state;
-let ui = {view: "hoy", month: CURRENT_MONTH, day: CURRENT_DAY, extraMonth: CURRENT_MONTH};
+let ui = {view: "hoy", month: CURRENT_MONTH, day: CURRENT_DAY, extraMonth: CURRENT_MONTH, priceMonth: CURRENT_MONTH};
 let debtFormMonth = CURRENT_MONTH + 1;
 let saveTimer = null;
 let saveStateTimer = null;
@@ -3242,6 +3270,70 @@ function clonePremiumPrices(values){
   return out;
 }
 
+function normalizePriceHistory(raw){
+  if (!Array.isArray(raw)) return [];
+  const byMonth = new Map();
+  for (const entry of raw){
+    if (!entry || typeof entry !== "object") continue;
+    const from = parseInt(entry.from, 10);
+    if (!(from >= 0 && from <= 11)) continue;
+    byMonth.set(from, { from, prices: clonePrices(entry.prices || entry.values) });
+  }
+  return [...byMonth.values()].sort((a, b) => a.from - b.from);
+}
+
+function normalizePremiumHistory(raw){
+  if (!Array.isArray(raw)) return [];
+  const byMonth = new Map();
+  for (const entry of raw){
+    if (!entry || typeof entry !== "object") continue;
+    const from = parseInt(entry.from, 10);
+    if (!(from >= 0 && from <= 11)) continue;
+    byMonth.set(from, { from, premiumPrices: clonePremiumPrices(entry.premiumPrices || entry.values) });
+  }
+  return [...byMonth.values()].sort((a, b) => a.from - b.from);
+}
+
+function historyEntryForMonth(history, monthIndex){
+  let found = null;
+  for (const entry of history || []){
+    if (entry.from <= monthIndex && (!found || entry.from > found.from)) found = entry;
+  }
+  return found;
+}
+
+function pricesForMonth(yearData, monthIndex){
+  const entry = historyEntryForMonth(yearData.priceHistory, monthIndex);
+  return entry ? entry.prices : yearData.prices;
+}
+
+function premiumPricesForMonth(yearData, monthIndex){
+  const entry = historyEntryForMonth(yearData.premiumHistory, monthIndex);
+  return entry ? entry.premiumPrices : (yearData.premiumPrices || DEFAULT_PREMIUM_PRICES);
+}
+
+function setJornadaPriceAtMonth(yearData, letter, value, monthIndex){
+  const next = clonePrices(pricesForMonth(yearData, monthIndex));
+  next[letter] = nonNeg(value);
+  const existing = (yearData.priceHistory || []).find(entry => entry.from === monthIndex);
+  if (existing) existing.prices = next;
+  else {
+    yearData.priceHistory = [...(yearData.priceHistory || []), { from: monthIndex, prices: next }]
+      .sort((a, b) => a.from - b.from);
+  }
+}
+
+function setPremiumPriceAtMonth(yearData, letter, value, monthIndex){
+  const next = clonePremiumPrices(premiumPricesForMonth(yearData, monthIndex));
+  next[letter] = nonNeg(value);
+  const existing = (yearData.premiumHistory || []).find(entry => entry.from === monthIndex);
+  if (existing) existing.premiumPrices = next;
+  else {
+    yearData.premiumHistory = [...(yearData.premiumHistory || []), { from: monthIndex, premiumPrices: next }]
+      .sort((a, b) => a.from - b.from);
+  }
+}
+
 function num(value){
   const n = toNumber(value);
   return nf.format(Math.round(n * 100) / 100);
@@ -3276,6 +3368,8 @@ function makeYear(prices = DEFAULT_PRICES, premiumPrices = DEFAULT_PREMIUM_PRICE
   return {
     prices: clonePrices(prices),
     premiumPrices: clonePremiumPrices(premiumPrices),
+    priceHistory: [],
+    premiumHistory: [],
     months: makeEmptyMonths()
   };
 }
@@ -3292,6 +3386,8 @@ function seedYear(){
   return {
     prices: clonePrices(SEED_2026.prices),
     premiumPrices: clonePremiumPrices(DEFAULT_PREMIUM_PRICES),
+    priceHistory: [],
+    premiumHistory: [],
     months
   };
 }
@@ -3322,17 +3418,23 @@ function normalizeYear(raw){
       year.months[m].plus = m % 2 === 0 ? nonNeg(source.plus) : 0;
     }
   }
+  if (raw && Array.isArray(raw.priceHistory)) year.priceHistory = normalizePriceHistory(raw.priceHistory);
+  if (raw && Array.isArray(raw.premiumHistory)) year.premiumHistory = normalizePremiumHistory(raw.premiumHistory);
   normalizeLegacyYPrice(year);
   return year;
 }
 
 function normalizeLegacyYPrice(yearData){
   if (!yearData || !yearData.prices) return;
-  if (nonNeg(yearData.prices.Y) !== 14000) return;
+  const historyHasLegacy = (yearData.priceHistory || []).some(entry => nonNeg(entry.prices.Y) === 14000);
+  if (nonNeg(yearData.prices.Y) !== 14000 && !historyHasLegacy) return;
   const hasY = yearData.months.some(month =>
     month.days.some(day => normalizeJND(day).includes("Y"))
   );
-  if (!hasY) yearData.prices.Y = 0;
+  if (!hasY){
+    yearData.prices.Y = 0;
+    (yearData.priceHistory || []).forEach(entry => { entry.prices.Y = 0; });
+  }
 }
 
 function normalizeDebts(raw){
@@ -3483,7 +3585,7 @@ function ensureYear(year){
 /* ============================================================
    Cálculos
    ============================================================ */
-function baseOf(jnd, prices = currentYearData().prices){
+function baseOf(jnd, prices = pricesForMonth(currentYearData(), ui.month)){
   let total = 0;
   for (const char of normalizeJND(jnd)){
     if (char === "+") continue;
@@ -3494,7 +3596,7 @@ function baseOf(jnd, prices = currentYearData().prices){
   return total;
 }
 
-function pSumOf(jnd, prices = currentYearData().prices){
+function pSumOf(jnd, prices = pricesForMonth(currentYearData(), ui.month)){
   let total = 0;
   for (const char of normalizeJND(jnd)){
     if (char === "+") total += nonNeg(prices["+"]);
@@ -3502,7 +3604,7 @@ function pSumOf(jnd, prices = currentYearData().prices){
   return total;
 }
 
-function totalOf(jnd, prices = currentYearData().prices){
+function totalOf(jnd, prices = pricesForMonth(currentYearData(), ui.month)){
   return baseOf(jnd, prices) + pSumOf(jnd, prices);
 }
 
@@ -3514,7 +3616,7 @@ function countsOf(jnd){
   return counts;
 }
 
-function premiumOfJND(jnd, premiumPrices = currentYearData().premiumPrices){
+function premiumOfJND(jnd, premiumPrices = premiumPricesForMonth(currentYearData(), ui.month)){
   const prices = premiumPrices || DEFAULT_PREMIUM_PRICES;
   const counts = countsOf(jnd);
   return (counts.X || 0) * nonNeg(prices.X) +
@@ -3524,6 +3626,8 @@ function premiumOfJND(jnd, premiumPrices = currentYearData().premiumPrices){
 
 function monthStats(yearData, monthIndex){
   const month = yearData.months[monthIndex];
+  const prices = pricesForMonth(yearData, monthIndex);
+  const premiumPrices = premiumPricesForMonth(yearData, monthIndex);
   let base = 0;
   let pSum = 0;
   let premium = 0;
@@ -3531,9 +3635,9 @@ function monthStats(yearData, monthIndex){
   for (const raw of month.days){
     if (String(raw).trim() !== ""){
       worked++;
-      base += baseOf(raw, yearData.prices);
-      pSum += pSumOf(raw, yearData.prices);
-      if (monthIndex % 2 === 0) premium += premiumOfJND(raw, yearData.premiumPrices);
+      base += baseOf(raw, prices);
+      pSum += pSumOf(raw, prices);
+      if (monthIndex % 2 === 0) premium += premiumOfJND(raw, premiumPrices);
     }
   }
   return {base, pSum, premium, salary: base + pSum + premium, worked};
@@ -3543,10 +3647,11 @@ function premiumInMonths(yearData, monthIndexes){
   let days = 0;
   let amount = 0;
   for (const monthIndex of monthIndexes){
+    const premiumPrices = premiumPricesForMonth(yearData, monthIndex);
     for (const raw of yearData.months[monthIndex].days){
       if (String(raw).trim() === "") continue;
       days++;
-      amount += premiumOfJND(raw, yearData.premiumPrices);
+      amount += premiumOfJND(raw, premiumPrices);
     }
   }
   return {days, amount};
@@ -3938,7 +4043,7 @@ function setView(view){
    Render: registro rápido
    ============================================================ */
 function renderQuickLetters(){
-  const prices = currentYearData().prices;
+  const prices = pricesForMonth(currentYearData(), ui.month);
   $("#quickLetters").innerHTML = LETTERS
     .filter(letter => nonNeg(prices[letter]) > 0)
     .map(letter =>
@@ -3965,7 +4070,7 @@ function updateQuickStats(){
 
 function updatePreview(){
   const raw = $("#jndInput").value;
-  const prices = currentYearData().prices;
+  const prices = pricesForMonth(currentYearData(), ui.month);
   const base = baseOf(raw, prices);
   const counts = countsOf(raw);
   $("#basePreview").textContent = money(base);
@@ -4052,12 +4157,13 @@ function updateMonthTotals(){
 
 function renderMonthTable(){
   const yearData = currentYearData();
+  const prices = pricesForMonth(yearData, ui.month);
   const count = daysInMonth(state.activeYear, ui.month);
   $("#monthBody").innerHTML = Array.from({length: count}, (_, index) => {
     const day = index + 1;
     const raw = yearData.months[ui.month].days[index] || "";
     const description = normalizeDescription(yearData.months[ui.month].descriptions?.[index] || "");
-    const base = baseOf(raw, yearData.prices);
+    const base = baseOf(raw, prices);
     const isToday = state.activeYear === CURRENT_YEAR && ui.month === CURRENT_MONTH && day === CURRENT_DAY;
     const weekdayIndex = new Date(state.activeYear, ui.month, day).getDay();
     const weekday = WEEKDAYS[weekdayIndex];
@@ -4158,7 +4264,7 @@ function renderAnnual(){
    Render: precios y respaldo
    ============================================================ */
 function updatePriceExample(){
-  const prices = currentYearData().prices;
+  const prices = pricesForMonth(currentYearData(), ui.priceMonth);
   const counts = countsOf("XM++++");
   const parts = LETTERS.filter(letter => counts[letter]).map(letter => {
     const count = counts[letter];
@@ -4170,8 +4276,16 @@ function updatePriceExample(){
 
 function renderPrices(){
   const yearData = currentYearData();
+  const effectiveMonth = Math.max(0, Math.min(11, Number(ui.priceMonth) || 0));
+  ui.priceMonth = effectiveMonth;
   $("#pricesYear").textContent = state.activeYear;
   $("#clearYearLabel").textContent = state.activeYear;
+  $("#priceEffectiveMonth").innerHTML = MONTHS_LONG.map((name, index) =>
+    `<option value="${index}"${index === effectiveMonth ? " selected" : ""}>${name}</option>`
+  ).join("");
+
+  const prices = pricesForMonth(yearData, effectiveMonth);
+  const premiumPrices = premiumPricesForMonth(yearData, effectiveMonth);
 
   $("#priceRows").innerHTML = LETTERS.map(letter => `
     <div class="price-row">
@@ -4181,7 +4295,7 @@ function renderPrices(){
         <span class="money-field">
           <span>${currencySymbol()}</span>
           <input type="number" data-letter="${letter}" inputmode="numeric" min="0" step="100"
-                 value="${yearData.prices[letter]}" aria-label="${esc(t("priceAria", {letter}))}">
+                 value="${prices[letter]}" aria-label="${esc(t("priceAria", {letter: displayLetter(letter)}))}">
         </span>
       </label>
     </div>`).join("");
@@ -4190,29 +4304,28 @@ function renderPrices(){
     input.addEventListener("input", () => {
       const letter = input.dataset.letter;
       const value = input.value === "" ? 0 : Math.max(0, Math.round(Number(input.value) || 0));
-      currentYearData().prices[letter] = value;
+      setJornadaPriceAtMonth(currentYearData(), letter, value, ui.priceMonth);
       updatePriceExample();
       renderQuickLetters();
       scheduleSave();
     });
     input.addEventListener("blur", () => {
-      input.value = currentYearData().prices[input.dataset.letter];
+      input.value = pricesForMonth(currentYearData(), ui.priceMonth)[input.dataset.letter];
       saveNow();
       flashSaved();
     });
   });
 
-  const premiumPrices = yearData.premiumPrices || DEFAULT_PREMIUM_PRICES;
   $$("#premiumPrices input[data-premium]").forEach(input => {
     input.value = premiumPrices[input.dataset.premium];
     input.addEventListener("input", () => {
       const letter = input.dataset.premium;
       const value = input.value === "" ? 0 : Math.max(0, Math.round(Number(input.value) || 0));
-      currentYearData().premiumPrices[letter] = value;
+      setPremiumPriceAtMonth(currentYearData(), letter, value, ui.priceMonth);
       scheduleSave();
     });
     input.addEventListener("blur", () => {
-      input.value = currentYearData().premiumPrices[input.dataset.premium];
+      input.value = premiumPricesForMonth(currentYearData(), ui.priceMonth)[input.dataset.premium];
       saveNow();
       flashSaved();
     });
@@ -4220,7 +4333,6 @@ function renderPrices(){
 
   updatePriceExample();
 }
-
 /* ============================================================
    Deudas con la compañía
    ============================================================ */
@@ -4899,22 +5011,30 @@ function csvCell(value){
 }
 
 function buildCSV(){
-  const rows = [["anio","mes","dia","jnd","plus_mes","precio_x","precio_s","precio_m","precio_y","precio_plus","base","tipo","nota","importe","pagada","pago","auto","extra","precio_g","precio_z","precio_e","precio_f","precio_t","premio_x","premio_s","premio_m"]];
+  const rows = [["anio","mes","dia","jnd","plus_mes","precio_x","precio_s","precio_m","precio_y","precio_plus","base","tipo","nota","importe","pagada","pago","auto","extra","precio_g","precio_z","precio_e","precio_f","precio_t","premio_x","premio_s","premio_m","historial"]];
   const years = Object.keys(state.years).map(Number).sort((a, b) => a - b);
 
   for (const yearNumber of years){
     const yearData = state.years[String(yearNumber)];
     const prices = yearData.prices;
     const premiumPrices = yearData.premiumPrices || DEFAULT_PREMIUM_PRICES;
+    const historyJson = (yearData.priceHistory?.length || yearData.premiumHistory?.length)
+      ? JSON.stringify({
+          priceHistory: yearData.priceHistory || [],
+          premiumHistory: yearData.premiumHistory || []
+        })
+      : "";
     for (let month = 0; month < 12; month++){
       const stats = monthStats(yearData, month);
+      const monthPrices = pricesForMonth(yearData, month);
+      const monthPremiums = premiumPricesForMonth(yearData, month);
       const plus = month % 2 === 0 ? stats.premium : 0;
-      rows.push([yearNumber, month + 1, 0, "", plus, prices.X, prices.S, prices.M, prices.Y, prices["+"], stats.base, "", "", "", "", "", "", "", prices.G, prices.Z, prices.E, prices.F, prices.T, premiumPrices.X, premiumPrices.S, premiumPrices.M]);
+      rows.push([yearNumber, month + 1, 0, "", plus, monthPrices.X, monthPrices.S, monthPrices.M, monthPrices.Y, monthPrices["+"], stats.base, "", "", "", "", "", "", "", monthPrices.G, monthPrices.Z, monthPrices.E, monthPrices.F, monthPrices.T, monthPremiums.X, monthPremiums.S, monthPremiums.M, historyJson]);
       for (let day = 1; day <= 31; day++){
         const jnd = normalizeJND(yearData.months[month].days[day - 1]);
         const description = normalizeDescription(yearData.months[month].descriptions?.[day - 1]);
         if (!jnd && !description) continue;
-        rows.push([yearNumber, month + 1, day, jnd, plus, prices.X, prices.S, prices.M, prices.Y, prices["+"], baseOf(jnd, prices), "", description, "", "", "", "", "", prices.G, prices.Z, prices.E, prices.F, prices.T, premiumPrices.X, premiumPrices.S, premiumPrices.M]);
+        rows.push([yearNumber, month + 1, day, jnd, plus, monthPrices.X, monthPrices.S, monthPrices.M, monthPrices.Y, monthPrices["+"], baseOf(jnd, monthPrices), "", description, "", "", "", "", "", monthPrices.G, monthPrices.Z, monthPrices.E, monthPrices.F, monthPrices.T, monthPremiums.X, monthPremiums.S, monthPremiums.M, historyJson]);
       }
     }
   }
@@ -4928,7 +5048,7 @@ function buildCSV(){
       "deuda", debt.note || "", debt.amount, debt.paid ? 1 : 0, debt.paidAmount || 0,
       debt.auto ? 1 : 0, debt.extraPaid || 0,
       prices.G, prices.Z, prices.E, prices.F, prices.T,
-      premiumPrices.X, premiumPrices.S, premiumPrices.M
+      premiumPrices.X, premiumPrices.S, premiumPrices.M, ""
     ]);
   }
   const salaryPrices = currentYearData().prices;
@@ -4937,7 +5057,7 @@ function buildCSV(){
     state.activeYear, 1, 0, "", 0,
     salaryPrices.X, salaryPrices.S, salaryPrices.M, salaryPrices.Y, salaryPrices["+"], 0,
     "salario", "", officialSalary(), "", "", "", "", "", "", "", "", "",
-    salaryPremiumPrices.X, salaryPremiumPrices.S, salaryPremiumPrices.M
+    salaryPremiumPrices.X, salaryPremiumPrices.S, salaryPremiumPrices.M, ""
   ]);
   for (const job of allExtra()){
     const yearData = state.years[String(job.year)];
@@ -5075,6 +5195,7 @@ function parseImport(text){
   const iPlus = find("plus_mes","plus","mas");
   const iTipo = find("tipo");
   const iNota = find("nota");
+  const iHistory = find("historial","historial_precios","price_history");
   const iImporte = find("importe");
   const iPagada = find("pagada");
   const iPago = find("pago");
@@ -5158,7 +5279,7 @@ function parseImport(text){
     }
 
     if (!imported.has(year)){
-      imported.set(year, {prices: null, premiumPrices: null, months: makeEmptyMonths(), plusSet: Array(12).fill(false)});
+      imported.set(year, {prices: null, premiumPrices: null, history: null, months: makeEmptyMonths(), plusSet: Array(12).fill(false)});
     }
     const record = imported.get(year);
 
@@ -5190,6 +5311,20 @@ function parseImport(text){
         }
       }
       if (foundPremium) record.premiumPrices = premiumValues;
+      if (iHistory >= 0 && !record.history){
+        const rawHistory = String(row[iHistory] ?? "").trim();
+        if (rawHistory){
+          try {
+            const parsedHistory = JSON.parse(rawHistory);
+            if (parsedHistory && typeof parsedHistory === "object"){
+              record.history = {
+                priceHistory: normalizePriceHistory(parsedHistory.priceHistory),
+                premiumHistory: normalizePremiumHistory(parsedHistory.premiumHistory)
+              };
+            }
+          } catch (error){}
+        }
+      }
     }
 
     const monthIndex = month - 1;
@@ -5241,6 +5376,10 @@ function applyImport(parsed){
       yearData.months[month].days = record.months[month].days.slice();
       yearData.months[month].descriptions = (record.months[month].descriptions || Array(31).fill("")).slice();
       yearData.months[month].plus = month % 2 === 0 ? record.months[month].plus : 0;
+    }
+    if (record.history){
+      yearData.priceHistory = normalizePriceHistory(record.history.priceHistory);
+      yearData.premiumHistory = normalizePremiumHistory(record.history.premiumHistory);
     }
     normalizeLegacyYPrice(yearData);
     state.years[String(yearNumber)] = yearData;
@@ -5398,6 +5537,8 @@ async function resetPrices(){
   if (!ok) return;
   currentYearData().prices = clonePrices(DEFAULT_PRICES);
   currentYearData().premiumPrices = clonePremiumPrices(DEFAULT_PREMIUM_PRICES);
+  currentYearData().priceHistory = [];
+  currentYearData().premiumHistory = [];
   saveNow();
   renderPrices();
   renderQuickLetters();
@@ -5642,7 +5783,7 @@ function bindEvents(){
     }
     currentYearData().months[ui.month].days[day - 1] = value;
     const row = field.closest("tr");
-    const base = baseOf(value, currentYearData().prices);
+    const base = baseOf(value, pricesForMonth(currentYearData(), ui.month));
     row.classList.toggle("has-data", value.trim() !== "");
     row.querySelector(".base-cell").innerHTML = base ? num(base) : '<span class="zero">—</span>';
     updateMonthTotals();
@@ -5656,7 +5797,7 @@ function bindEvents(){
     field.value = displayJND(value);
     currentYearData().months[ui.month].days[day - 1] = value;
     const row = field.closest("tr");
-    const base = baseOf(value, currentYearData().prices);
+    const base = baseOf(value, pricesForMonth(currentYearData(), ui.month));
     row.querySelector(".base-cell").innerHTML = base ? num(base) : '<span class="zero">—</span>';
     updateMonthTotals();
     saveNow();
@@ -5683,6 +5824,10 @@ function bindEvents(){
     if (file) handleImportFile(file);
   });
 
+  $("#priceEffectiveMonth").addEventListener("change", event => {
+    ui.priceMonth = Math.max(0, Math.min(11, Number(event.target.value) || 0));
+    renderPrices();
+  });
   $("#btnResetPrices").addEventListener("click", resetPrices);
   $("#btnClearYear").addEventListener("click", clearYearData);
   $("#btnClearAll").addEventListener("click", clearAllData);
