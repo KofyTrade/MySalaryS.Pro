@@ -149,6 +149,15 @@
     color:#bcd6d0;font-weight:700;white-space:nowrap;
   }
   .appbar-right{display:flex;align-items:center;gap:8px;flex:0 0 auto}
+  .top-save{
+    width:36px;height:36px;flex:0 0 36px;display:grid;place-items:center;
+    border:1px solid rgba(255,255,255,.22);border-radius:10px;
+    background:rgba(255,255,255,.10);color:#eef7f4;cursor:pointer;
+    transition:background .15s ease,color .15s ease,transform .12s ease;
+  }
+  .top-save svg{width:19px;height:19px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+  .top-save:active{transform:scale(.94)}
+  .top-save.saved{background:var(--brand);border-color:var(--brand);color:#fff}
   .save-badge{
     font-size:10px;font-weight:800;letter-spacing:.02em;
     color:#b9d5ce;display:inline-flex;align-items:center;gap:4px;
@@ -1173,6 +1182,12 @@
       <div class="year-box">
         <select class="year-select" id="yearSelect" aria-label="Elegir año" data-i18n-aria="yearSelect"></select>
       </div>
+      <button type="button" class="top-save" id="btnTopSave" aria-label="Guardar" title="Guardar" data-i18n-aria="save" data-i18n-title="save">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M5 3h11l3 3v15H5z"/>
+          <path d="M8 3v6h7V3M8 21v-7h8v7"/>
+        </svg>
+      </button>
     </div>
   </div>
 </header>
@@ -1230,10 +1245,6 @@
         </div>
         <div class="breakdown" id="breakdown"></div>
 
-        <div class="entry-actions">
-          <span class="save-state" id="saveState" data-i18n="autosave">Se guarda solo</span>
-          <button type="button" class="btn primary sm" id="btnSaveDay" data-i18n="save">Guardar</button>
-        </div>
       </div>
     </div>
   </section>
@@ -5182,6 +5193,15 @@ function openHelp(){
    Eventos
    ============================================================ */
 function bindEvents(){
+  $("#btnTopSave").addEventListener("click", () => {
+    if (!saveNow()) return;
+    flashSaved();
+    const button = $("#btnTopSave");
+    button.classList.add("saved");
+    clearTimeout(button._savedTimer);
+    button._savedTimer = setTimeout(() => button.classList.remove("saved"), 900);
+    toast(t("saved"));
+  });
   $("#btnAppMenu").addEventListener("click", event => {
     event.stopPropagation();
     toggleAppMenu();
@@ -5394,17 +5414,6 @@ function bindEvents(){
       event.preventDefault();
       descriptionInput.blur();
     }
-  });
-
-  $("#btnSaveDay").addEventListener("click", () => {
-    const value = normalizeJND(input.value);
-    input.value = value;
-    currentYearData().months[ui.month].days[ui.day - 1] = value;
-    updatePreview();
-    updateDayButton();
-    saveNow();
-    flashSaved();
-    toast(t("shiftSaved"));
   });
 
   $("#btnClearDay").addEventListener("click", clearSelectedDay);
