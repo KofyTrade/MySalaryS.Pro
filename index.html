@@ -740,12 +740,16 @@
   .sync-quick{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:10px 0 2px}
   .sync-quick .btn{width:100%;min-height:44px;padding:0 6px;font-size:12px}
   .sync-quick .btn span{font-size:16px;line-height:1}
+  .sync-quick .sync-generate{grid-column:1 / -1}
   .sync-privacy{font-size:10.5px;line-height:1.45;margin-top:8px !important}
   .sync-qr-wrap{display:flex;flex-direction:column;align-items:center;gap:7px;margin:12px 0 10px;padding:10px;border:1px solid var(--line);border-radius:12px;background:#fff}
   .sync-qr{width:100%;max-width:230px;display:grid;place-items:center}
   .sync-qr svg{display:block;width:100%;height:auto}
   .sync-qr-wrap .hint{margin:0 !important;text-align:center}
-  .sync-paste-modal,.sync-scan-modal{max-width:430px}
+  .sync-paste-modal,.sync-scan-modal,.sync-qr-modal{max-width:430px}
+  .sync-qr-modal{text-align:center}
+  .sync-qr-modal .sync-qr{max-width:260px;margin:10px auto}
+  .sync-qr-modal #syncQrCodeOut{margin:8px 0 2px;font-size:10px}
   .sync-paste-text{width:100%;min-height:96px;resize:vertical;padding:11px;line-height:1.4;font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-size:11px}
   .sync-video-wrap{position:relative;width:100%;aspect-ratio:1/1;max-height:52vh;overflow:hidden;border-radius:12px;background:#111;margin:8px 0}
   .sync-video-wrap video{width:100%;height:100%;object-fit:cover;display:block}
@@ -1626,6 +1630,7 @@
         <div class="sync-quick" id="syncQuick">
           <button type="button" class="btn primary" id="syncScanBtn"><span>⌗</span> Escanear QR</button>
           <button type="button" class="btn ghost" id="syncPasteBtn"><span>⌨</span> Pegar código</button>
+          <button type="button" class="btn ghost sync-generate" id="syncGenerateBtn"><span>▣</span> Generar mi QR y código</button>
         </div>
         <p class="hint sync-privacy">El QR y el código permiten conectar otro dispositivo. No los compartas con personas que no quieras que accedan a tu nube.</p>
         <div id="syncSetup">
@@ -1753,6 +1758,20 @@
     <p class="hint" id="syncScanStatus">Preparando cámara…</p>
     <div class="modal-actions">
       <button type="button" class="btn ghost" id="syncScanCancel">Cerrar</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-backdrop" id="syncQrBackdrop" hidden>
+  <div class="modal sync-qr-modal" role="dialog" aria-modal="true" aria-labelledby="syncQrTitle">
+    <h3 id="syncQrTitle">Mi QR para sincronizar</h3>
+    <p class="hint">Mostrá este QR en el otro dispositivo o copiá el código. Al escanearlo, ese dispositivo queda conectado a tu nube.</p>
+    <div class="sync-qr" id="syncQrLarge"></div>
+    <input class="sync-input sync-code-out" id="syncQrCodeOut" type="text" readonly>
+    <p class="hint sync-privacy">El QR y el código dan acceso a tu nube. No los compartas con otras personas.</p>
+    <div class="modal-actions">
+      <button type="button" class="btn ghost" id="syncQrCopy">Copiar código</button>
+      <button type="button" class="btn primary" id="syncQrClose">Cerrar</button>
     </div>
   </div>
 </div>
@@ -5711,18 +5730,19 @@ function syncDecodeCode(raw, fallbackToken = ""){
 }
 
 function syncRenderQr(){
-  const node = $("#syncQr");
-  if (!node) return;
-  node.innerHTML = "";
+  const nodes = [$("#syncQr"), $("#syncQrLarge")].filter(Boolean);
+  if (!nodes.length) return;
   const code = syncCodeText();
+  for (const node of nodes) node.innerHTML = "";
   if (!code || typeof qrcode !== "function") return;
   try {
     const qr = qrcode(0, "M");
     qr.addData(code);
     qr.make();
-    node.innerHTML = qr.createSvgTag({ cellSize: 5, margin: 2, scalable: true });
+    const svg = qr.createSvgTag({ cellSize: 5, margin: 2, scalable: true });
+    for (const node of nodes) node.innerHTML = svg;
   } catch (error){
-    node.innerHTML = "";
+    for (const node of nodes) node.innerHTML = "";
   }
 }
 
@@ -5738,7 +5758,7 @@ function syncNotice(message){
 
 function syncSetBusy(value){
   syncBusy = value;
-  ["syncCreate", "syncConnect", "syncPush", "syncPull", "syncCopy", "syncDisconnect", "syncScanBtn", "syncPasteBtn", "syncPasteConnect"].forEach(id => {
+  ["syncCreate", "syncConnect", "syncPush", "syncPull", "syncCopy", "syncDisconnect", "syncScanBtn", "syncPasteBtn", "syncPasteConnect", "syncGenerateBtn"].forEach(id => {
     const node = $("#" + id);
     if (node) node.disabled = value;
   });
@@ -5946,10 +5966,10 @@ function applySyncData(data){
 }
 
 async function syncCreateNew(){
-  if (syncBusy) return;
+  if (syncBusy) return false;
   const tokenInput = $("#syncToken");
   const token = tokenInput ? tokenInput.value.trim() : "";
-  if (!token){ syncSetError("Pegá un token de GitHub."); return; }
+  if (!token){ syncSetError("Pegá un token de GitHub."); return false; }
   syncSetBusy(true);
   syncSetError("");
   try {
@@ -5966,8 +5986,11 @@ async function syncCreateNew(){
     syncRender();
     syncNotice("Nube creada. Copiá el código en el otro dispositivo.");
     toast("Nube creada. Copiá el código de sincronización.");
+    return true;
   } catch (error){
     syncSetError(error.message);
+    toast(error.message);
+    return false;
   } finally {
     syncSetBusy(false);
   }
@@ -6054,6 +6077,49 @@ async function submitSyncPaste(){
   }
   const tokenInput = $("#syncToken");
   await syncConnectCode(code, tokenInput ? tokenInput.value.trim() : "", true);
+}
+
+function openSyncQr(){
+  if (!syncIsConnected()) return;
+  const backdrop = $("#syncQrBackdrop");
+  if (!backdrop) return;
+  const codeInput = $("#syncQrCodeOut");
+  if (codeInput) codeInput.value = syncCodeText();
+  syncRenderQr();
+  backdrop.hidden = false;
+  backdrop.classList.add("show");
+}
+
+function closeSyncQr(){
+  const backdrop = $("#syncQrBackdrop");
+  if (!backdrop) return;
+  backdrop.classList.remove("show");
+  backdrop.hidden = true;
+}
+
+async function syncGenerate(){
+  if (syncBusy) return;
+  if (syncIsConnected()){
+    openSyncQr();
+    return;
+  }
+  const tokenInput = $("#syncToken");
+  const token = await showModal({
+    title: "Generar mi QR y código",
+    body: `<p class="hint">Para generar el QR primero hay que crear la nube. Necesitás un token de GitHub con permiso <b>Gists</b>. El token se guarda solo en este dispositivo.</p><p class="hint">Después podrás escanear el QR o pegar el código en el otro dispositivo, sin volver a escribir el token.</p>`,
+    input: {
+      label: "Token de GitHub",
+      type: "password",
+      value: tokenInput ? tokenInput.value : "",
+      placeholder: "ghp_…",
+      validate: value => value ? "" : "Pegá un token de GitHub."
+    },
+    confirmText: "Crear nube y generar QR"
+  });
+  if (token === null) return;
+  if (tokenInput) tokenInput.value = token;
+  const created = await syncCreateNew();
+  if (created) openSyncQr();
 }
 
 let syncScanStream = null;
@@ -6261,7 +6327,7 @@ async function syncCopyCode(){
     await navigator.clipboard.writeText(code);
     toast("Código copiado.");
   } catch (error){
-    const input = $("#syncCodeOut");
+    const input = $("#syncQrCodeOut") || $("#syncCodeOut");
     if (input){ input.select(); document.execCommand("copy"); toast("Código copiado."); }
   }
 }
@@ -6300,6 +6366,12 @@ function bindSyncEvents(){
   }
   $("#syncScanBtn")?.addEventListener("click", openSyncScan);
   $("#syncPasteBtn")?.addEventListener("click", openSyncPaste);
+  $("#syncGenerateBtn")?.addEventListener("click", syncGenerate);
+  $("#syncQrClose")?.addEventListener("click", closeSyncQr);
+  $("#syncQrCopy")?.addEventListener("click", syncCopyCode);
+  $("#syncQrBackdrop")?.addEventListener("click", event => {
+    if (event.target === $("#syncQrBackdrop")) closeSyncQr();
+  });
   $("#syncPasteCancel")?.addEventListener("click", closeSyncPaste);
   $("#syncPasteConnect")?.addEventListener("click", submitSyncPaste);
   $("#syncPasteBackdrop")?.addEventListener("click", event => {
@@ -6315,6 +6387,12 @@ function bindSyncEvents(){
   $("#syncPull")?.addEventListener("click", () => syncPull(true));
   $("#syncCopy")?.addEventListener("click", syncCopyCode);
   $("#syncDisconnect")?.addEventListener("click", syncDisconnect);
+  document.addEventListener("keydown", event => {
+    if (event.key !== "Escape") return;
+    if ($("#syncQrBackdrop") && !$("#syncQrBackdrop").hidden) closeSyncQr();
+    else if ($("#syncPasteBackdrop") && !$("#syncPasteBackdrop").hidden) closeSyncPaste();
+    else if ($("#syncScanBackdrop") && !$("#syncScanBackdrop").hidden) closeSyncScan();
+  });
   document.addEventListener("visibilitychange", () => {
     if (document.visibilityState === "visible") syncAutoPull();
   });
