@@ -3567,6 +3567,17 @@ function seedState(){
   return {version: 1, activeYear: 2026, years: {"2026": seedYear()}, debts: [], extra: [], officialSalary: DEFAULT_OFFICIAL_SALARY};
 }
 
+function blankState(){
+  return {
+    version: 1,
+    activeYear: CURRENT_YEAR,
+    years: {[String(CURRENT_YEAR)]: makeYear(DEFAULT_PRICES)},
+    debts: [],
+    extra: [],
+    officialSalary: DEFAULT_OFFICIAL_SALARY
+  };
+}
+
 function normalizeYear(raw){
   const year = makeYear(
     raw && raw.prices ? raw.prices : DEFAULT_PRICES,
@@ -3877,7 +3888,7 @@ async function createProfile(){
     return;
   }
   saveNow();
-  const data = seedState();
+  const data = blankState();
   const profile = { id: newProfileId(), name: normalizeProfileName(name), data };
   profiles.push(profile);
   activeProfileId = profile.id;

@@ -1,5 +1,5 @@
 const CACHE_PREFIX = "misalario-personal-";
-const CACHE = CACHE_PREFIX + "v19";
+const CACHE = CACHE_PREFIX + "v20";
 const ASSETS = ["./", "./index.html", "./manifest.webmanifest", "./icon-192.png", "./icon-512.png"];
 
 self.addEventListener("install", event => {
