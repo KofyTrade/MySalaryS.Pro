@@ -130,6 +130,7 @@
   .app-menu-divider{height:1px;background:var(--line);margin:6px 2px}
   .app-menu-action{padding:10px 9px !important}
   .app-menu-action b{margin-left:auto;font-weight:900;color:var(--ink-2)}
+  #currentProfileName{max-width:96px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
   .menu-chevron{font-style:normal;color:var(--muted);font-size:10px;line-height:1;margin-left:2px;transition:transform .15s ease}
   #btnLanguages[aria-expanded="true"] .menu-chevron{transform:rotate(180deg)}
   .language-submenu{padding:1px 0 4px 10px}
@@ -948,6 +949,25 @@
   .modal-actions{display:flex;gap:8px;margin-top:16px}
   .modal-actions .btn{flex:1;min-height:46px;padding:0 12px;font-size:13px}
   .modal-actions .btn[hidden]{display:none!important}
+  .profile-modal{max-width:430px}
+  .profile-list{display:flex;flex-direction:column;gap:7px;margin:12px 0 14px;max-height:45vh;overflow:auto}
+  .profile-row{display:flex;align-items:center;gap:4px}
+  .profile-select{
+    flex:1;min-width:0;display:flex;align-items:center;gap:8px;text-align:left;
+    border:1px solid var(--line);background:var(--bg-2);border-radius:10px;
+    padding:10px 11px;font:inherit;font-size:13px;font-weight:800;color:var(--ink);
+  }
+  .profile-row.active .profile-select{border-color:var(--brand);background:var(--brand-soft);color:var(--brand)}
+  .profile-select b{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:850}
+  .profile-select small{font-size:9px;font-weight:900;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+  .profile-row.active .profile-select small{color:var(--brand)}
+  .profile-mark{width:15px;text-align:center;color:var(--brand);font-weight:900}
+  .profile-icon{
+    width:34px;height:36px;flex:0 0 34px;border:1px solid var(--line);border-radius:9px;
+    background:transparent;color:var(--muted);font-size:16px;line-height:1;
+  }
+  .profile-icon.danger{font-size:18px}
+  .profile-icon:active{background:var(--line-2)}
 
   /* ---------- Toast ---------- */
   .toast{
@@ -1148,6 +1168,11 @@
       <div class="brand-wrap">
         <button type="button" class="logo" id="btnAppMenu" aria-haspopup="menu" aria-expanded="false" aria-label="Menú de la aplicación" data-i18n-aria="appMenuAria">JND</button>
         <div class="app-menu" id="appMenu" role="menu" hidden>
+          <button type="button" class="app-menu-action" id="btnProfiles" aria-haspopup="dialog">
+            <span data-i18n="profile">Perfil</span>
+            <b id="currentProfileName">Principal</b>
+            <i class="menu-chevron" aria-hidden="true">▸</i>
+          </button>
           <button type="button" class="app-menu-action" id="btnLanguages" aria-haspopup="menu" aria-expanded="false" aria-controls="languageSubmenu">
             <span data-i18n="language">Idioma</span>
             <b id="currentLangName">English</b>
@@ -1674,6 +1699,18 @@
   </div>
 </div>
 
+<div class="modal-backdrop" id="profileBackdrop" hidden>
+  <div class="modal profile-modal" role="dialog" aria-modal="true" aria-labelledby="profileTitle">
+    <h3 id="profileTitle" data-i18n="profilesTitle">Perfiles</h3>
+    <p class="hint" data-i18n="profilesNote">Separá tus datos por persona o compañía. Cada perfil tiene sus propios años, precios, deudas y extras.</p>
+    <div class="profile-list" id="profileList"></div>
+    <div class="modal-actions">
+      <button type="button" class="btn primary" id="profileAdd"><span>+ </span><span data-i18n="profileNew">Nuevo perfil</span></button>
+      <button type="button" class="btn ghost" id="profileClose" data-i18n="close">Cerrar</button>
+    </div>
+  </div>
+</div>
+
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
 <script>
@@ -1706,6 +1743,24 @@ const I18N = {
       yearSelect: "Choose year",
       language: "Language",
       appMenuAria: "Application menu",
+      profile: "Profile",
+      profilesTitle: "Profiles",
+      profilesNote: "Keep data separate for each person or company. Each profile has its own years, prices, debts and extras.",
+      profileNew: "New profile",
+      profileRename: "Rename profile",
+      profileDelete: "Delete profile",
+      profileDeleteTitle: "Delete profile",
+      profileDeleteBody: "Delete “{name}” and all its data? This cannot be undone.",
+      profileName: "Profile name",
+      profileNamePlaceholder: "E.g.: My company",
+      profileNameRequired: "Enter a name.",
+      profileNameTaken: "That name is already used.",
+      profileCannotDelete: "You need at least one profile.",
+      profileCreated: "Profile “{name}” created.",
+      profileRenamed: "Profile renamed.",
+      profileDeleted: "Profile deleted.",
+      profileSwitched: "Now using “{name}”.",
+      profileCurrent: "Current",
       darkMode: "Dark mode",
       updateApp: "Update",
       updating: "Updating app…",
@@ -1943,6 +1998,24 @@ const I18N = {
       yearSelect: "Elegir año",
       language: "Idioma",
       appMenuAria: "Menú de la aplicación",
+      profile: "Perfil",
+      profilesTitle: "Perfiles",
+      profilesNote: "Separá los datos por persona o compañía. Cada perfil tiene sus propios años, precios, deudas y extras.",
+      profileNew: "Nuevo perfil",
+      profileRename: "Renombrar perfil",
+      profileDelete: "Eliminar perfil",
+      profileDeleteTitle: "Eliminar perfil",
+      profileDeleteBody: "¿Eliminar “{name}” y todos sus datos? No se puede deshacer.",
+      profileName: "Nombre del perfil",
+      profileNamePlaceholder: "Ej.: Mi compañía",
+      profileNameRequired: "Escribe un nombre.",
+      profileNameTaken: "Ese nombre ya está en uso.",
+      profileCannotDelete: "Tenés que tener al menos un perfil.",
+      profileCreated: "Perfil “{name}” creado.",
+      profileRenamed: "Perfil renombrado.",
+      profileDeleted: "Perfil eliminado.",
+      profileSwitched: "Ahora usás “{name}”.",
+      profileCurrent: "Actual",
       darkMode: "Modo oscuro",
       updateApp: "Actualizar",
       updating: "Actualizando la app…",
@@ -2179,6 +2252,24 @@ const I18N = {
       yearSelect: "Yilni tanlash",
       language: "Til",
       appMenuAria: "Ilova menyusi",
+      profile: "Profil",
+      profilesTitle: "Profillar",
+      profilesNote: "Ma’lumotlarni har bir shaxs yoki kompaniya uchun alohida saqlang. Har bir profilning o‘z yillari, narxlari, qarzlari va qo‘shimcha ishlari bor.",
+      profileNew: "Yangi profil",
+      profileRename: "Profil nomini o‘zgartirish",
+      profileDelete: "Profilni o‘chirish",
+      profileDeleteTitle: "Profilni o‘chirish",
+      profileDeleteBody: "“{name}” va uning barcha ma’lumotlari o‘chirilsinmi? Buni qaytarib bo‘lmaydi.",
+      profileName: "Profil nomi",
+      profileNamePlaceholder: "Masalan: Mening kompaniyam",
+      profileNameRequired: "Nom kiriting.",
+      profileNameTaken: "Bu nom allaqachon ishlatilgan.",
+      profileCannotDelete: "Kamida bitta profil kerak.",
+      profileCreated: "“{name}” profili yaratildi.",
+      profileRenamed: "Profil nomi o‘zgartirildi.",
+      profileDeleted: "Profil o‘chirildi.",
+      profileSwitched: "Endi “{name}” ishlatiladi.",
+      profileCurrent: "Joriy",
       darkMode: "Qorong‘i rejim",
       updateApp: "Yangilash",
       updating: "Ilova yangilanmoqda…",
@@ -2416,6 +2507,24 @@ const I18N = {
       yearSelect: "Выбрать год",
       language: "Язык",
       appMenuAria: "Меню приложения",
+      profile: "Профиль",
+      profilesTitle: "Профили",
+      profilesNote: "Храните данные отдельно для каждого человека или компании. У каждого профиля свои годы, цены, долги и халтуры.",
+      profileNew: "Новый профиль",
+      profileRename: "Переименовать профиль",
+      profileDelete: "Удалить профиль",
+      profileDeleteTitle: "Удалить профиль",
+      profileDeleteBody: "Удалить «{name}» и все его данные? Это нельзя отменить.",
+      profileName: "Название профиля",
+      profileNamePlaceholder: "Напр.: Моя компания",
+      profileNameRequired: "Введите название.",
+      profileNameTaken: "Это название уже используется.",
+      profileCannotDelete: "Нужен хотя бы один профиль.",
+      profileCreated: "Профиль «{name}» создан.",
+      profileRenamed: "Профиль переименован.",
+      profileDeleted: "Профиль удалён.",
+      profileSwitched: "Теперь используется «{name}».",
+      profileCurrent: "Текущий",
       darkMode: "Тёмный режим",
       updateApp: "Обновить",
       updating: "Обновление приложения…",
@@ -2654,6 +2763,24 @@ I18N.ky = {
             "yearSelect": "Жылды тандаңыз",
             "language": "Тил",
             "appMenuAria": "Колдонмонун менюсу",
+      "profile": "Профиль",
+      "profilesTitle": "Профилдер",
+      "profilesNote": "Маалыматтарды ар бир адам же компания үчүн өзүнчө сактаңыз. Ар бир профилдин өз жылдары, баалары, карыздары жана кошумча жумуштары бар.",
+      "profileNew": "Жаңы профиль",
+      "profileRename": "Профилдин атын өзгөртүү",
+      "profileDelete": "Профилди жок кылуу",
+      "profileDeleteTitle": "Профилди жок кылуу",
+      "profileDeleteBody": "«{name}» жана анын бардык маалыматтары жок кылынсынбы? Бул кайтарылбайт.",
+      "profileName": "Профилдин аты",
+      "profileNamePlaceholder": "Мисалы: Менин компаниям",
+      "profileNameRequired": "Ат жазыңыз.",
+      "profileNameTaken": "Бул ат мурун колдонулган.",
+      "profileCannotDelete": "Жок дегенде бир профиль керек.",
+      "profileCreated": "«{name}» профили түзүлдү.",
+      "profileRenamed": "Профилдин аты өзгөртүлдү.",
+      "profileDeleted": "Профиль жок кылынды.",
+      "profileSwitched": "Эми «{name}» колдонулат.",
+      "profileCurrent": "Учурдагы",
             "darkMode": "Караңгы режим",
             "updateApp": "Жаңыртуу",
             "updating": "Колдонмо жаңыртылууда…",
@@ -2891,6 +3018,24 @@ I18N.ro = {
             "yearSelect": "Alege anul",
             "language": "Limbă",
             "appMenuAria": "Meniul aplicației",
+      "profile": "Profil",
+      "profilesTitle": "Profiluri",
+      "profilesNote": "Păstrează datele separat pentru fiecare persoană sau companie. Fiecare profil are propriii ani, prețuri, datorii și lucrări extra.",
+      "profileNew": "Profil nou",
+      "profileRename": "Redenumește profilul",
+      "profileDelete": "Șterge profilul",
+      "profileDeleteTitle": "Șterge profilul",
+      "profileDeleteBody": "Ștergi „{name}” și toate datele sale? Nu se poate anula.",
+      "profileName": "Numele profilului",
+      "profileNamePlaceholder": "Ex.: Compania mea",
+      "profileNameRequired": "Introdu un nume.",
+      "profileNameTaken": "Acest nume este deja folosit.",
+      "profileCannotDelete": "Ai nevoie de cel puțin un profil.",
+      "profileCreated": "Profilul „{name}” a fost creat.",
+      "profileRenamed": "Profil redenumit.",
+      "profileDeleted": "Profil șters.",
+      "profileSwitched": "Acum folosești „{name}”.",
+      "profileCurrent": "Actual",
             "darkMode": "Mod întunecat",
             "updateApp": "Actualizează",
             "updating": "Se actualizează aplicația…",
@@ -3539,27 +3684,34 @@ function officialSalary(){
   return normalizeOfficialSalary(state.officialSalary);
 }
 
-function loadState(){
-  let rawText = null;
-  try {
-    rawText = localStorage.getItem(STORAGE_KEY);
-  } catch (error){
-    return {state: seedState(), fresh: true, warning: false};
-  }
-  if (!rawText) return {state: seedState(), fresh: true, warning: false};
+const PROFILES_VERSION = 2;
+let profiles = [];
+let activeProfileId = null;
 
-  let raw = null;
-  try {
-    raw = JSON.parse(rawText);
-  } catch (error){
-    try { localStorage.setItem(STORAGE_KEY + "-corrupt-" + Date.now(), rawText); } catch (ignore){}
-    return {state: seedState(), fresh: true, warning: true};
-  }
+function newProfileId(){
+  return "profile-" + Date.now() + "-" + Math.random().toString(36).slice(2, 7);
+}
 
-  if (!raw || typeof raw !== "object" || !raw.years || typeof raw.years !== "object"){
-    return {state: seedState(), fresh: true, warning: true};
-  }
+function normalizeProfileName(value){
+  return String(value ?? "").replace(/\s+/g, " ").trim().slice(0, 40);
+}
 
+function activeProfile(){
+  return profiles.find(profile => profile.id === activeProfileId) || profiles[0] || null;
+}
+
+function bindActiveProfile(){
+  const profile = activeProfile();
+  if (profile) profile.data = state;
+}
+
+function setActiveState(nextState){
+  state = nextState;
+  bindActiveProfile();
+}
+
+function normalizeState(raw){
+  if (!raw || typeof raw !== "object" || !raw.years || typeof raw.years !== "object") return null;
   const years = {};
   for (const [key, value] of Object.entries(raw.years)){
     const year = parseInt(key, 10);
@@ -3567,27 +3719,235 @@ function loadState(){
       years[String(year)] = normalizeYear(value);
     }
   }
-  if (!Object.keys(years).length){
-    return {state: seedState(), fresh: true, warning: true};
-  }
-
+  if (!Object.keys(years).length) return null;
   let activeYear = parseInt(raw.activeYear, 10);
   if (!years[String(activeYear)]){
     activeYear = Number(Object.keys(years).sort((a, b) => Number(a) - Number(b))[0]);
   }
-
   return {
-    state: {
-      version: 1,
-      activeYear,
-      years,
-      debts: normalizeDebts(raw.debts),
-      extra: normalizeExtra(raw.extra),
-      officialSalary: normalizeOfficialSalary(raw.officialSalary)
-    },
-    fresh: false,
-    warning: false
+    version: 1,
+    activeYear,
+    years,
+    debts: normalizeDebts(raw.debts),
+    extra: normalizeExtra(raw.extra),
+    officialSalary: normalizeOfficialSalary(raw.officialSalary)
   };
+}
+
+function workspaceFromState(data, fresh, warning){
+  const profile = { id: newProfileId(), name: "Principal", data };
+  return { profiles: [profile], activeProfileId: profile.id, fresh, warning };
+}
+
+function loadWorkspace(){
+  let rawText = null;
+  try {
+    rawText = localStorage.getItem(STORAGE_KEY);
+  } catch (error){
+    return workspaceFromState(seedState(), true, false);
+  }
+  if (!rawText) return workspaceFromState(seedState(), true, false);
+
+  let raw = null;
+  try {
+    raw = JSON.parse(rawText);
+  } catch (error){
+    try { localStorage.setItem(STORAGE_KEY + "-corrupt-" + Date.now(), rawText); } catch (ignore){}
+    return workspaceFromState(seedState(), true, true);
+  }
+
+  if (raw && raw.version === PROFILES_VERSION && Array.isArray(raw.profiles)){
+    const list = [];
+    for (const profile of raw.profiles){
+      if (!profile || typeof profile !== "object") continue;
+      const data = normalizeState(profile.data);
+      if (!data) continue;
+      list.push({
+        id: String(profile.id || newProfileId()),
+        name: normalizeProfileName(profile.name) || "Principal",
+        data
+      });
+    }
+    if (list.length){
+      const active = list.some(profile => profile.id === raw.activeProfileId)
+        ? raw.activeProfileId
+        : list[0].id;
+      return { profiles: list, activeProfileId: active, fresh: false, warning: false };
+    }
+  }
+
+  const migrated = normalizeState(raw);
+  if (migrated) return workspaceFromState(migrated, false, false);
+  return workspaceFromState(seedState(), true, true);
+}
+
+function renderProfileName(){
+  const node = $("#currentProfileName");
+  if (!node) return;
+  const profile = activeProfile();
+  node.textContent = profile ? profile.name : "Principal";
+}
+
+function profileNameTaken(name, exceptId){
+  const normalized = normalizeProfileName(name).toLowerCase();
+  return profiles.some(profile => profile.id !== exceptId && profile.name.toLowerCase() === normalized);
+}
+
+function renderProfileList(){
+  const list = $("#profileList");
+  if (!list) return;
+  list.innerHTML = profiles.map(profile => {
+    const active = profile.id === activeProfileId;
+    return `
+      <div class="profile-row${active ? " active" : ""}" data-profile-id="${esc(profile.id)}">
+        <button type="button" class="profile-select" data-profile-id="${esc(profile.id)}">
+          <span class="profile-mark" aria-hidden="true">${active ? "✓" : ""}</span>
+          <b>${esc(profile.name)}</b>
+          ${active ? `<small>${esc(t("profileCurrent"))}</small>` : ""}
+        </button>
+        <button type="button" class="profile-icon" data-act="rename" data-profile-id="${esc(profile.id)}" aria-label="${esc(t("profileRename"))}">✎</button>
+        ${profiles.length > 1 ? `<button type="button" class="profile-icon danger" data-act="delete" data-profile-id="${esc(profile.id)}" aria-label="${esc(t("profileDelete"))}">×</button>` : ""}
+      </div>`;
+  }).join("");
+}
+
+function openProfiles(){
+  closeAppMenu();
+  renderProfileList();
+  const backdrop = $("#profileBackdrop");
+  if (!backdrop) return;
+  backdrop.hidden = false;
+  backdrop.classList.add("show");
+  setTimeout(() => {
+    const close = $("#profileClose");
+    if (close) close.focus();
+  }, 60);
+}
+
+function closeProfiles(){
+  const backdrop = $("#profileBackdrop");
+  if (!backdrop) return;
+  backdrop.classList.remove("show");
+  backdrop.hidden = true;
+}
+
+function resetUiForProfile(){
+  if (state.activeYear === CURRENT_YEAR){
+    ui.month = CURRENT_MONTH;
+    ui.day = CURRENT_DAY;
+  } else {
+    ui.month = 0;
+    ui.day = 1;
+  }
+  ui.extraMonth = ui.month;
+  ui.priceMonth = ui.month;
+}
+
+function switchProfile(id){
+  const profile = profiles.find(item => item.id === id);
+  if (!profile) return;
+  if (profile.id !== activeProfileId){
+    saveNow();
+    activeProfileId = profile.id;
+    setActiveState(profile.data);
+    resetUiForProfile();
+    saveNow();
+    renderAll();
+    renderProfileName();
+  }
+  closeProfiles();
+  toast(t("profileSwitched", {name: profile.name}));
+}
+
+async function createProfile(){
+  closeProfiles();
+  const name = await showModal({
+    title: t("profileNew"),
+    body: `<p class="hint">${esc(t("profilesNote"))}</p>`,
+    input: {
+      label: t("profileName"),
+      placeholder: t("profileNamePlaceholder"),
+      maxlength: 40,
+      validate: value => !value ? t("profileNameRequired") : (profileNameTaken(value) ? t("profileNameTaken") : "")
+    },
+    confirmText: t("accept")
+  });
+  if (name === null){
+    openProfiles();
+    return;
+  }
+  saveNow();
+  const data = seedState();
+  const profile = { id: newProfileId(), name: normalizeProfileName(name), data };
+  profiles.push(profile);
+  activeProfileId = profile.id;
+  setActiveState(data);
+  resetUiForProfile();
+  saveNow();
+  renderAll();
+  renderProfileName();
+  openProfiles();
+  toast(t("profileCreated", {name: profile.name}));
+}
+
+async function renameProfile(id){
+  const profile = profiles.find(item => item.id === id);
+  if (!profile) return;
+  closeProfiles();
+  const name = await showModal({
+    title: t("profileRename"),
+    input: {
+      label: t("profileName"),
+      value: profile.name,
+      placeholder: t("profileNamePlaceholder"),
+      maxlength: 40,
+      validate: value => !value ? t("profileNameRequired") : (profileNameTaken(value, id) ? t("profileNameTaken") : "")
+    },
+    confirmText: t("save")
+  });
+  if (name === null){
+    openProfiles();
+    return;
+  }
+  profile.name = normalizeProfileName(name);
+  bindActiveProfile();
+  saveNow();
+  renderProfileName();
+  renderProfileList();
+  openProfiles();
+  toast(t("profileRenamed"));
+}
+
+async function deleteProfile(id){
+  const profile = profiles.find(item => item.id === id);
+  if (!profile) return;
+  if (profiles.length <= 1){
+    toast(t("profileCannotDelete"));
+    return;
+  }
+  closeProfiles();
+  const confirmed = await confirmDialog(
+    t("profileDeleteTitle"),
+    t("profileDeleteBody", {name: esc(profile.name)}),
+    t("profileDelete"),
+    true
+  );
+  if (!confirmed){
+    openProfiles();
+    return;
+  }
+  saveNow();
+  profiles = profiles.filter(item => item.id !== id);
+  if (activeProfileId === id){
+    activeProfileId = profiles[0].id;
+    setActiveState(profiles[0].data);
+    resetUiForProfile();
+  }
+  saveNow();
+  renderAll();
+  renderProfileName();
+  openProfiles();
+  toast(t("profileDeleted"));
 }
 
 function currentYearData(){
@@ -3741,7 +4101,12 @@ function saveNow(){
   clearTimeout(saveTimer);
   saveTimer = null;
   try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    bindActiveProfile();
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({
+      version: PROFILES_VERSION,
+      activeProfileId,
+      profiles
+    }));
     setSaveBadge("ok");
     if (typeof queueSyncPush === "function") queueSyncPush();
     return true;
@@ -5578,16 +5943,18 @@ async function clearAllData(){
   });
   if (typed === null) return;
 
-  state = {
+  setActiveState({
     version: 1,
     activeYear: CURRENT_YEAR,
     years: {[String(CURRENT_YEAR)]: makeYear(DEFAULT_PRICES)},
     debts: [],
     extra: [],
     officialSalary: DEFAULT_OFFICIAL_SALARY
-  };
+  });
   ui.month = CURRENT_MONTH;
   ui.day = CURRENT_DAY;
+  ui.extraMonth = CURRENT_MONTH;
+  ui.priceMonth = CURRENT_MONTH;
   saveNow();
   renderAll();
   toast(t("allDeleted"));
@@ -5643,6 +6010,10 @@ function bindEvents(){
     toggleAppMenu();
   });
   $("#appMenu").addEventListener("click", event => {
+    if (event.target.closest("#btnProfiles")){
+      openProfiles();
+      return;
+    }
     if (event.target.closest("#btnLanguages")){
       const submenu = $("#languageSubmenu");
       const button = $("#btnLanguages");
@@ -5669,6 +6040,25 @@ function bindEvents(){
   });
   document.addEventListener("click", event => {
     if (!event.target.closest(".brand-wrap")) closeAppMenu();
+  });
+
+  $("#profileClose").addEventListener("click", closeProfiles);
+  $("#profileAdd").addEventListener("click", createProfile);
+  $("#profileBackdrop").addEventListener("click", event => {
+    if (event.target === $("#profileBackdrop")) closeProfiles();
+  });
+  $("#profileList").addEventListener("click", event => {
+    const action = event.target.closest("[data-act]");
+    const row = event.target.closest("[data-profile-id]");
+    if (!row) return;
+    const id = row.dataset.profileId;
+    if (!id) return;
+    if (action && action.dataset.act === "rename") renameProfile(id);
+    else if (action && action.dataset.act === "delete") deleteProfile(id);
+    else switchProfile(id);
+  });
+  document.addEventListener("keydown", event => {
+    if (event.key === "Escape" && !$("#profileBackdrop").hidden) closeProfiles();
   });
 
   $("#officialSalary").addEventListener("input", () => {
@@ -6016,7 +6406,14 @@ function syncRender(){
 }
 
 function syncData(){
+  bindActiveProfile();
   return {
+    activeProfileId,
+    profiles: profiles.map(profile => ({
+      id: profile.id,
+      name: profile.name,
+      data: JSON.parse(JSON.stringify(profile.data))
+    })),
     activeYear: state.activeYear,
     years: JSON.parse(JSON.stringify(state.years)),
     debts: JSON.parse(JSON.stringify(state.debts || [])),
@@ -6143,31 +6540,38 @@ async function syncWriteGist(token, gistId, data, secret){
 }
 
 function applySyncData(data){
-  if (!data || !data.years || typeof data.years !== "object") throw new Error("La nube no tiene datos válidos.");
-  const years = {};
-  for (const [key, value] of Object.entries(data.years)){
-    const year = parseInt(key, 10);
-    if (Number.isInteger(year) && year >= 2019 && year <= 2100){
-      years[String(year)] = normalizeYear(value);
-    }
-  }
-  if (!Object.keys(years).length) throw new Error("La nube no tiene años válidos.");
-  let activeYear = parseInt(data.activeYear, 10);
-  if (!years[String(activeYear)]) activeYear = Number(Object.keys(years).sort((a, b) => Number(a) - Number(b))[0]);
   syncApplying = true;
   try {
-    state = {
-      version: 1,
-      activeYear,
-      years,
-      debts: normalizeDebts(data.debts),
-      extra: normalizeExtra(data.extra),
-      officialSalary: normalizeOfficialSalary(data.officialSalary)
-    };
-    ui.month = Math.min(11, Math.max(0, ui.month));
-    ui.day = Math.max(1, Math.min(ui.day, daysInMonth(state.activeYear, ui.month)));
+    const nextProfiles = [];
+    if (data && Array.isArray(data.profiles)){
+      for (const rawProfile of data.profiles){
+        if (!rawProfile || typeof rawProfile !== "object") continue;
+        const normalized = normalizeState(rawProfile.data);
+        if (!normalized) continue;
+        let id = String(rawProfile.id || newProfileId());
+        if (nextProfiles.some(profile => profile.id === id)) id = newProfileId();
+        nextProfiles.push({
+          id,
+          name: normalizeProfileName(rawProfile.name) || "Principal",
+          data: normalized
+        });
+      }
+    }
+    if (!nextProfiles.length){
+      const normalized = normalizeState(data);
+      if (!normalized) throw new Error("La nube no tiene datos válidos.");
+      nextProfiles.push({ id: newProfileId(), name: "Principal", data: normalized });
+    }
+    profiles = nextProfiles;
+    const requestedProfile = data && data.activeProfileId;
+    activeProfileId = profiles.some(profile => profile.id === requestedProfile)
+      ? requestedProfile
+      : profiles[0].id;
+    setActiveState(activeProfile().data);
+    resetUiForProfile();
     saveNow();
     renderAll();
+    renderProfileName();
   } finally {
     syncApplying = false;
   }
@@ -6394,8 +6798,10 @@ function syncInit(){
 
 
 function init(){
-  const loaded = loadState();
-  state = loaded.state;
+  const loaded = loadWorkspace();
+  profiles = loaded.profiles;
+  activeProfileId = loaded.activeProfileId;
+  setActiveState((activeProfile() && activeProfile().data) || seedState());
   applyTheme(loadTheme(), false);
   applyLanguage(loadLang(), false);
 
@@ -6410,9 +6816,12 @@ function init(){
     ui.month = 0;
     ui.day = 1;
   }
+  ui.extraMonth = ui.month;
+  ui.priceMonth = ui.month;
 
   bindEvents();
   renderAll();
+  renderProfileName();
   setSaveBadge("ok");
   syncInit();
 
