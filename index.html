@@ -1652,6 +1652,7 @@
           </div>
           <label class="sync-label" for="syncCodeOut">Código para el otro dispositivo</label>
           <input class="sync-input sync-code-out" id="syncCodeOut" type="text" readonly>
+          <button type="button" class="btn ghost sync-wide" id="syncShowQr">Ver mi QR y código</button>
           <div class="sync-actions">
             <button type="button" class="btn ghost" id="syncCopy">Copiar código</button>
             <button type="button" class="btn primary" id="syncPush">Subir</button>
@@ -6367,6 +6368,7 @@ function bindSyncEvents(){
   $("#syncScanBtn")?.addEventListener("click", openSyncScan);
   $("#syncPasteBtn")?.addEventListener("click", openSyncPaste);
   $("#syncGenerateBtn")?.addEventListener("click", syncGenerate);
+  $("#syncShowQr")?.addEventListener("click", openSyncQr);
   $("#syncQrClose")?.addEventListener("click", closeSyncQr);
   $("#syncQrCopy")?.addEventListener("click", syncCopyCode);
   $("#syncQrBackdrop")?.addEventListener("click", event => {
