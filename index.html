@@ -748,7 +748,7 @@
   .sync-qr-wrap .hint{margin:0 !important;text-align:center}
   .sync-paste-modal,.sync-scan-modal,.sync-qr-modal{max-width:430px}
   .sync-qr-modal{text-align:center}
-  .sync-qr-modal .sync-qr{max-width:260px;margin:10px auto}
+  .sync-qr-modal .sync-qr{max-width:330px;margin:10px auto}
   .sync-qr-modal #syncQrCodeOut{margin:8px 0 2px;font-size:10px}
   .sync-paste-text{width:100%;min-height:96px;resize:vertical;padding:11px;line-height:1.4;font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-size:11px}
   .sync-video-wrap{position:relative;width:100%;aspect-ratio:1/1;max-height:52vh;overflow:hidden;border-radius:12px;background:#111;margin:8px 0}
@@ -1632,9 +1632,9 @@
           <button type="button" class="btn ghost" id="syncPasteBtn"><span>⌨</span> Pegar código</button>
           <button type="button" class="btn ghost sync-generate" id="syncGenerateBtn"><span>▣</span> Generar mi QR y código</button>
         </div>
-        <p class="hint sync-privacy">El QR y el código permiten conectar otro dispositivo. No los compartas con personas que no quieras que accedan a tu nube.</p>
+        <p class="hint sync-privacy">El QR y el código transfieren una copia de tus datos sin nube. Si después cambiás datos, generá un QR nuevo. No los compartas: contienen tu información.</p>
         <div id="syncSetup">
-          <div class="sync-divider"><span>Primera vez: crear la nube</span></div>
+          <div class="sync-divider"><span>Opcional: nube automática entre dispositivos</span></div>
           <label class="sync-label" for="syncToken">Token de GitHub</label>
           <input class="sync-input" id="syncToken" type="password" autocomplete="off" spellcheck="false" placeholder="ghp_…">
           <p class="hint">Creá un token con permiso <b>Gists</b>. Se guarda solo en este dispositivo.</p>
@@ -1765,11 +1765,12 @@
 
 <div class="modal-backdrop" id="syncQrBackdrop" hidden>
   <div class="modal sync-qr-modal" role="dialog" aria-modal="true" aria-labelledby="syncQrTitle">
-    <h3 id="syncQrTitle">Mi QR para sincronizar</h3>
-    <p class="hint">Mostrá este QR en el otro dispositivo o copiá el código. Al escanearlo, ese dispositivo queda conectado a tu nube.</p>
+    <h3 id="syncQrTitle">Transferir datos</h3>
+    <p class="hint">Mostrá este QR en el otro dispositivo o copiá el código. No necesita nube ni token: los datos viajan dentro del QR o del código.</p>
     <div class="sync-qr" id="syncQrLarge"></div>
+    <p class="hint" id="syncQrStatus"></p>
     <input class="sync-input sync-code-out" id="syncQrCodeOut" type="text" readonly>
-    <p class="hint sync-privacy">El QR y el código dan acceso a tu nube. No los compartas con otras personas.</p>
+    <p class="hint sync-privacy">Este QR contiene una copia de tus datos. No lo compartas con otras personas.</p>
     <div class="modal-actions">
       <button type="button" class="btn ghost" id="syncQrCopy">Copiar código</button>
       <button type="button" class="btn primary" id="syncQrClose">Cerrar</button>
@@ -5730,21 +5731,92 @@ function syncDecodeCode(raw, fallbackToken = ""){
   return { token, gistId: code.slice(0, split), secret: code.slice(split + 1) };
 }
 
-function syncRenderQr(){
-  const nodes = [$("#syncQr"), $("#syncQrLarge")].filter(Boolean);
-  if (!nodes.length) return;
-  const code = syncCodeText();
-  for (const node of nodes) node.innerHTML = "";
-  if (!code || typeof qrcode !== "function") return;
+function renderQrInto(node, code){
+  if (!node) return false;
+  node.innerHTML = "";
+  if (!code || typeof qrcode !== "function") return false;
   try {
     const qr = qrcode(0, "M");
     qr.addData(code);
     qr.make();
-    const svg = qr.createSvgTag({ cellSize: 5, margin: 2, scalable: true });
-    for (const node of nodes) node.innerHTML = svg;
+    node.innerHTML = qr.createSvgTag({ cellSize: 5, margin: 2, scalable: true });
+    return true;
   } catch (error){
-    for (const node of nodes) node.innerHTML = "";
+    node.innerHTML = "";
+    return false;
   }
+}
+
+function syncRenderQr(){
+  const node = $("#syncQr");
+  if (node) renderQrInto(node, syncCodeText());
+}
+
+async function syncCompressText(text){
+  if (typeof CompressionStream !== "function") return null;
+  const stream = new Blob([text]).stream().pipeThrough(new CompressionStream("gzip"));
+  const buffer = await new Response(stream).arrayBuffer();
+  return bytesToB64Url(new Uint8Array(buffer));
+}
+
+async function syncDecompressText(encoded){
+  if (typeof DecompressionStream !== "function"){
+    throw new Error("Este dispositivo no puede leer este código comprimido.");
+  }
+  const stream = new Blob([b64UrlToBytes(encoded)]).stream().pipeThrough(new DecompressionStream("gzip"));
+  return await new Response(stream).text();
+}
+
+async function syncBuildTransferCode(){
+  const text = JSON.stringify({ v: 1, data: syncData() });
+  const compressed = await syncCompressText(text);
+  if (compressed) return "MSD1." + compressed;
+  return "MSD0." + bytesToB64Url(new TextEncoder().encode(text));
+}
+
+async function syncReadTransferCode(raw){
+  const code = String(raw || "").trim();
+  let text;
+  if (code.startsWith("MSD1.")){
+    text = await syncDecompressText(code.slice(5));
+  } else if (code.startsWith("MSD0.")){
+    text = new TextDecoder().decode(b64UrlToBytes(code.slice(5)));
+  } else {
+    throw new Error("El código no es una transferencia de datos.");
+  }
+  let payload;
+  try { payload = JSON.parse(text); } catch (error){ throw new Error("El código de transferencia está dañado."); }
+  if (!payload || !payload.data || (!payload.data.years && !Array.isArray(payload.data.profiles))){
+    throw new Error("El código no contiene datos válidos.");
+  }
+  return payload.data;
+}
+
+async function syncImportTransfer(raw){
+  if (syncBusy) return false;
+  let data;
+  try {
+    data = await syncReadTransferCode(raw);
+  } catch (error){
+    syncSetError(error.message);
+    const pasteError = $("#syncPasteError");
+    if (pasteError) pasteError.textContent = error.message;
+    toast(error.message);
+    return false;
+  }
+  const confirmed = await confirmDialog(
+    "Transferir datos",
+    "Se reemplazarán los datos de este dispositivo por los del código. ¿Continuar?",
+    "Importar"
+  );
+  if (!confirmed) return false;
+  closeSyncPaste();
+  closeSyncScan();
+  closeSyncQr();
+  applySyncData(data);
+  syncSetError("");
+  toast("Datos transferidos.");
+  return true;
 }
 
 function syncSetError(message){
@@ -5999,6 +6071,11 @@ async function syncCreateNew(){
 
 async function syncConnectCode(rawCode, fallbackToken = "", autoPull = true){
   if (syncBusy) return;
+  const transferCode = String(rawCode || "").trim();
+  if (transferCode.startsWith("MSD1.") || transferCode.startsWith("MSD0.")){
+    await syncImportTransfer(transferCode);
+    return;
+  }
   let config;
   try {
     config = syncDecodeCode(rawCode, fallbackToken);
@@ -6080,15 +6157,20 @@ async function submitSyncPaste(){
   await syncConnectCode(code, tokenInput ? tokenInput.value.trim() : "", true);
 }
 
-function openSyncQr(){
-  if (!syncIsConnected()) return;
+function openSyncQrCode(code){
   const backdrop = $("#syncQrBackdrop");
   if (!backdrop) return;
   const codeInput = $("#syncQrCodeOut");
-  if (codeInput) codeInput.value = syncCodeText();
-  syncRenderQr();
+  if (codeInput) codeInput.value = code;
+  const ok = renderQrInto($("#syncQrLarge"), code);
+  const status = $("#syncQrStatus");
+  if (status) status.textContent = ok ? "" : "El QR es demasiado grande. Usá Copiar código.";
   backdrop.hidden = false;
   backdrop.classList.add("show");
+}
+
+async function openSyncQr(){
+  await syncGenerate();
 }
 
 function closeSyncQr(){
@@ -6100,27 +6182,14 @@ function closeSyncQr(){
 
 async function syncGenerate(){
   if (syncBusy) return;
-  if (syncIsConnected()){
-    openSyncQr();
+  let code;
+  try {
+    code = await syncBuildTransferCode();
+  } catch (error){
+    toast(error.message);
     return;
   }
-  const tokenInput = $("#syncToken");
-  const token = await showModal({
-    title: "Generar mi QR y código",
-    body: `<p class="hint">Para generar el QR primero hay que crear la nube. Necesitás un token de GitHub con permiso <b>Gists</b>. El token se guarda solo en este dispositivo.</p><p class="hint">Después podrás escanear el QR o pegar el código en el otro dispositivo, sin volver a escribir el token.</p>`,
-    input: {
-      label: "Token de GitHub",
-      type: "password",
-      value: tokenInput ? tokenInput.value : "",
-      placeholder: "ghp_…",
-      validate: value => value ? "" : "Pegá un token de GitHub."
-    },
-    confirmText: "Crear nube y generar QR"
-  });
-  if (token === null) return;
-  if (tokenInput) tokenInput.value = token;
-  const created = await syncCreateNew();
-  if (created) openSyncQr();
+  openSyncQrCode(code);
 }
 
 let syncScanStream = null;
@@ -6322,13 +6391,17 @@ async function syncDisconnect(){
 }
 
 async function syncCopyCode(){
-  const code = syncCodeText();
+  const modal = $("#syncQrBackdrop");
+  const code = modal && !modal.hidden
+    ? ($("#syncQrCodeOut") ? $("#syncQrCodeOut").value : "")
+    : syncCodeText();
   if (!code) return;
   try {
     await navigator.clipboard.writeText(code);
     toast("Código copiado.");
   } catch (error){
-    const input = $("#syncQrCodeOut") || $("#syncCodeOut");
+    const modal = $("#syncQrBackdrop");
+    const input = (modal && !modal.hidden ? $("#syncQrCodeOut") : $("#syncCodeOut"));
     if (input){ input.select(); document.execCommand("copy"); toast("Código copiado."); }
   }
 }
